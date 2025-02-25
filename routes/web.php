@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\User\ReportController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\SuperAdminController;
@@ -21,9 +22,15 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {
     // User Dashboard (Only Users in DEFAULT Agency)
-    Route::get('/user/dashboard', [UserController::class, 'index'])
-        ->middleware('role:user,DEFAULT')
-        ->name('user.dashboard');
+
+    Route::middleware(['role:user,DEFAULT'])->group(function () {
+        Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
+
+        Route::get('user/reports/create', [ReportController::class, 'create'])->name('user.reports.create');
+        Route::post('user/reports', [ReportController::class, 'store'])->name('user.reports.store');
+        Route::get('user/reports', [ReportController::class, 'index'])->name('user.reports.index');
+    });
+   
 
     // Admin Dashboards
     Route::middleware('role:admin,PNP')->get('/admin/pnp-dashboard', [AdminController::class, 'pnpDashboard'])->name('admin.pnp');
