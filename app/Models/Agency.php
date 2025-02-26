@@ -10,10 +10,17 @@ class Agency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code'];
+    protected $fillable = ['name'];
 
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
+    }
+    public function incidentTypes() {
+        return $this->belongsToMany(IncidentType::class, 'agency_incident_type');
+    }
+    public function reports()
+    {
+        return $this->belongsToMany(Report::class, 'agency_report');
     }
 }

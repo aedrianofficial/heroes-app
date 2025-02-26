@@ -51,12 +51,13 @@
     </style>
 @endsection
 @section('content')
-    <div class="card mt-5">
+    <div class="card my-5">
         <h5 class="card-header">Submit a Report</h5>
         <div class="card-body">
 
             <form method="POST" action="{{ route('user.reports.store') }}" enctype="multipart/form-data">
-              
+                @csrf
+
                 <div class="mb-3">
                     <label class="form-label">Title</label>
                     <input type="text" name="title" class="form-control" required>
@@ -68,14 +69,47 @@
                 </div>
 
                 <div class="mb-3">
-                    <label class="form-label">Select Agency</label>
-                    <select name="agency_id" class="form-select" required>
-                        @foreach (App\Models\Agency::where('name', '!=', 'DEFAULT')->get() as $agency)
-                            <option value="{{ $agency->id }}">{{ $agency->name }}</option>
+                    <label class="form-label">Select Incident Type</label>
+                    <select name="incident_type_id" class="form-select" required>
+                        @foreach (App\Models\IncidentType::all() as $incident)
+                            <option value="{{ $incident->id }}">{{ $incident->name }}</option>
                         @endforeach
                     </select>
                 </div>
+                <!-- Contact Number Selection -->
+                <div class="mb-3">
+                    <label class="form-label">Contact Number:</label>
 
+                    @php
+                        $user = auth()->user();
+                        $savedContact = $user->contacts->first()->contact_number ?? null; // Get first saved contact number
+                    @endphp
+
+                    <!-- Hidden input to detect if checkbox was unchecked -->
+                    <input type="hidden" name="use_saved_number" value="0">
+
+                    <!-- Checkbox for using saved contact number -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="use_saved_number" id="use_saved_number"
+                            value="1" {{ $savedContact ? '' : 'disabled' }}>
+                        <label class="form-check-label" for="use_saved_number">
+                            Use my saved number: <strong>{{ $savedContact ?? 'No number saved' }}</strong>
+                        </label>
+                    </div>
+
+
+                    <!-- Manual input field -->
+                    <div class="input-group mt-2">
+
+                        <input type="text" name="contact_number" id="contact_number" class="form-control"
+                            value="{{ old('contact_number') }}" pattern="\d{11}" maxlength="11"
+                            placeholder="Enter 11-digit number (e.g., 09123456789)">
+                    </div>
+
+                    @error('contact_number')
+                        <small class="text-danger">{{ $message }}</small>
+                    @enderror
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label">Attachments (Optional)</label>
@@ -83,25 +117,26 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="map" class="form-label">Project Location</label>
+                    <label for="map" class="form-label">Location</label>
                     <input type="text" id="searchAddress" class="form-control" placeholder="Search for an address..."
                         style="width: 100%;">
                     <div id="suggestions" class="list-group" style="display: none; max-height: 200px; overflow-y: auto;">
                     </div>
                 </div>
-                @csrf
-                
-                <!-- Hidden Inputs-->
+
+                <!-- Hidden Inputs -->
                 <input type="hidden" name="address" id="address">
                 <input type="hidden" name="latitude" id="latitude">
                 <input type="hidden" name="longitude" id="longitude">
+
                 <!-- Map Container -->
                 <div class="mb-3">
-                    <div id="map" style="height: 300px;"></div> <!-- Specify height for the map -->
+                    <div id="map" style="height: 300px;"></div>
                 </div>
 
                 <button type="submit" class="btn btn-primary">Submit Report</button>
             </form>
+
         </div>
     </div>
 @endsection
@@ -277,6 +312,42 @@
                 return `<div>${addressIcon} Address: ${address}</div>
                 <div>${coordinatesIcon} Coordinates: ${lat.toFixed(5)}, ${lng.toFixed(5)}</div>`;
             }
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const checkbox = document.getElementById('use_saved_number');
+            const contactInput = document.getElementById('contact_number');
+
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    contactInput.value = ''; // Clear input field
+                    contactInput.setAttribute('disabled', 'disabled'); // Disable input
+                } else {
+                    contactInput.removeAttribute('disabled'); // Enable input
+                }
+            });
+
+            contactInput.addEventListener('input', function() {
+                if (this.value.trim().length > 0) {
+                    checkbox.checked = false;
+                }
+            });
+        });
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const contactInput = document.getElementById("contact_number");
+
+            contactInput.addEventListener("input", function(e) {
+                // Remove non-numeric characters
+                this.value = this.value.replace(/\D/g, "");
+
+                // Limit input to exactly 10 digits
+                if (this.value.length > 11) {
+                    this.value = this.value.slice(0, 11);
+                }
+            });
         });
     </script>
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\UserContact;
 use App\Models\UserProfile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,8 +30,10 @@ class RegisterController extends Controller
             'middlename' => 'nullable|string|max:255',
             'lastname' => 'required|string|max:255',
             'extname' => 'nullable|string|max:50',
+            'bday' => 'required|date',
+            'contact_number' => 'required|string|max:11',
         ]);
-    
+
         // Create User with default role_id = 1 and agency_id = 1
         $user = User::create([
             'username' => $request->username,
@@ -39,7 +42,7 @@ class RegisterController extends Controller
             'role_id' => 1, // Default User Role
             'agency_id' => 1, // Default Agency
         ]);
-    
+
         // Create User Profile
         UserProfile::create([
             'user_id' => $user->id,
@@ -47,13 +50,20 @@ class RegisterController extends Controller
             'middlename' => $request->middlename,
             'lastname' => $request->lastname,
             'extname' => $request->extname,
+            'bday' => $request->bday, // Store the birthdate
         ]);
-    
+
+        // Store contact number in user_contacts table
+        UserContact::create([
+            'user_id' => $user->id,
+            'contact_number' => $request->contact_number, // Store contact number
+        ]);
+
         // Log the user in
         Auth::login($user);
-    
+
         // Redirect to the dashboard after registration
-        return redirect()->route('dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
+        return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
     }
-    
+
 }

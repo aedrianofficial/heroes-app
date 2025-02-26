@@ -10,7 +10,7 @@ class UserContact extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'user_id', 'contact', 'telno'
+        'user_id', 'contact_number',
     ];
     public function user(): BelongsTo
     {

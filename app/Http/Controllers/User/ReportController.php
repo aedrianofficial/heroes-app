@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\IncidentType;
 use App\Models\Report;
 use App\Models\ReportAttachment;
 use Illuminate\Http\Request;
@@ -17,24 +18,48 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+    
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
-            'agency_id' => 'required|exists:agencies,id',
+            'incident_type_id' => 'required|exists:incident_types,id',
             'report_attachments' => 'nullable',
             'report_attachments.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'address' => 'required|string',
+            'contact_number' => 'nullable|string|max:11',
             'latitude' => 'required|numeric',
             'longitude' => 'required|numeric',
         ]);
     
+        // Determine which contact number to use
+        if ($request->use_saved_number == 1) {
+            $contactNumber = $user->contacts->first()->contact_number ?? null;
+        } else {
+            $contactNumber = $request->contact_number;
+        }
+    
+        // Debugging Output
+       
+    
+        if (!$contactNumber) {
+            return redirect()->back()->withErrors(['contact_number' => 'Contact number is required.']);
+        }
+     
+        // Create Report
         $report = Report::create([
             'user_id' => Auth::id(),
-            'agency_id' => $request->agency_id,
+            'incident_type_id' => $request->incident_type_id,
             'title' => $request->title,
             'description' => $request->description,
             'status_id' => 1, // Default to Pending
+            'contact_number' => $contactNumber,
         ]);
+    
+        // Assign Agencies Based on Incident Type
+        $incidentType = IncidentType::find($request->incident_type_id);
+        $agencies = $incidentType->agencies;
+        $report->agencies()->attach($agencies);
     
         // Save Location Data
         $report->location()->create([
@@ -59,11 +84,10 @@ class ReportController extends Controller
         return redirect()->route('user.reports.index')->with('success', 'Report submitted successfully.');
     }
     
-    
-
     public function index()
     {
-        $reports = Report::where('user_id', Auth::id())->latest()->get();
+        $reports = Report::with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])->where('user_id', Auth::id())->latest()->get();
         return view('user.report.index', compact('reports'));
+        
     }
 }
