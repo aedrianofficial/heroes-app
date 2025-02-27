@@ -32,7 +32,7 @@ class IncidentTypeSeeder extends Seeder
 
         // Define agency and their responsibilities
         $agencyIncidentMapping = [
-            ' ' => ['CRIME', 'ROAD ACCIDENT'],
+            'PNP' => ['CRIME', 'ROAD ACCIDENT'],
             'BFP' => ['FIRE'],
             'MDRRMO' => ['DISASTER'],
             'MHO' => ['HEALTH EMERGENCY'],

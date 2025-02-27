@@ -6,15 +6,9 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
-    public function pnpDashboard()
-    {
-        return view('admin.pnp.dashboard');
-    }
+   
 
-    public function bfpDashboard()
-    {
-        return view('admin.bfp.dashboard');
-    }
+   
 
     public function mdrrmoDashboard()
     {
