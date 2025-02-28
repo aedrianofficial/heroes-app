@@ -25,7 +25,7 @@ class ReportController extends Controller
             'description' => 'required|string',
             'incident_type_id' => 'required|exists:incident_types,id',
             'report_attachments' => 'nullable',
-            'report_attachments.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'report_attachments.*' => 'image|mimes:jpeg,png,jpg,gif,webp|max:2048',
             'address' => 'required|string',
             'contact_number' => 'nullable|string|max:11',
             'latitude' => 'required|numeric',

@@ -1,6 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\BfpController;
+use App\Http\Controllers\Admin\CoastGuardController;
+use App\Http\Controllers\Admin\LguController;
+use App\Http\Controllers\Admin\MdrrmoController;
+use App\Http\Controllers\Admin\MhoController;
 use App\Http\Controllers\Admin\PnpController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
@@ -23,8 +27,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {
-    // User Dashboard (Only Users in DEFAULT Agency)
-
+    // User Dashboard (Only Users in DEFAULT)
     Route::middleware(['role:user,DEFAULT'])->group(function () {
         Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
 
@@ -33,6 +36,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('user/reports', [ReportController::class, 'index'])->name('user.reports.index');
     });
     
+    // Philippine National Police (PNP)
     Route::middleware(['role:admin,PNP'])->group(function () {
         Route::get('/admin/pnp-dashboard', [PnpController::class, 'pnpDashboard'])->name('admin.pnp');
         Route::get('admin/pnp/all-reports', [PnpController::class, 'allReports'])->name('admin.pnp.reports');
@@ -41,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/pnp/reports/{id}/resolve', [PnpController::class, 'markAsResolved'])->name('pnp.reports.resolve');
     });
 
+    // Bureau of Fire Protection (BFP)
     Route::middleware(['role:admin,BFP'])->group(function () {
         Route::get('/admin/bfp-dashboard', [BfpController::class, 'bfpDashboard'])->name('admin.bfp');
         Route::get('admin/bfp/all-reports', [BfpController::class, 'allReports'])->name('admin.bfp.reports');
@@ -49,13 +54,41 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/bfp/reports/{id}/resolve', [BfpController::class, 'markAsResolved'])->name('bfp.reports.resolve');
     });
     
-    Route::middleware('role:admin,MDRRMO')->get('/admin/mdrrmo-dashboard', [AdminController::class, 'mdrrmoDashboard'])->name('admin.mdrrmo');
-
-    Route::middleware('role:admin,MHO')->get('/admin/mho-dashboard', [AdminController::class, 'mhoDashboard'])->name('admin.mho');
-
-    Route::middleware('role:admin,COAST GUARD')->get('/admin/coast-guard-dashboard', [AdminController::class, 'coastGuardDashboard'])->name('admin.coastguard');
+    //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
+    Route::middleware( ['role:admin,MDRRMO'])->group(function () {
+         Route::get('/admin/mdrrmo-dashboard', [MdrrmoController::class, 'mdrrmoDashboard'])->name('admin.mdrrmo');
+         Route::get('admin/mdrrmo/all-reports', [MdrrmoController::class, 'allReports'])->name('admin.mdrrmo.reports');
+         Route::get('admin/mdrrmo/reports/{id}/view', [MdrrmoController::class, 'viewReport'])->name('mdrrmo.reports.view');
+         Route::post('admin/mdrrmo/reports/{id}/ongoing', [MdrrmoController::class, 'markAsOngoing'])->name('mdrrmo.reports.ongoing');
+         Route::post('admin/mdrrmo/reports/{id}/resolve', [MdrrmoController::class, 'markAsResolved'])->name('mdrrmo.reports.resolve');
+    });
     
-    Route::middleware('role:admin,LGU')->get('/admin/lgu-dashboard', [AdminController::class, 'lguDashboard'])->name('admin.lgu');
+    //Municipal Health Office (MHO)
+    Route::middleware( ['role:admin,MHO'])->group(function () {
+        Route::get('/admin/mho-dashboard', [MhoController::class, 'mhoDashboard'])->name('admin.mho');
+        Route::get('admin/mho/all-reports', [MhoController::class, 'allReports'])->name('admin.mho.reports');
+        Route::get('admin/mho/reports/{id}/view', [MhoController::class, 'viewReport'])->name('mho.reports.view');
+        Route::post('admin/mho/reports/{id}/ongoing', [MhoController::class, 'markAsOngoing'])->name('mho.reports.ongoing');
+        Route::post('admin/mho/reports/{id}/resolve', [MhoController::class, 'markAsResolved'])->name('mho.reports.resolve');
+    });
+
+    // Coast Guard
+    Route::middleware(['role:admin,COAST GUARD'])->group(function () {
+        Route::get('/admin/coast-guard-dashboard', [CoastGuardController::class, 'coastGuardDashboard'])->name('admin.coastguard');
+        Route::get('admin/coast-guard/all-reports', [CoastGuardController::class, 'allReports'])->name('admin.coastguard.reports');
+        Route::get('admin/coast-guard/reports/{id}/view', [CoastGuardController::class, 'viewReport'])->name('coastguard.reports.view');
+        Route::post('admin/coast-guard/reports/{id}/ongoing', [CoastGuardController::class, 'markAsOngoing'])->name('coastguard.reports.ongoing');
+        Route::post('admin/coast-guard/reports/{id}/resolve', [CoastGuardController::class, 'markAsResolved'])->name('coastguard.reports.resolve');
+    });
+    
+    //Local Government Unit (LGU)
+    Route::middleware(['role:admin,LGU'])->group(function () {
+        Route::get('/admin/lgu-dashboard', [LguController::class, 'lguDashboard'])->name('admin.lgu');
+        Route::get('admin/lgu/all-reports', [LguController::class, 'allReports'])->name('admin.lgu.reports');
+        Route::get('admin/lgu/reports/{id}/view', [LguController::class, 'viewReport'])->name('lgu.reports.view');
+        Route::post('admin/lgu/reports/{id}/ongoing', [LguController::class, 'markAsOngoing'])->name('lgu.reports.ongoing');
+        Route::post('admin/lgu/reports/{id}/resolve', [LguController::class, 'markAsResolved'])->name('lgu.reports.resolve');
+    });
 
     // Super Admin Dashboard (Only Super Admins in DEFAULT Agency)
     Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])

@@ -1,4 +1,4 @@
-@extends('layouts.mho')
+@extends('layouts.coastguard')
 
 @section('content')
     <div class="container">
