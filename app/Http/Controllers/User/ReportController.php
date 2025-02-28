@@ -81,7 +81,7 @@ class ReportController extends Controller
             }
         }
     
-        return redirect()->route('user.reports.index')->with('success', 'Report submitted successfully.');
+        return redirect()->route('user.reports.index')->with('success', 'Report marked as ongoing.');
     }
     
     public function index()

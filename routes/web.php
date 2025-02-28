@@ -90,8 +90,12 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/lgu/reports/{id}/resolve', [LguController::class, 'markAsResolved'])->name('lgu.reports.resolve');
     });
 
-    // Super Admin Dashboard (Only Super Admins in DEFAULT Agency)
-    Route::get('/super-admin/dashboard', [SuperAdminController::class, 'index'])
-        ->middleware('role:super admin,DEFAULT')
-        ->name('superadmin.dashboard');
+    Route::middleware(['role:super admin,DEFAULT'])->group(function () {
+
+        // Super Admin Dashboard (Only Super Admins in DEFAULT Agency)
+        Route::get('/super-admin/dashboard', [SuperAdminController::class, 'superAdminDashboard'])->name('superadmin.dashboard');
+        Route::get('/super-admin/users', [SuperAdminController::class, 'usersList'])->name('superadmin.users');
+        Route::get('/super-admin/users/{id}', [SuperAdminController::class, 'viewUser'])->name('superadmin.users.view');
+
+    });
 });

@@ -134,7 +134,8 @@
                     <div id="map" style="height: 300px;"></div>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Submit Report</button>
+                <button type="submit" class="btn btn-primary" onclick="confirmSubmission(event)">Submit Report</button>
+
             </form>
 
         </div>
@@ -350,4 +351,49 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let successMessage = "{{ session('success') }}";
+            let errorMessage = "{{ session('error') }}";
+    
+            if (successMessage) {
+                Swal.fire({
+                    title: "Success!",
+                    text: successMessage,
+                    icon: "success",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+    
+            if (errorMessage) {
+                Swal.fire({
+                    title: "Error!",
+                    text: errorMessage,
+                    icon: "error",
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        });
+    
+        function confirmSubmission(event) {
+            event.preventDefault();
+    
+            Swal.fire({
+                title: "Are you sure?",
+                text: "Do you want to submit this report?",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#007bff",
+                cancelButtonColor: "#6c757d",
+                confirmButtonText: "Yes, submit!",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    event.target.closest("form").submit();
+                }
+            });
+        }
+    </script>
+    
 @endsection
