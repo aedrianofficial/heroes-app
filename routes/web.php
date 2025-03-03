@@ -13,17 +13,23 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\WebsiteController;
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    return view('website.welcome');
+})->name('welcome');
 
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
 Route::post('/register', [RegisterController::class, 'register'])->name('register');
-Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login.form');
+Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::get('/news', [WebsiteController::class, 'news'])->name('news');
+Route::get('/safety-guide', [WebsiteController::class, 'safetyGuide'])->name('safetyguide');
+Route::get('/about-us', [WebsiteController::class, 'aboutUs'])->name('aboutus');
+Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact');
+
 
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {

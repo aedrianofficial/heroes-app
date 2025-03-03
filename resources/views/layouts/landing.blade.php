@@ -19,14 +19,14 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="{{ asset('asset/css/Control.Geocoder.css') }}" />
-    @yield(section: 'styles')
+    @yield( 'styles')
 </head>
 
 <body>
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
         <div class="container">
-            <a class="navbar-brand" href="#">Heroes App</a>
+            <a class="navbar-brand" href="{{ route('welcome') }}">Heroes App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -35,19 +35,19 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('welcome') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">News</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('news') }}">News</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Safety Guide</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('safetyguide') }}">Safety Guide</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">About Us</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('aboutus') }}">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Contact</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('contact') }}">Contact</a>
                     </li>
 
                 </ul>
@@ -80,8 +80,8 @@
         </div>
     </nav>
 
-    @yield(section: 'content')
-
+    @yield( 'content')
+    
 
 
 
