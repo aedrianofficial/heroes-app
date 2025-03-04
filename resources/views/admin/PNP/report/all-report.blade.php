@@ -6,14 +6,15 @@
         <!--All Reports Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Reports Assigned to PNP</h5>
+                <h5>Reports</h5>
             </div>
             <div class="card-body">
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>Title</th>
+                            <th>Name</th>
                             <th>Incident Type</th>
+                            <th>Description</th>
                             <th>Location</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -22,8 +23,9 @@
                     <tbody>
                         @foreach ($reports as $report)
                             <tr>
-                                <td>{{ $report->title }}</td>
+                                <td>{{ $report->name }}</td>
                                 <td>{{ $report->incidentType->name }}</td>
+                                <td>{{ $report->description }}</td>
                                 <td>{{ $report->location->address }}</td>
                                 <td>
                                     <span
@@ -44,10 +46,10 @@
                                     </form>
                                 </td>
                                 <td>
-                                    <form action="{{ route('pnp.reports.resolve', $report->id) }}" method="POST">
+                                    <form action="{{ route('pnp.reports.complete', $report->id) }}" method="POST">
                                         @csrf
-                                        <button type="submit" onclick="confirmResolve(event)"
-                                            class="btn btn-sm btn-success ">Resolve</button>
+                                        <button type="submit" onclick="confirmComplete(event)"
+                                            class="btn btn-sm btn-success ">Complete</button>
                                     </form>
                                 </td>
                             </tr>
@@ -108,7 +110,7 @@
             });
         }
     </script>
-    <!--Mark as Resolved-->
+    <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "{{ session('success') }}";
@@ -116,7 +118,7 @@
 
             if (successMessage) {
                 Swal.fire({
-                    title: "Resolved!",
+                    title: "Success!",
                     text: successMessage,
                     icon: "success",
                     timer: 2000,
@@ -156,17 +158,17 @@
             });
         }
 
-        function confirmResolve(event) {
+        function confirmComplete(event) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this report as resolved?",
+                text: "Do you want to mark this report as completed?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#28a745",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as resolved!"
+                confirmButtonText: "Yes, mark as completed!"
             }).then((result) => {
                 if (result.isConfirmed) {
                     event.target.closest("form").submit();

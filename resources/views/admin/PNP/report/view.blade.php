@@ -5,14 +5,15 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-lg mt-4">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0">{{ $report->title }}</h4>
-
-                    </div>
+                  
                     <div class="card-body">
                         <div class="row">
                             <!-- Left Column -->
                             <div class="col-md-6">
+                                <div class="mb-3">
+                                    <h5 class="fw-bold text-muted">Name</h5>
+                                    <p class="text-dark">{{ $report->name }}</p>
+                                </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Description</h5>
                                     <p class="text-dark">{{ $report->description }}</p>
@@ -77,7 +78,7 @@
 
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('admin.pnp.reports') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('pnp.reports.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
@@ -86,10 +87,10 @@
                                 <button type="submit" onclick="confirmOngoing(event)" class="btn btn-sm btn-warning">Mark
                                     as Ongoing</button>
                             </form>
-                            <form action="{{ route('pnp.reports.resolve', $report->id) }}" method="POST">
+                            <form action="{{ route('pnp.reports.complete', $report->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" onclick="confirmResolve(event)" class="btn btn-sm btn-success">Mark
-                                    as Resolved</button>
+                                <button type="submit" onclick="confirmComplete(event)" class="btn btn-sm btn-success">Mark
+                                    as Completed</button>
                             </form>
                         </div>
                     </div>
@@ -148,7 +149,7 @@
             });
         }
     </script>
-    <!--Mark as Resolved-->
+    <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "{{ session('success') }}";
@@ -156,7 +157,7 @@
 
             if (successMessage) {
                 Swal.fire({
-                    title: "Resolved!",
+                    title: "Success!",
                     text: successMessage,
                     icon: "success",
                     timer: 2000,
@@ -196,17 +197,17 @@
             });
         }
 
-        function confirmResolve(event) {
+        function confirmComplete(event) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this report as resolved?",
+                text: "Do you want to mark this report as completed?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#28a745",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as resolved!"
+                confirmButtonText: "Yes, mark as completed!"
             }).then((result) => {
                 if (result.isConfirmed) {
                     event.target.closest("form").submit();

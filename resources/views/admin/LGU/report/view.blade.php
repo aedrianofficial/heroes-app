@@ -86,10 +86,10 @@
                                 <button type="submit" onclick="confirmOngoing(event)" class="btn btn-sm btn-warning">Mark
                                     as Ongoing</button>
                             </form>
-                            <form action="{{ route('lgu.reports.resolve', $report->id) }}" method="POST">
+                            <form action="{{ route('lgu.reports.complete', $report->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" onclick="confirmResolve(event)" class="btn btn-sm btn-success">Mark
-                                    as Resolved</button>
+                                <button type="submit" onclick="confirmComplete(event)" class="btn btn-sm btn-success">Mark
+                                    as Completed</button>
                             </form>
                         </div>
                     </div>
@@ -148,7 +148,7 @@
             });
         }
     </script>
-    <!--Mark as Resolved-->
+    <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "{{ session('success') }}";
@@ -156,7 +156,7 @@
 
             if (successMessage) {
                 Swal.fire({
-                    title: "Resolved!",
+                    title: "Success!",
                     text: successMessage,
                     icon: "success",
                     timer: 2000,
@@ -196,17 +196,17 @@
             });
         }
 
-        function confirmResolve(event) {
+        function confirmComplete(event) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this report as resolved?",
+                text: "Do you want to mark this report as completed?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#28a745",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as resolved!"
+                confirmButtonText: "Yes, mark as completed!"
             }).then((result) => {
                 if (result.isConfirmed) {
                     event.target.closest("form").submit();

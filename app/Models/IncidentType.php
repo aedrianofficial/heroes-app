@@ -14,4 +14,8 @@ class IncidentType extends Model
     {
         return $this->belongsToMany(Agency::class, 'agency_incident_type');
     }
+    public function messages()
+    {
+        return $this->belongsToMany(Message::class, 'incident_message');
+    }
 }

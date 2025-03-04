@@ -31,8 +31,8 @@
             <div class="col-md-3 my-2">
                 <div class="card bg-success text-white">
                     <div class="card-body">
-                        <h5>Resolved Reports</h5>
-                        <h2>{{ $resolvedReports }}</h2>
+                        <h5>Completed Reports</h5>
+                        <h2>{{ $completedReports }}</h2>
                     </div>
                 </div>
             </div>

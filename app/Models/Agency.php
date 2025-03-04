@@ -23,4 +23,8 @@ class Agency extends Model
     {
         return $this->belongsToMany(Report::class, 'agency_report');
     }
+    public function messages()
+    {
+        return $this->belongsToMany(Message::class, 'agency_message');
+    }
 }
