@@ -52,6 +52,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('pnp/reports', [PnpController::class, 'storeReport'])->name('pnp.reports.store');
         Route::get('pnp/all-reports', [PnpController::class, 'reportList'])->name('pnp.reports.index');
         Route::get('admin/pnp/reports/{id}/view', [PnpController::class, 'viewReport'])->name('pnp.reports.view');
+
+        //emergency message
+        Route::get('pnp/all-emergency-message', [PnpController::class, 'emergencyMessageList'])->name('pnp.emergencymessage.index');
+        Route::get('admin/pnp/emergency-message/{id}/view', [PnpController::class, 'viewEmergencyMessage'])->name('pnp.emergencymessage.view');
+        Route::post('admin/pnp/emergency-message/{id}/ongoing', [PnpController::class, 'markAsOngoingForMessage'])->name('pnp.emergencymessage.ongoing');
+        Route::post('admin/pnp/emergency-message/{id}/complete', [PnpController::class, 'markAsCompletedForMessage'])->name('pnp.emergencymessage.complete');
+        Route::post('pnp/messages/update-status', [PnpController::class, 'updateStatus'])->name('messages.updateStatus');
+
+        
+
     });
 
     // Bureau of Fire Protection (BFP)
@@ -113,6 +123,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/lgu/reports/{id}/ongoing', [LguController::class, 'markAsOngoing'])->name('lgu.reports.ongoing');
         Route::post('admin/lgu/reports/{id}/complete', [LguController::class, 'markAsCompleted'])->name('lgu.reports.complete');
 
+        //reports
         Route::get('lgu/reports/create', [LguController::class, 'createReport'])->name('lgu.reports.create');
         Route::post('lgu/reports', [LguController::class, 'storeReport'])->name('lgu.reports.store');
         Route::get('lgu/all-reports', [LguController::class, 'reportList'])->name('lgu.reports.index');

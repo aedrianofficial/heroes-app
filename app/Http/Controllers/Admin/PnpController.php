@@ -4,10 +4,13 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\IncidentType;
+use App\Models\Message;
 use App\Models\Report;
 use App\Models\ReportAttachment;
+use App\Models\StatusLogMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PnpController extends Controller
 {
@@ -143,4 +146,82 @@ class PnpController extends Controller
     
         return view('admin.PNP.report.all-report', compact('reports'));
     }    
+
+    public function emergencyMessageList()
+    {
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+
+
+        // Return view with data
+        return view('admin.PNP.emergency-messages.index', compact('messages'));
+    }
+    public function viewEmergencyMessage($id)
+    {
+        $message = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->findOrFail($id);
+        
+        return view('admin.pnp.emergency-messages.view', compact('message'));
+    }
+    public function markAsOngoingForMessage($id, Request $request)
+    {
+        try {
+            $message = Message::findOrFail($id);
+            $message->status_id = 2; // 2 = Ongoing
+            $message->save();
+
+            StatusLogMessage::create([
+                'message_id' => $request->message_id,
+                'status_id' => 2, // Ongoing
+                'user_id' => auth::id(),
+                'log_details' => $request->log_details
+            ]);
+            
+            return redirect()->back()->with('success', 'Marked as ongoing.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+
+    public function markAsCompletedForMessage($id)
+    {
+        try {
+            $message = Message::findOrFail($id);
+            $message->status_id = 3; // 3 = Completed
+            $message->save();
+
+            return redirect()->back()->with('success', 'Marked as completed.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+
+    public function updateStatus(Request $request)
+    {
+        $request->validate([
+            'message_id' => 'required|exists:messages,id',
+            'status_id' => 'required|exists:statuses,id',
+            'log_details' => 'required|string|max:255'
+        ]);
+    
+        try {
+            // Update message status
+            $message = Message::findOrFail($request->message_id);
+            $message->status_id = $request->status_id;
+            $message->save();
+    
+            // Log the status change
+            DB::table('status_log_messages')->insert([
+                'message_id' => $request->message_id,
+                'status_id' => $request->status_id,
+                'user_id' => auth::id(),
+                'log_details' => $request->log_details,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+    
+            return redirect()->back()->with('success', 'Status updated and log added successfully.');
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+    
 }

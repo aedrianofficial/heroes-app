@@ -18,4 +18,8 @@ class IncidentType extends Model
     {
         return $this->belongsToMany(Message::class, 'incident_message');
     }
+    public function keywords()
+    {
+        return $this->hasMany(Keyword::class);
+    }
 }

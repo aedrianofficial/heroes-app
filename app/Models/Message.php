@@ -13,9 +13,15 @@ class Message extends Model
     protected $fillable = [
         'sender_contact',
         'message_content',
-        'sender_type'
+        'sender_type',
+        'user_id',
+        'status_id'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
     public function incidentTypes()
     {
         return $this->belongsToMany(IncidentType::class, 'incident_message');
@@ -25,4 +31,14 @@ class Message extends Model
     {
         return $this->belongsToMany(Agency::class, 'agency_message');
     }
+
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
+    public function statusLogs()
+    {
+        return $this->hasMany(StatusLogMessage::class);
+    }
+
 }
