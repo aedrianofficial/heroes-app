@@ -1,4 +1,4 @@
-@extends('layouts.pnp')
+@extends('layouts.mdrrmo')
 
 @section('content')
     <div class="container">
@@ -32,13 +32,13 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('pnp.emergencymessage.view', $message->id) }}"
+                                    <a href="{{ route('mdrrmo.emergencymessage.view', $message->id) }}"
                                         class="btn btn-sm btn-primary">View</a>
 
                                 </td>
                                 <td>
                                     <form id="ongoingForm-{{ $message->id }}"
-                                        action="{{ route('pnp.emergencymessage.ongoing', $message->id) }}" method="POST">
+                                        action="{{ route('mdrrmo.emergencymessage.ongoing', $message->id) }}" method="POST">
                                         @csrf
                                         <input type="hidden" name="message_id" value="{{ $message->id }}">
                                         <button type="button"
@@ -49,7 +49,7 @@
 
                                 <td>
                                     <form id="completeForm-{{ $message->id }}"
-                                        action="{{ route('pnp.emergencymessage.complete', $message->id) }}" method="POST">
+                                        action="{{ route('mdrrmo.emergencymessage.complete', $message->id) }}" method="POST">
                                         @csrf
                                         <button type="button"
                                             onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"

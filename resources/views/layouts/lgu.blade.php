@@ -22,6 +22,8 @@
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="{{ asset('asset/css/Control.Geocoder.css') }}" />
 
+
+
     @yield(section: 'styles')
 </head>
 
@@ -57,12 +59,11 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page"
-                            href="{{ route('lgu.reports.index') }}">Emergency
+                            href="{{ route('lgu.emergencymessage.index') }}">Emergency
                             Messages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="{{ route('lgu.reports.index') }}">Activity
+                        <a class="nav-link active" aria-current="page" href="{{ route('lgu.reports.index') }}">Activity
                             Logs</a>
                     </li>
                 </ul>
@@ -113,6 +114,37 @@
 
     <!--sweetalert2-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!--pusher-->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <script>
+        function connectSSE() {
+            const eventSource = new EventSource("/sse/calls");
+
+            eventSource.addEventListener("call-submit", (event) => {
+                const data = JSON.parse(event.data);
+
+                // Show SweetAlert notification
+                Swal.fire({
+                    title: "Incoming Call Alert",
+                    text: `Caller: ${data.caller_contact}\nTime: ${data.call_time}`,
+                    icon: "info",
+                });
+            });
+
+            eventSource.onerror = () => {
+                console.error("SSE connection lost. Retrying in 5 seconds...");
+                eventSource.close();
+
+                // Reconnect after 5 seconds
+                setTimeout(connectSSE, 5000);
+            };
+        }
+
+        // Start SSE connection
+        connectSSE();
+    </script>
+
     @yield('scripts')
 </body>
 

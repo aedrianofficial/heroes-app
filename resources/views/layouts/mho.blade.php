@@ -54,7 +54,7 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('mho.reports.index') }}">Emergency
+                        <a class="nav-link active" aria-current="page" href="{{ route('mho.emergencymessage.index') }}">Emergency
                             Messages</a>
                     </li>
                     <li class="nav-item">

@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\IncidentType;
+use App\Models\Message;
 use App\Models\Report;
 use App\Models\ReportAttachment;
+use App\Models\StatusLogMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -149,5 +151,63 @@ class LguController extends Controller
     
         return view('admin.lgu.report.all-report', compact('reports'));
     }
+    public function emergencyMessageList()
+    {
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        // Return view with data
+        return view('admin.lgu.emergency-messages.index', compact('messages'));
+    }
+    public function viewEmergencyMessage($id)
+    {
+        $message = Message::with(['incidentTypes', 'agencies', 'user', 'status', 'statusLogMessages.user.profile' => function ($query) {
+            $query->orderBy('created_at', 'desc'); // Fetch logs in descending order
+        }])->findOrFail($id);
+
+        return view('admin.lgu.emergency-messages.view', compact('message'));
+    }
+
+    public function markAsOngoingForMessage($id, Request $request)
+    {
+        try {
+            $message = Message::findOrFail($id);
+            $message->status_id = 2; // 2 = Ongoing
+            $message->save();
+
+            // Save log entry
+            StatusLogMessage::create([
+                'message_id' => $message->id,
+                'status_id' => 2, // Ongoing
+                'user_id' => Auth::id(),
+                'log_details' => $request->log_details
+            ]);
+
+            return redirect()->back()->with('success', 'Marked as ongoing.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+
+
+    public function markAsCompletedForMessage($id, Request $request)
+    {
+        try {
+            $message = Message::findOrFail($id);
+            $message->status_id = 3; // 3 = Completed
+            $message->save();
+
+            // Save log entry
+            StatusLogMessage::create([
+                'message_id' => $message->id,
+                'status_id' => 3, // Ongoing
+                'user_id' => Auth::id(),
+                'log_details' => $request->log_details
+            ]);
+
+            return redirect()->back()->with('success', 'Marked as completed.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+
 
 }

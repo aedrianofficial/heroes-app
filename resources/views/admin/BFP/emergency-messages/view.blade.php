@@ -1,4 +1,4 @@
-@extends('layouts.pnp')
+@extends('layouts.bfp')
 
 @section('content')
     <div class="container">
@@ -112,19 +112,19 @@
                         </div>
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('pnp.emergencymessage.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('bfp.emergencymessage.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="ongoingForm-{{ $message->id }}"
-                                action="{{ route('pnp.emergencymessage.ongoing', $message->id) }}" method="POST">
+                                action="{{ route('bfp.emergencymessage.ongoing', $message->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
                                 <button type="button" onclick="confirmOngoing(event, 'ongoingForm-{{ $message->id }}')"
                                     class="btn btn-sm btn-warning">Ongoing</button>
                             </form>
                             <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('pnp.emergencymessage.complete', $message->id) }}" method="POST">
+                                action="{{ route('bfp.emergencymessage.complete', $message->id) }}" method="POST">
                                 @csrf
                                 <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
                                     class="btn btn-sm btn-success">

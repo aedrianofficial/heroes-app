@@ -36,9 +36,10 @@ class Message extends Model
     {
         return $this->belongsTo(Status::class);
     }
-    public function statusLogs()
+    public function statusLogMessages()
     {
-        return $this->hasMany(StatusLogMessage::class);
+        return $this->hasMany(StatusLogMessage::class, 'message_id');
     }
+
 
 }
