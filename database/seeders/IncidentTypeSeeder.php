@@ -17,10 +17,10 @@ class IncidentTypeSeeder extends Seeder
          // Define Incident Types
          $incidentTypes = [
             'CRIME',
-            'ROAD ACCIDENT',
-            'HEALTH EMERGENCY',
+            'ROAD',
+            'HEALTH',
             'DISASTER',
-            'SEA INCIDENT',
+            'SEA',
             'FIRE'
         ];
 
@@ -32,12 +32,12 @@ class IncidentTypeSeeder extends Seeder
 
         // Define agency and their responsibilities
         $agencyIncidentMapping = [
-            'PNP' => ['CRIME', 'ROAD ACCIDENT'],
-            'BFP' => ['FIRE'],
-            'MDRRMO' => ['DISASTER'],
-            'MHO' => ['HEALTH EMERGENCY'],
-            'COAST GUARD' => ['SEA INCIDENT'],
-            'LGU' => ['ROAD ACCIDENT', 'DISASTER', 'HEALTH EMERGENCY']
+            'PNP' => ['CRIME', 'ROAD','FIRE','DISASTER'],
+            'BFP' => ['CRIME', 'ROAD','FIRE','DISASTER'],
+            'MDRRMO' => ['CRIME', 'ROAD','FIRE','DISASTER'],
+            'MHO' => ['HEALTH'],
+            'COAST GUARD' => ['SEA'],
+            'LGU' => ['ROAD', 'DISASTER', 'HEALTH']
         ];
 
         // Attach incident types to agencies

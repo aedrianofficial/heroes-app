@@ -54,11 +54,18 @@
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('mdrrmo.emergencymessage.index') }}">Emergency
+                        <a class="nav-link active" aria-current="page"
+                            href="{{ route('mdrrmo.emergencymessage.index') }}">Emergency
                             Messages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('mdrrmo.reports.index') }}">Activity
+                        <a class="nav-link active" aria-current="page"
+                            href="{{ route('mdrrmo.emergencycall.index') }}">Emergency
+                            Calls</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page"
+                            href="{{ route('mdrrmo.reports.index') }}">Activity
                             Logs</a>
                     </li>
                 </ul>
@@ -109,6 +116,145 @@
 
     <!--sweetalert2-->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!--pusher-->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    <!--call-->
+    <script>
+        // Check if we already have an active SSE connection
+        if (typeof window.callEventSource === 'undefined') {
+
+            // Function to mark a call as seen by this user
+            function markCallAsSeen(callId) {
+                fetch('/mark-call-as-seen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        call_id: callId
+                    })
+                });
+            }
+
+            function connectCallSSE() {
+                // Store the EventSource in a global variable so it persists
+                window.callEventSource = new EventSource("/sse/calls");
+
+                window.callEventSource.addEventListener("call-submit", (event) => {
+                    const data = JSON.parse(event.data);
+
+                    // Mark this call as seen by this user to prevent future notifications
+                    markCallAsSeen(data.id);
+
+                    // Show SweetAlert notification
+                    Swal.fire({
+                        title: "📞 Incoming Call Alert",
+                        html: `<b>Caller:</b> ${data.caller_name} (${data.caller_contact}) <br> <b>Time:</b> ${data.created_at}`,
+                        icon: "info",
+                        showCancelButton: true,
+                        cancelButtonText: "Close",
+                        confirmButtonText: "📄 View for more details",
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/admin/mdrrmo/emergency-call/${data.id}/view`;
+                        }
+                    });
+                });
+
+                window.callEventSource.onerror = () => {
+                    console.error("SSE connection lost. Retrying in 5 seconds...");
+                    window.callEventSource.close();
+
+                    // Reconnect after 5 seconds
+                    setTimeout(connectCallSSE, 5000);
+                };
+            }
+
+            // Initialize connection when the page loads for the first time
+            connectCallSSE();
+
+            // Handle page navigation in SPA or Turbolinks if you're using it
+            document.addEventListener('turbolinks:load', function() {
+                // If connection was closed during navigation, reconnect
+                if (window.callEventSource.readyState === 2) {
+                    connectCallSSE();
+                }
+            });
+        }
+    </script>
+
+    <script>
+        // Check if we already have an active Message SSE connection
+        if (typeof window.messageEventSource === 'undefined') {
+            // Function to mark a message as seen by this user
+            function markMessageAsSeen(messageId) {
+                fetch('/mark-message-as-seen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        message_id: messageId
+                    })
+                });
+            }
+
+            function connectMessageSSE() {
+                // Store the EventSource in a global variable so it persists
+                window.messageEventSource = new EventSource("/sse/messages");
+
+                window.messageEventSource.addEventListener("message-submit", (event) => {
+                    const data = JSON.parse(event.data);
+
+                    // Mark this message as seen by this user to prevent future notifications
+                    markMessageAsSeen(data.id);
+
+                    // Show SweetAlert notification
+                    Swal.fire({
+                        title: "📩 New Message Alert",
+                        html: `<b>From:</b> ${data.sender_name} (${data.sender_contact}) <br> 
+                           <b>Message:</b> ${data.message_content} <br>
+                           <b>Time:</b> ${data.created_at} <br>
+                           <b>Address:</b> ${data.address}`,
+                        icon: "info",
+                        showCancelButton: true,
+                        cancelButtonText: "Close",
+                        confirmButtonText: "📄 View for more details",
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/admin/mdrrmo/emergency-message/${data.id}/view`;
+                        }
+                    });
+                });
+
+                window.messageEventSource.onerror = () => {
+                    console.error("Message SSE connection lost. Retrying in 5 seconds...");
+                    window.messageEventSource.close();
+
+                    // Reconnect after 5 seconds
+                    setTimeout(connectMessageSSE, 5000);
+                };
+            }
+
+            // Initialize connection when the page loads for the first time
+            connectMessageSSE();
+
+            // Handle page navigation in SPA or Turbolinks if you're using it
+            document.addEventListener('turbolinks:load', function() {
+                // If connection was closed during navigation, reconnect
+                if (window.messageEventSource.readyState === 2) {
+                    connectMessageSSE();
+                }
+            });
+        }
+    </script>
     @yield('scripts')
 </body>
 

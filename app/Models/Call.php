@@ -13,8 +13,20 @@ class Call extends Model
     protected $table = 'calls';
     protected $fillable = [
         'caller_contact',
-        'call_time',
         'is_processed',
+        'status_id',
     ];
-   
+    public function status()
+    {
+        return $this->belongsTo(Status::class);
+    }
+    public function statusLogCalls()
+    {
+        return $this->hasMany(StatusLogCall::class, 'call_id');
+    }
+    public function requests()
+    {
+        return $this->hasMany(Request::class);
+    }
+
 }

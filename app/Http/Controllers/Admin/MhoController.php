@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Call;
 use App\Models\IncidentType;
 use App\Models\Message;
 use App\Models\Report;
 use App\Models\ReportAttachment;
+use App\Models\StatusLogCall;
 use App\Models\StatusLogMessage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MhoController extends Controller
 {
@@ -211,5 +214,77 @@ class MhoController extends Controller
             return redirect()->back()->with('error', 'Failed to update.');
         }
     }
+    public function emergencyCallList()
+    {
+        $calls = Call::with([ 'status'])->latest()->get();
+        // Return view with data
+        return view('admin.mho.emergency-calls.index', compact('calls'));
+    }
+    public function viewEmergencyCall($id)
+    {
+        $call = Call::with(['status', 'statusLogCalls.user.profile' => function ($query) {
+            $query->orderBy('created_at', 'desc'); // Fetch logs in descending order
+        }])->findOrFail($id);
+    
+        // Fetch the corresponding contact from aparrio1_dbbdc.m_contacts
+        $contact = DB::connection('aparrio_db')->table('m_contacts')
+            ->where('mobile_no', $call->caller_contact)
+            ->first();
+    
+        $profile = null;
+        if ($contact) {
+            // Fetch the profile from aparrio1_dbbdc.m_profiles using p_id from m_contacts
+            $profile = DB::connection('aparrio_db')->table('m_profiles')
+                ->where('id', $contact->p_id)
+                ->first();
+        }
+    
+        return view('admin.mho.emergency-calls.view', compact('call', 'profile'));
+    }
+    
 
+
+    public function markAsOngoingForCall($id, Request $request)
+    {
+        try {
+            $call = Call::findOrFail($id);
+            $call->status_id = 2; // 2 = Ongoing
+            $call->save();
+
+            // Save log entry
+            StatusLogCall::create([
+                'call_id' => $call->id,
+                'status_id' => 2, // Ongoing
+                'user_id' => Auth::id(),
+                'log_details' => $request->log_details
+            ]);
+
+            return redirect()->back()->with('success', 'Marked as ongoing.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+
+
+    public function markAsCompletedForCall($id, Request $request)
+    {
+        try {
+            $call = Call::findOrFail($id);
+            $call->status_id = 3; // 3 = Completed
+            $call->save();
+
+            // Save log entry
+            StatusLogCall::create([
+                'call_id' => $call->id,
+                'status_id' => 3, // Ongoing
+                'user_id' => Auth::id(),
+                'log_details' => $request->log_details
+            ]);
+
+            return redirect()->back()->with('success', 'Marked as completed.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update.');
+        }
+    }
+    
 }

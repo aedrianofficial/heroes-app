@@ -15,7 +15,8 @@ class Message extends Model
         'message_content',
         'sender_type',
         'user_id',
-        'status_id'
+        'status_id',
+        'is_processed',
     ];
 
     public function user()
@@ -36,6 +37,7 @@ class Message extends Model
     {
         return $this->belongsTo(Status::class);
     }
+    
     public function statusLogMessages()
     {
         return $this->hasMany(StatusLogMessage::class, 'message_id');

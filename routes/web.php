@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\PnpController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\User\ReportController;
+use App\Models\CallView;
+use App\Models\MessageView;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CallController;
@@ -16,6 +18,11 @@ use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebsiteController;
 use App\Models\Call;
+use App\Models\Message;
+use App\Models\RequestView;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 Route::get('/', function () {
     return view('website.welcome');
@@ -33,33 +40,188 @@ Route::get('/about-us', [WebsiteController::class, 'aboutUs'])->name('aboutus');
 Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact');
 
 
+// Route to mark call as seen
+Route::post('/mark-call-as-seen', function (Request $request) {
+    CallView::updateOrCreate([
+        'call_id' => $request->call_id,
+        'user_id' => Auth::id()
+    ]);
+    
+    return response()->json(['success' => true]);
+});
+
+//  SSE endpoint for calls
 Route::get('/sse/calls', function () {
     header('Content-Type: text/event-stream');
     header('Cache-Control: no-cache');
     header('Connection: keep-alive');
-    header('X-Accel-Buffering: no'); // Prevents buffering on Nginx
+    header('X-Accel-Buffering: no');
+    
+   // Get calls not yet processed AND not yet seen by this user
+    $userId = Auth::id();
+    $calls = Call::where('is_processed', false)
+        ->whereNotExists(function ($query) use ($userId) {
+            $query->select(DB::raw(1))
+                ->from('call_views')
+                ->whereRaw('call_views.call_id = calls.id')
+                ->where('call_views.user_id', $userId);
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
+    if ($calls->isNotEmpty()) {
+        foreach ($calls as $call) {
+            // Search for caller in external database
+            $profile = DB::connection('aparrio_db')
+                ->table('m_profiles')
+                ->join('m_contacts', 'm_profiles.id', '=', 'm_contacts.p_id')
+                ->where('m_contacts.mobile_no', $call->caller_contact)
+                ->select('m_profiles.first_name', 'm_profiles.middle_name', 'm_profiles.last_name', 'm_profiles.nameofbarangay')
+                ->first();
 
-    // Check for new call
-    $call = Call::where('is_processed', false)->first();
+            // Determine the caller name
+            $callerName = $profile
+                ? "{$profile->first_name} {$profile->middle_name} {$profile->last_name}"
+                : "Unknown Caller";
 
-    if ($call) {
-        echo "event: call-submit\n";
-        echo 'data: ' . json_encode([
-            'caller_contact' => $call->caller_contact,
-            'call_time' => $call->call_time
-        ]) . "\n\n";
+            $address = $profile
+                ? "{$profile->nameofbarangay}"
+                : "Unknown Address";
 
-        ob_flush();
-        flush();
+            // Send the data to the client
+            echo "event: call-submit\n";
+            echo 'data: ' . json_encode([
+                'id' => $call->id,
+                'caller_contact' => $call->caller_contact,
+                'caller_name' => $callerName,
+                'address' => $address,
+                'created_at' => $call->created_at->format('Y-m-d H:i:s')
+            ]) . "\n\n";
 
-        // Mark call as processed
-        $call->update(['is_processed' => true]);
+            ob_flush();
+            flush();
+        }
     }
-
-    // Close the connection so the client can reconnect
+    
     exit();
 });
 
+// Route to mark message
+Route::post('/mark-message-as-seen', function (Request $request) {
+    // Store that this user has seen this message
+    MessageView::updateOrCreate([
+        'message_id' => $request->message_id,
+        'user_id' => Auth::id() 
+    ]);
+    
+    return response()->json(['success' => true]);
+});
+
+//  SSE messages endpoint 
+Route::get('/sse/messages', function () {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('Connection: keep-alive');
+    header('X-Accel-Buffering: no');
+    
+    // Get messages not yet processed AND not yet seen by this user
+    $userId = Auth::id();
+    $messages = Message::where('is_processed', false)
+        ->whereNotExists(function ($query) use ($userId) {
+            $query->select(DB::raw(1))
+                ->from('message_views')
+                ->whereRaw('message_views.message_id = messages.id')
+                ->where('message_views.user_id', $userId);
+        })
+        ->orderBy('created_at', 'asc')
+        ->get();
+    
+    if ($messages->isNotEmpty()) {
+        foreach ($messages as $message) {
+            // Search for sender in external database
+            $profile = DB::connection('aparrio_db')
+                ->table('m_profiles')
+                ->join('m_contacts', 'm_profiles.id', '=', 'm_contacts.p_id')
+                ->where('m_contacts.mobile_no', $message->sender_contact)
+                ->select('m_profiles.first_name', 'm_profiles.middle_name', 'm_profiles.last_name', 'm_profiles.nameofbarangay')
+                ->first();
+
+            // Determine the sender name
+            $senderName = $profile
+                ? "{$profile->first_name} {$profile->middle_name} {$profile->last_name}"
+                : "Unknown Sender";
+            $address = $profile
+                ? "{$profile->nameofbarangay}"
+                : "Unknown Address";
+            // Send the data to the client
+            echo "event: message-submit\n";
+            echo 'data: ' . json_encode([
+                'id' => $message->id,
+                'sender_contact' => $message->sender_contact,
+                'message_content' => $message->message_content,
+                'sender_name' => $senderName,
+                'address' => $address,
+                'created_at' => $message->created_at->format('Y-m-d H:i:s')
+            ]) . "\n\n";
+
+            ob_flush();
+            flush();
+        }
+    }
+    
+    exit();
+});
+
+Route::post('/mark-request-as-seen', function (Request $request) {
+    RequestView::updateOrCreate([
+        'request_id' => $request->request_id,
+        'user_id' => Auth::id()
+    ]);
+
+    return response()->json(['success' => true]);
+});
+
+Route::get('/sse/requests', function () {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('Connection: keep-alive');
+    header('X-Accel-Buffering: no');
+
+    $userId = Auth::id();
+    $userAgencyId = Auth::user()->agency_id; // Assuming users are linked to agencies
+
+    $requests = DB::table('requests')
+        ->join('request_agency', 'requests.id', '=', 'request_agency.request_id')
+        ->where('request_agency.agency_id', $userAgencyId)
+        ->where('requests.is_processed', false)
+        ->whereNotExists(function ($query) use ($userId) {
+            $query->select(DB::raw(1))
+                ->from('request_views')
+                ->whereRaw('request_views.request_id = requests.id')
+                ->where('request_views.user_id', $userId);
+        })
+        ->select('requests.id', 'requests.call_id', 'requests.name', 'requests.address', 'requests.description', 'requests.is_processed', 'requests.created_at')
+        ->orderBy('requests.created_at', 'asc')
+        ->get();
+
+    if ($requests->isNotEmpty()) {
+        foreach ($requests as $request) {
+            echo "event: request-submit\n";
+            echo 'data: ' . json_encode([
+                'id' => $request->call_id,
+                'name' => $request->name,
+                'address' => $request->address,
+                'description' => $request->description,
+                'created_at' => $request->created_at
+            ]) . "\n\n";
+
+            ob_flush();
+            flush();
+        }
+    }
+
+    exit();
+});
 
 
 // Protected Route (Dashboard)
@@ -91,6 +253,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/pnp/emergency-message/{id}/view', [PnpController::class, 'viewEmergencyMessage'])->name('pnp.emergencymessage.view');
         Route::post('admin/pnp/emergency-message/{id}/ongoing', [PnpController::class, 'markAsOngoingForMessage'])->name('pnp.emergencymessage.ongoing');
         Route::post('admin/pnp/emergency-message/{id}/complete', [PnpController::class, 'markAsCompletedForMessage'])->name('pnp.emergencymessage.complete');
+
+         //emergency call
+         Route::get('pnp/all-emergency-call', [PnpController::class, 'emergencyCallList'])->name('pnp.emergencycall.index');
+         Route::get('admin/pnp/emergency-call/{id}/view', [PnpController::class, 'viewEmergencyCall'])->name('pnp.emergencycall.view');
+         Route::post('admin/pnp/emergency-call/{id}/ongoing', [PnpController::class, 'markAsOngoingForCall'])->name('pnp.emergencycall.ongoing');
+         Route::post('admin/pnp/emergency-call/{id}/complete', [PnpController::class, 'markAsCompletedForCall'])->name('pnp.emergencycall.complete');
     });
 
     // Bureau of Fire Protection (BFP)
@@ -111,6 +279,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/bfp/emergency-message/{id}/view', [BfpController::class, 'viewEmergencyMessage'])->name('bfp.emergencymessage.view');
         Route::post('admin/bfp/emergency-message/{id}/ongoing', [BfpController::class, 'markAsOngoingForMessage'])->name('bfp.emergencymessage.ongoing');
         Route::post('admin/bfp/emergency-message/{id}/complete', [BfpController::class, 'markAsCompletedForMessage'])->name('bfp.emergencymessage.complete');
+
+         //emergency call
+         Route::get('bfp/all-emergency-call', [BfpController::class, 'emergencyCallList'])->name('bfp.emergencycall.index');
+         Route::get('admin/bfp/emergency-call/{id}/view', [BfpController::class, 'viewEmergencyCall'])->name('bfp.emergencycall.view');
+         Route::post('admin/bfp/emergency-call/{id}/ongoing', [BfpController::class, 'markAsOngoingForCall'])->name('bfp.emergencycall.ongoing');
+         Route::post('admin/bfp/emergency-call/{id}/complete', [BfpController::class, 'markAsCompletedForCall'])->name('bfp.emergencycall.complete');
     });
     
     //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
@@ -131,6 +305,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/mdrrmo/emergency-message/{id}/view', [MdrrmoController::class, 'viewEmergencyMessage'])->name('mdrrmo.emergencymessage.view');
         Route::post('admin/mdrrmo/emergency-message/{id}/ongoing', [MdrrmoController::class, 'markAsOngoingForMessage'])->name('mdrrmo.emergencymessage.ongoing');
         Route::post('admin/mdrrmo/emergency-message/{id}/complete', [MdrrmoController::class, 'markAsCompletedForMessage'])->name('mdrrmo.emergencymessage.complete');
+
+         //emergency call
+         Route::get('mdrrmo/all-emergency-call', [MdrrmoController::class, 'emergencyCallList'])->name('mdrrmo.emergencycall.index');
+         Route::get('admin/mdrrmo/emergency-call/{id}/view', [MdrrmoController::class, 'viewEmergencyCall'])->name('mdrrmo.emergencycall.view');
+         Route::post('admin/mdrrmo/emergency-call/{id}/ongoing', [MdrrmoController::class, 'markAsOngoingForCall'])->name('mdrrmo.emergencycall.ongoing');
+         Route::post('admin/mdrrmo/emergency-call/{id}/complete', [MdrrmoController::class, 'markAsCompletedForCall'])->name('mdrrmo.emergencycall.complete');
     });
     
     //Municipal Health Office (MHO)
@@ -150,6 +330,12 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/mho/emergency-message/{id}/view', [MhoController::class, 'viewEmergencyMessage'])->name('mho.emergencymessage.view');
         Route::post('admin/mho/emergency-message/{id}/ongoing', [MhoController::class, 'markAsOngoingForMessage'])->name('mho.emergencymessage.ongoing');
         Route::post('admin/mho/emergency-message/{id}/complete', [MhoController::class, 'markAsCompletedForMessage'])->name('mho.emergencymessage.complete');
+
+         //emergency call
+         Route::get('mho/all-emergency-call', [MhoController::class, 'emergencyCallList'])->name('mho.emergencycall.index');
+         Route::get('admin/mho/emergency-call/{id}/view', [MhoController::class, 'viewEmergencyCall'])->name('mho.emergencycall.view');
+         Route::post('admin/mho/emergency-call/{id}/ongoing', [MhoController::class, 'markAsOngoingForCall'])->name('mho.emergencycall.ongoing');
+         Route::post('admin/mho/emergency-call/{id}/complete', [MhoController::class, 'markAsCompletedForCall'])->name('mho.emergencycall.complete');
     });
 
     // Coast Guard
@@ -169,6 +355,12 @@ Route::middleware(['auth'])->group(function () {
          Route::get('admin/coastguard/emergency-message/{id}/view', [CoastGuardController::class, 'viewEmergencyMessage'])->name('coastguard.emergencymessage.view');
          Route::post('admin/coastguard/emergency-message/{id}/ongoing', [CoastGuardController::class, 'markAsOngoingForMessage'])->name('coastguard.emergencymessage.ongoing');
          Route::post('admin/coastguard/emergency-message/{id}/complete', [CoastGuardController::class, 'markAsCompletedForMessage'])->name('coastguard.emergencymessage.complete');
+
+           //emergency call
+           Route::get('coast-guard/all-emergency-call', [CoastGuardController::class, 'emergencyCallList'])->name('coastguard.emergencycall.index');
+           Route::get('admin/coast-guard/emergency-call/{id}/view', [CoastGuardController::class, 'viewEmergencyCall'])->name('coastguard.emergencycall.view');
+           Route::post('admin/coast-guard/emergency-call/{id}/ongoing', [CoastGuardController::class, 'markAsOngoingForCall'])->name('coastguard.emergencycall.ongoing');
+           Route::post('admin/coast-guard/emergency-call/{id}/complete', [CoastGuardController::class, 'markAsCompletedForCall'])->name('coastguard.emergencycall.complete');
     });
     
     //Local Government Unit (LGU)
@@ -189,6 +381,13 @@ Route::middleware(['auth'])->group(function () {
         Route::get('admin/lgu/emergency-message/{id}/view', [LguController::class, 'viewEmergencyMessage'])->name('lgu.emergencymessage.view');
         Route::post('admin/lgu/emergency-message/{id}/ongoing', [LguController::class, 'markAsOngoingForMessage'])->name('lgu.emergencymessage.ongoing');
         Route::post('admin/lgu/emergency-message/{id}/complete', [LguController::class, 'markAsCompletedForMessage'])->name('lgu.emergencymessage.complete');
+
+        //emergency call
+        Route::get('lgu/all-emergency-call', [LguController::class, 'emergencyCallList'])->name('lgu.emergencycall.index');
+        Route::get('admin/lgu/emergency-call/{id}/view', [LguController::class, 'viewEmergencyCall'])->name('lgu.emergencycall.view');
+        Route::post('admin/lgu/emergency-call/{id}/ongoing', [LguController::class, 'markAsOngoingForCall'])->name('lgu.emergencycall.ongoing');
+        Route::post('admin/lgu/emergency-call/{id}/complete', [LguController::class, 'markAsCompletedForCall'])->name('lgu.emergencycall.complete');
+
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {

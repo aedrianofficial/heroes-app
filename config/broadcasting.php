@@ -8,16 +8,12 @@ return [
 
         'pusher' => [
             'driver' => 'pusher',
-            'key' => env('PUSHER_APP_KEY'),
-            'secret' => env('PUSHER_APP_SECRET'),
-            'app_id' => env('PUSHER_APP_ID'),
+            'key' => env('154d054de658862f751e'),
+            'secret' => env('40bbdcf2ee4c79299197'),
+            'app_id' => env('1953578'),
             'options' => [
-                'cluster' => env('PUSHER_APP_CLUSTER'),
+                'cluster' => env('ap1'),
                 'useTLS' => true,
-                'host' => env('PUSHER_HOST'),
-                'port' => env('PUSHER_PORT', 6001),
-                'scheme' => env('PUSHER_SCHEME', 'http'),
-                'encrypted' => false,
             ],
         ],
 

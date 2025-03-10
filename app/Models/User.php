@@ -67,4 +67,8 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Agency::class);
     }
+    public function seenRequests() {
+        return $this->hasMany(RequestView::class);
+    }
+    
 }

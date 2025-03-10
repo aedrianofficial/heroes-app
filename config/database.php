@@ -47,7 +47,7 @@ return [
             'url' => env('DB_URL'),
             'host' => env('DB_HOST', '127.0.0.1'),
             'port' => env('DB_PORT', '3306'),
-            'database' => env('DB_DATABASE', 'laravel'),
+            'database' => env('DB_DATABASE', 'db_heroes_app'),
             'username' => env('DB_USERNAME', 'root'),
             'password' => env('DB_PASSWORD', ''),
             'unix_socket' => env('DB_SOCKET', ''),
@@ -60,6 +60,21 @@ return [
             'options' => extension_loaded('pdo_mysql') ? array_filter([
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
+            
+        ],
+
+        'aparrio_db' => [ // Second database connection
+        'driver' => 'mysql',
+        'host' => env('DB_HOST_SECOND', '127.0.0.1'),
+        'port' => env('DB_PORT_SECOND', '3306'),
+        'database' => env('DB_DATABASE_SECOND', 'aparrio1_dbbdc'),
+        'username' => env('DB_USERNAME_SECOND', 'root'),
+        'password' => env('DB_PASSWORD_SECOND', ''),
+        'charset' => 'utf8mb4',
+        'collation' => 'utf8mb4_unicode_ci',
+        'prefix' => '',
+        'strict' => true,
+        'engine' => null,
         ],
 
         'mariadb' => [

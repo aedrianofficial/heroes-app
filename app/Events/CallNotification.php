@@ -23,14 +23,14 @@ class CallNotification implements ShouldBroadcast
     {
         $this->call = $call;
     }
-  
+
     public function broadcastOn()
     {
-        return new Channel('call-channel');
+        return new Channel('calls');
     }
-  
+
     public function broadcastAs()
     {
-        return 'call-submit';
+        return 'call-submitted';
     }
 }
