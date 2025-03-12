@@ -165,11 +165,31 @@ class CoastGuardController extends Controller
     }
     public function viewEmergencyMessage($id)
     {
-        $message = Message::with(['incidentTypes', 'agencies', 'user', 'status', 'statusLogMessages.user.profile' => function ($query) {
-            $query->orderBy('created_at', 'desc'); // Fetch logs in descending order
-        }])->findOrFail($id);
+        $message = Message::with([
+            'incidentTypes', 
+            'agencies', 
+            'user', 
+            'status', 
+            'statusLogMessages.user.profile' => function ($query) {
+                $query->orderBy('created_at', 'desc'); // Fetch logs in descending order
+            },
+            'requests.agencies' // Include requests and their assigned agencies, like in viewEmergencyCall
+        ])->findOrFail($id);
 
-        return view('admin.coastguard.emergency-messages.view', compact('message'));
+        // Fetch the corresponding contact from aparrio1_dbbdc.m_contacts
+        $contact = DB::connection('aparrio_db')->table('m_contacts')
+            ->where('mobile_no', $message->sender_contact) // Assuming the field name is sender_contact
+            ->first();
+
+        $profile = null;
+        if ($contact) {
+            // Fetch the profile from aparrio1_dbbdc.m_profiles using p_id from m_contacts
+            $profile = DB::connection('aparrio_db')->table('m_profiles')
+                ->where('id', $contact->p_id)
+                ->first();
+        }
+
+        return view('admin.coastguard.emergency-messages.view', compact('message', 'profile'));
     }
 
     public function markAsOngoingForMessage($id, Request $request)
@@ -222,15 +242,19 @@ class CoastGuardController extends Controller
     }
     public function viewEmergencyCall($id)
     {
-        $call = Call::with(['status', 'statusLogCalls.user.profile' => function ($query) {
-            $query->orderBy('created_at', 'desc'); // Fetch logs in descending order
-        }])->findOrFail($id);
-    
+        $call = Call::with([
+            'status',
+            'statusLogCalls.user.profile' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'requests.agencies' // Include requests and their assigned agencies
+        ])->findOrFail($id);
+
         // Fetch the corresponding contact from aparrio1_dbbdc.m_contacts
         $contact = DB::connection('aparrio_db')->table('m_contacts')
             ->where('mobile_no', $call->caller_contact)
             ->first();
-    
+
         $profile = null;
         if ($contact) {
             // Fetch the profile from aparrio1_dbbdc.m_profiles using p_id from m_contacts
@@ -238,10 +262,9 @@ class CoastGuardController extends Controller
                 ->where('id', $contact->p_id)
                 ->first();
         }
-    
+
         return view('admin.coastguard.emergency-calls.view', compact('call', 'profile'));
     }
-    
 
 
     public function markAsOngoingForCall($id, Request $request)

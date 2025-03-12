@@ -7,7 +7,7 @@
                 <div class="card shadow-lg mt-4">
 
                     <div class="card-body">
-                         <!-- Caller contact row -->
+                        <!-- Caller contact row -->
                         <div class="row">
                             <!-- Left Column -->
                             <div class="col-md-6">
@@ -17,7 +17,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Date Received</h5>
-                                    <p class="text-dark">{{ $call->created_at }}</p>
+                                    <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
                                 </div>
                                 {{-- <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Date recieve</h5>
@@ -93,7 +93,8 @@
                                 <h5 class="fw-bold text-muted">Caller Profile</h5>
                                 @if ($profile)
                                     <div class="mb-3">
-                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }} {{ $profile->last_name }} {{ $profile->suffix }}</p>
+                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }}
+                                            {{ $profile->last_name }} {{ $profile->suffix }}</p>
                                     </div>
                                     <div class="mb-3">
                                         <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
@@ -108,7 +109,7 @@
                                     <p class="text-muted">No profile information available.</p>
                                 @endif
                             </div>
-                        
+
                             <!-- Right Column -->
                             <div class="col-md-6">
                                 @if ($profile)
@@ -130,7 +131,51 @@
                                 @endif
                             </div>
                         </div>
-                        <hr>                        
+                        <hr>
+                        @if ($call->requests->isNotEmpty())
+                            @foreach ($call->requests as $index => $request)
+                                <div class="border rounded p-3 mb-4 shadow-sm">
+                                    <h5 class="fw-bold text-muted">Request {{ $index + 1 }}</h5>
+                                    <div class="row">
+                                        <!-- Left Column -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <p><strong>Name:</strong> {{ $request->name }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Address:</strong> {{ $request->address }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Description:</strong> {{ $request->description }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Column -->
+                                        <div class="col-md-6">
+                                            <h5 class="fw-bold text-muted">Assigned Agencies</h5>
+                                            @if ($request->agencies->isNotEmpty())
+                                                <div class="mb-3">
+                                                    <ul>
+                                                        @foreach ($request->agencies as $agency)
+                                                            <li>{{ $agency->name }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @else
+                                                <p class="text-muted">No assigned agencies</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <p class="text-muted">No requests found for this call.</p>
+                        @endif
+
+                        <hr>
                         <div class="mb-3">
                             <h5 class="fw-bold text-muted">Status Log</h5>
                             @if ($call->statusLogCalls->isNotEmpty())
@@ -147,7 +192,7 @@
                                             </span>
                                             on {{ $log->created_at->format('F j, Y g:i A') }}.
                                             <br>
-                                            <small class="text-muted">Log Details: {{ $log->log_details }}</small>
+                                            <strong>Log Details:</strong> {{ $log->log_details }} 
                                         </li>
                                     @endforeach
                                 </ul>

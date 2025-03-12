@@ -43,5 +43,8 @@ class Message extends Model
         return $this->hasMany(StatusLogMessage::class, 'message_id');
     }
 
-
+    public function requests()
+    {
+        return $this->hasMany(RequestMessage::class);
+    }
 }

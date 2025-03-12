@@ -11,6 +11,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\User\ReportController;
 use App\Models\CallView;
 use App\Models\MessageView;
+use App\Models\RequestMessageView;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CallController;
@@ -19,7 +20,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebsiteController;
 use App\Models\Call;
 use App\Models\Message;
-use App\Models\RequestView;
+use App\Models\RequestCallView;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +28,18 @@ use Illuminate\Support\Facades\DB;
 Route::get('/', function () {
     return view('website.welcome');
 })->name('welcome');
+Route::middleware(['auth', 'admin'])->group(function () {
+    Route::get('/admin/analytics', 'App\Http\Controllers\Admin\AnalyticsController@index')->name('admin.analytics');
+});
+
+// routes/api.php
+Route::middleware(['auth:sanctum'])->prefix('api/analytics')->group(function () {
+    Route::get('/agency-performance', 'App\Http\Controllers\AnalyticsController@agencyPerformance');
+    Route::get('/daily-call-volume', 'App\Http\Controllers\AnalyticsController@dailyCallVolume');
+    Route::get('/calls-status-distribution', 'App\Http\Controllers\AnalyticsController@callsStatusDistribution');
+    Route::get('/top-agencies', 'App\Http\Controllers\AnalyticsController@topAgencies');
+});
+
 
 
 Route::get('/register', [RegisterController::class, 'showRegistrationForm'])->name('register.form');
@@ -172,16 +185,17 @@ Route::get('/sse/messages', function () {
     exit();
 });
 
-Route::post('/mark-request-as-seen', function (Request $request) {
-    RequestView::updateOrCreate([
-        'request_id' => $request->request_id,
+//  SSE request-call 
+Route::post('/mark-request-call-as-seen', function (Request $request) {
+    RequestCallView::updateOrCreate([
+        'request_call_id' => $request->request_call_id,
         'user_id' => Auth::id()
     ]);
 
     return response()->json(['success' => true]);
 });
 
-Route::get('/sse/requests', function () {
+Route::get('/sse/request-call', function () {
     header('Content-Type: text/event-stream');
     header('Cache-Control: no-cache');
     header('Connection: keep-alive');
@@ -190,18 +204,18 @@ Route::get('/sse/requests', function () {
     $userId = Auth::id();
     $userAgencyId = Auth::user()->agency_id; // Assuming users are linked to agencies
 
-    $requests = DB::table('requests')
-        ->join('request_agency', 'requests.id', '=', 'request_agency.request_id')
-        ->where('request_agency.agency_id', $userAgencyId)
-        ->where('requests.is_processed', false)
+    $requests = DB::table('request_calls')
+        ->join('request_call_agency', 'request_calls.id', '=', 'request_call_agency.request_call_id')
+        ->where('request_call_agency.agency_id', $userAgencyId)
+        ->where('request_calls.is_processed', false)
         ->whereNotExists(function ($query) use ($userId) {
             $query->select(DB::raw(1))
-                ->from('request_views')
-                ->whereRaw('request_views.request_id = requests.id')
-                ->where('request_views.user_id', $userId);
+                ->from('request_call_views')
+                ->whereRaw('request_call_views.request_call_id = request_calls.id')
+                ->where('request_call_views.user_id', $userId);
         })
-        ->select('requests.id', 'requests.call_id', 'requests.name', 'requests.address', 'requests.description', 'requests.is_processed', 'requests.created_at')
-        ->orderBy('requests.created_at', 'asc')
+        ->select('request_calls.id', 'request_calls.call_id', 'request_calls.name', 'request_calls.address', 'request_calls.description', 'request_calls.is_processed', 'request_calls.created_at')
+        ->orderBy('request_calls.created_at', 'asc')
         ->get();
 
     if ($requests->isNotEmpty()) {
@@ -209,6 +223,7 @@ Route::get('/sse/requests', function () {
             echo "event: request-submit\n";
             echo 'data: ' . json_encode([
                 'id' => $request->call_id,
+                'request_call_id' => $request->id,
                 'name' => $request->name,
                 'address' => $request->address,
                 'description' => $request->description,
@@ -223,6 +238,60 @@ Route::get('/sse/requests', function () {
     exit();
 });
 
+//  SSE request-message
+Route::post('/mark-request-message-as-seen', function (Request $request) {
+    RequestMessageView::updateOrCreate([
+        'request_message_id' => $request->request_message_id,
+        'user_id' => Auth::id()
+    ]);
+
+    return response()->json(['success' => true]);
+});
+
+Route::get('/sse/request-message', function () {
+    header('Content-Type: text/event-stream');
+    header('Cache-Control: no-cache');
+    header('Connection: keep-alive');
+    header('X-Accel-Buffering: no');
+
+    $userId = Auth::id();
+    $userAgencyId = Auth::user()->agency_id;
+
+    $requests = DB::table('request_messages')
+        ->join('request_message_agency', 'request_messages.id', '=', 'request_message_agency.request_message_id')
+        ->where('request_message_agency.agency_id', $userAgencyId)
+        ->where('request_messages.is_processed', false)
+        ->whereNotExists(function ($query) use ($userId) {
+            $query->select(DB::raw(1))
+                ->from('request_message_views')
+                ->whereRaw('request_message_views.request_message_id = request_messages.id')
+                ->where('request_message_views.user_id', $userId);
+        })
+        ->select('request_messages.id', 'request_messages.message_id', 'request_messages.name', 
+                 'request_messages.address', 'request_messages.description', 
+                 'request_messages.is_processed', 'request_messages.created_at')
+        ->orderBy('request_messages.created_at', 'asc')
+        ->get();
+
+    if ($requests->isNotEmpty()) {
+        foreach ($requests as $request) {
+            echo "event: message-submit\n";
+            echo 'data: ' . json_encode([
+                'id' => $request->message_id,
+                'request_message_id' => $request->id, // Include the actual database ID
+                'name' => $request->name,
+                'address' => $request->address,
+                'description' => $request->description,
+                'created_at' => $request->created_at
+            ]) . "\n\n";
+
+            ob_flush();
+            flush();
+        }
+    }
+
+    exit();
+});
 
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {

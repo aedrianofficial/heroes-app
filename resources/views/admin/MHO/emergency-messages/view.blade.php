@@ -20,7 +20,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Date recieve</h5>
-                                    <p class="text-dark">{{ $message->created_at }}</p>
+                                    <p class="text-dark">{{ $message->created_at->format('F j, Y g:i A') }}</p>
                                 </div>
                                 {{-- <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Address</h5>
@@ -84,7 +84,94 @@
                                 </div> --}}
                             </div>
                         </div>
+                        <hr>
+                        <div class="row">
+                            <!-- Left Column -->
+                            <div class="col-md-6">
+                                <h5 class="fw-bold text-muted">Sender Profile</h5>
+                                @if ($profile)
+                                    <div class="mb-3">
+                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }}
+                                            {{ $profile->last_name }} {{ $profile->suffix }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Sex:</strong> {{ $profile->sex }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                    </div>
+                                @else
+                                    <p class="text-muted">No profile information available.</p>
+                                @endif
+                            </div>
 
+                            <!-- Right Column -->
+                            <div class="col-md-6">
+                                @if ($profile)
+                                    <div class="mb-3">
+                                        <p><strong>Religion:</strong> {{ $profile->religion }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Ethnicity:</strong> {{ $profile->ethnicity }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Birth Place:</strong> {{ $profile->birth_place }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Zone:</strong> {{ $profile->zone }}</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                        <hr>
+                        @if ($message->requests->isNotEmpty())
+                            @foreach ($message->requests as $index => $request)
+                                <div class="border rounded p-3 mb-4 shadow-sm">
+                                    <h5 class="fw-bold text-muted">Request {{ $index + 1 }}</h5>
+                                    <div class="row">
+                                        <!-- Left Column -->
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <p><strong>Name:</strong> {{ $request->name }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Address:</strong> {{ $request->address }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Description:</strong> {{ $request->description }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Right Column -->
+                                        <div class="col-md-6">
+                                            <h5 class="fw-bold text-muted">Assigned Agencies</h5>
+                                            @if ($request->agencies->isNotEmpty())
+                                                <div class="mb-3">
+                                                    <ul>
+                                                        @foreach ($request->agencies as $agency)
+                                                            <li>{{ $agency->name }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                </div>
+                                            @else
+                                                <p class="text-muted">No assigned agencies</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        @else
+                            <p class="text-muted">No requests found for this message.</p>
+                        @endifs
                         <hr>
                         <div class="mb-3">
                             <h5 class="fw-bold text-muted">Status Log</h5>
@@ -102,7 +189,7 @@
                                             </span>
                                             on {{ $log->created_at->format('F j, Y g:i A') }}.
                                             <br>
-                                            <small class="text-muted">Log Details: {{ $log->log_details }}</small>
+                                            <strong>Log Details:</strong> {{ $log->log_details }}
                                         </li>
                                     @endforeach
                                 </ul>

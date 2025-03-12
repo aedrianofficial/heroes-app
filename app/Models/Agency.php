@@ -29,6 +29,6 @@ class Agency extends Model
     }
     public function requests()
     {
-        return $this->belongsToMany(Request::class, 'request_agency');
+        return $this->belongsToMany(RequestCall::class, 'request_call_agency');
     }
 }

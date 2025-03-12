@@ -17,7 +17,7 @@
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Date Received</h5>
-                                    <p class="text-dark">{{ $call->created_at }}</p>
+                                    <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
                                 </div>
 
 
@@ -99,7 +99,7 @@
                                                 <p><strong>Description:</strong> {{ $request->description }}</p>
                                             </div>
                                             <div class="mb-3">
-                                                <p><strong>Time:</strong> {{ $request->created_at }}</p>
+                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
                                             </div>
                                         </div>
 
@@ -142,7 +142,7 @@
                                             </span>
                                             on {{ $log->created_at->format('F j, Y g:i A') }}.
                                             <br>
-                                            <small class="text-muted">Log Details: {{ $log->log_details }}</small>
+                                            <strong>Log Details:</strong> {{ $log->log_details }}
                                         </li>
                                     @endforeach
                                 </ul>

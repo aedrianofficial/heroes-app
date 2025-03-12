@@ -151,7 +151,10 @@
                     Swal.fire({
                         title: "📞 Incoming Call Alert",
                         html: `<b>Caller:</b> ${data.caller_name} (${data.caller_contact}) <br>
-                         <b>Time:</b> ${data.created_at}<br>
+                         <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+        month: 'long', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    })}<br>
                          <b>Address:</b> ${data.address}`,
                         icon: "info",
                         showCancelButton: true,
@@ -220,7 +223,11 @@
                         title: "📩 New Message Alert",
                         html: `<b>From:</b> ${data.sender_name} (${data.sender_contact}) <br> 
                            <b>Message:</b> ${data.message_content} <br>
-                           <b>Time:</b> ${data.created_at}`,
+                           <b>Address:</b> ${data.address} <br>
+                            <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+        month: 'long', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    })}`,
                         icon: "info",
                         showCancelButton: true,
                         cancelButtonText: "Close",
@@ -256,37 +263,40 @@
         }
     </script>
 
-    <!--request-->
+    <!--request call-->
     <script>
         if (typeof window.requestEventSource === 'undefined') {
 
-            function markRequestAsSeen(requestId) {
-                fetch('/mark-request-as-seen', {
+            function markRequestAsSeen(requestId, requestCallId) {
+                fetch('/mark-request-call-as-seen', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
                     body: JSON.stringify({
-                        request_id: requestId
+                        request_call_id: requestCallId
                     })
                 });
             }
 
             function connectRequestSSE() {
-                window.requestEventSource = new EventSource("/sse/requests");
+                window.requestEventSource = new EventSource("/sse/request-call");
 
                 window.requestEventSource.addEventListener("request-submit", (event) => {
                     const data = JSON.parse(event.data);
 
-                    markRequestAsSeen(data.id);
+                    markRequestAsSeen(data.id, data.request_call_id);
 
                     Swal.fire({
-                        title: "🚨 New Emergency Request",
+                        title: "🚨 New Emergency Call Request",
                         html: `<b>Name:</b> ${data.name} <br>
                            <b>Address:</b> ${data.address} <br>
                            <b>Description:</b> ${data.description} <br>
-                           <b>Time:</b> ${data.created_at}`,
+                            <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+        month: 'long', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    })}`,
                         icon: "warning",
                         showCancelButton: true,
                         cancelButtonText: "Close",
@@ -295,7 +305,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/agency/request/${data.id}/view`;
+                            window.location.href = `/admin/bfp/emergency-call/${data.id}/view`;
                         }
                     });
                 });
@@ -313,6 +323,69 @@
             document.addEventListener('turbolinks:load', function() {
                 if (window.requestEventSource.readyState === 2) {
                     connectRequestSSE();
+                }
+            });
+        }
+    </script>
+    <!--request message-->
+    <script>
+        if (typeof window.messageEventSource === 'undefined') {
+            function markMessageAsSeen(messageId, requestMessageId) {
+                fetch('/mark-request-message-as-seen', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    },
+                    body: JSON.stringify({
+                        request_message_id: requestMessageId
+                    })
+                });
+            }
+
+            function connectMessageSSE() {
+                window.messageEventSource = new EventSource("/sse/request-message");
+
+                window.messageEventSource.addEventListener("message-submit", (event) => {
+                    const data = JSON.parse(event.data);
+
+                    markMessageAsSeen(data.id, data.request_message_id);
+
+                    Swal.fire({
+                        title: "📩 New Message Emergency Request",
+                        html: `<b>Name:</b> ${data.name} <br>
+                       <b>Address:</b> ${data.address} <br>
+                       <b>Description:</b> ${data.description} <br>
+                        <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+        month: 'long', day: 'numeric', year: 'numeric', 
+        hour: 'numeric', minute: 'numeric', hour12: true 
+    })}`,
+                        icon: "info",
+                        showCancelButton: true,
+                        cancelButtonText: "Close",
+                        confirmButtonText: "📄 View Details",
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = `/admin/pnp/emergency-message/${data.id}/view`;
+                        }
+                    });
+                });
+
+                window.messageEventSource.onerror = () => {
+                    console.error("Message SSE connection lost. Retrying in 5 seconds...");
+                    window.messageEventSource.close();
+
+                    setTimeout(connectMessageSSE, 5000);
+                };
+            }
+
+            connectMessageSSE();
+
+            document.addEventListener('turbolinks:load', function() {
+                if (window.messageEventSource.readyState === 2) {
+                    connectMessageSSE();
                 }
             });
         }
