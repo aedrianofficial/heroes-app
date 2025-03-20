@@ -67,10 +67,10 @@
                             href="{{ route('lgu.emergencycall.index') }}">Emergency
                             Calls</a>
                     </li>
-                    <li class="nav-item">
+                    <!--<li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('lgu.reports.index') }}">Activity
                             Logs</a>
-                    </li>
+                    </li>-->
                 </ul>
 
                 <ul class="navbar-nav d-flex">
@@ -127,8 +127,7 @@
         // Check if we already have an active SSE connection
         if (typeof window.callEventSource === 'undefined') {
 
-            // Function to mark a call as seen by this user
-            function markCallAsSeen(callId) {
+             function markCallAsSeen(callId) {
                 fetch('/mark-call-as-seen', {
                     method: 'POST',
                     headers: {
@@ -140,6 +139,8 @@
                     })
                 });
             }
+
+
 
             function connectCallSSE() {
                 // Store the EventSource in a global variable so it persists
@@ -394,6 +395,7 @@
             });
         }
     </script>
+    
     @yield('scripts')
 </body>
 

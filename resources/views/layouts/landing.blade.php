@@ -19,7 +19,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="{{ asset('asset/css/Control.Geocoder.css') }}" />
-    @yield( 'styles')
+    @yield('styles')
 </head>
 
 <body>
@@ -41,7 +41,8 @@
                         <a class="nav-link active" aria-current="page" href="{{ route('news') }}">News</a>
                     </li> --}}
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="{{ route('safetyguide') }}">Safety Guide</a>
+                        <a class="nav-link active" aria-current="page" href="{{ route('safetyguide') }}">Safety
+                            Guide</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('aboutus') }}">About Us</a>
@@ -51,37 +52,85 @@
                     </li>
 
                 </ul>
-
-                @if (Route::has('login'))
-                    <ul class="navbar-nav flex">
-                        @auth
+                <ul class="navbar-nav flex">
+                    @auth
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                                @if (Auth::user()->profile && Auth::user()->profile->firstname)
+                                    {{ Auth::user()->profile->firstname }}
+                                @else
+                                    {{ Auth::user()->name ?? 'User' }}
+                                @endif
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                @if (Auth::user()->role === 'user')
+                                    <li><a class="dropdown-item" href="{{ url('/') }}">User Dashboard</a></li>
+                                @elseif(Auth::user()->role->name === 'admin')
+                                    @if (Auth::user()->agency->name === 'PNP')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/pnp-dashboard') }}">PNP
+                                                Dashboard</a></li>
+                                    @elseif(Auth::user()->agency->name === 'BFP')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/bfp-dashboard') }}">BFP
+                                                Dashboard</a></li>
+                                    @elseif(Auth::user()->agency->name === 'MDRRMO')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/mdrrmo-dashboard') }}">MDRRMO
+                                                Dashboard</a></li>
+                                    @elseif(Auth::user()->agency->name === 'MHO')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/mho-dashboard') }}">MHO
+                                                Dashboard</a></li>
+                                    @elseif(Auth::user()->agency->name === 'COAST GUARD')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/coast-guard-dashboard') }}">Coast
+                                                Guard Dashboard</a></li>
+                                    @elseif(Auth::user()->agency->name === 'LGU')
+                                        <li><a class="dropdown-item" href="{{ url('/admin/lgu-dashboard') }}">LGU
+                                                Dashboard</a></li>
+                                    @else
+                                        <li><a class="dropdown-item" href="{{ url('/') }}">Default Dashboard</a></li>
+                                    @endif
+                                @elseif(Auth::user()->role->name === 'super admin')
+                                    <li><a class="dropdown-item" href="{{ url('/super-admin/dashboard') }}">Super Admin
+                                            Dashboard</a></li>
+                                @else
+                                    <li><a class="dropdown-item" href="{{ url('/') }}">Dashboard (Role:
+                                            {{ Auth::user()->role ?? 'None' }})</a></li>
+                                @endif
+                                <li>
+                                    <hr class="dropdown-divider">
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('logout') }}"
+                                        onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                        Logout
+                                    </a>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                        @csrf
+                                    </form>
+                                </li>
+                            </ul>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a href="{{ route('login') }}" class="nav-link active">
+                                Log in
+                            </a>
+                        </li>
+                        @if (Route::has('register'))
                             <li class="nav-item">
-                                <a href="{{ url('user/dashboard') }}" class="nav-link active">Dashboard</a>
-                            </li>
-                        @else
-                            <li class="nav-item">
-                                <a href="{{ route('login') }}" class="nav-link active">
-                                    Log in
+                                <a href="{{ route('register') }}" class="nav-link active">
+                                    Register
                                 </a>
                             </li>
-
-                            @if (Route::has('register'))
-                                <li class="nav-item">
-                                    <a href="{{ route('register') }}" class="nav-link active">
-                                        Register
-                                    </a>
-                                </li>
-                            @endif
-                        @endauth
-                    </ul>
-                @endif
+                        @endif
+                    @endauth
+                </ul>
 
             </div>
         </div>
     </nav>
 
-    @yield( 'content')
-    
+    @yield('content')
+
 
 
 

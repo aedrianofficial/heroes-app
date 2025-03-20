@@ -1,4 +1,4 @@
-@extends('layouts.mdrrmo')
+@extends('layouts.superadmin')
 
 @section('content')
     <div class="container">
@@ -9,12 +9,13 @@
                 <h5>Reports</h5>
             </div>
             <div class="card-body">
-               <div class="table-responsive">
+              <div class="table-responsive">
                 <table class="table table-striped">
                     <thead>
                         <tr>
                             <th>Name</th>
                             <th>Incident Type</th>
+                            <th>Description</th>
                             <th>Location</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -25,6 +26,7 @@
                             <tr>
                                 <td>{{ $report->name }}</td>
                                 <td>{{ $report->incidentType->name }}</td>
+                                <td>{{ $report->description }}</td>
                                 <td>{{ $report->location->address }}</td>
                                 <td>
                                     <span
@@ -33,19 +35,19 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{ route('mdrrmo.reports.view', $report->id) }}"
+                                    <a href="{{ route('superadmin.reports.view', $report->id) }}"
                                         class="btn btn-sm btn-primary">View</a>
 
                                 </td>
                                 <td>
-                                    <form action="{{ route('mdrrmo.reports.ongoing', $report->id) }}" method="POST">
+                                    <form action="{{ route('superadmin.reports.ongoing', $report->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" onclick="confirmOngoing(event)"
                                             class="btn btn-sm btn-warning ">Ongoing</button>
                                     </form>
                                 </td>
                                 <td>
-                                    <form action="{{ route('mdrrmo.reports.complete', $report->id) }}" method="POST">
+                                    <form action="{{ route('superadmin.reports.complete', $report->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" onclick="confirmComplete(event)"
                                             class="btn btn-sm btn-success ">Complete</button>
@@ -55,7 +57,7 @@
                         @endforeach
                     </tbody>
                 </table>
-               </div>
+              </div>
             </div>
         </div>
     </div>

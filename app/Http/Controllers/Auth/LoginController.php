@@ -39,10 +39,11 @@ class LoginController extends Controller
         // Define role-agency dashboard redirection
         $dashboardRoutes = [
             'user' => [
-                'DEFAULT' => '/user/dashboard',
+                'DEFAULT' => '/',
              
             ],
             'admin' => [
+                'DEFAULT' => '/',
                 'PNP' => '/admin/pnp-dashboard',
                 'BFP' => '/admin/bfp-dashboard',
                 'MDRRMO' => '/admin/mdrrmo-dashboard',
@@ -76,5 +77,4 @@ class LoginController extends Controller
         $request->session()->regenerateToken();
         return redirect('/login')->with('success', 'You have been logged out.');
     }
-
 }

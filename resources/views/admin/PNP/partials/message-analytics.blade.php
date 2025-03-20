@@ -1,12 +1,10 @@
-@extends('layouts.bfp')
-
+@extends('layouts.pnp')
 @section('content')
-    <div class="container-fluid">
-
-        <!-- Date Range Selector -->
-        <div class="card my-4">
-            <div class="card-header">Filter Analytics</div>
-            <div class="card-body">
+    <!-- Date Range Selector -->
+    <div class="card my-4">
+        <div class="card-header">Filter Message Analytics</div>
+        <div class="card-body">
+            <form id="filterForm" class="row g-3">
                 <div class="dropdown mb-3">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                         data-bs-toggle="dropdown" aria-expanded="false">
@@ -14,164 +12,163 @@
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
                         <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                href="{{ route('admin.bfp') }}">Call Analytics</a></li>
+                                href="{{ route('admin.pnp') }}">Call Analytics</a></li>
                         <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                href="{{ route('admin.bfp') }}/message-analytics">Message Analytics</a></li>
+                                href="{{ route('admin.pnp') }}/message-analytics">Message Analytics</a></li>
                     </ul>
                 </div>
 
-                <form id="filterForm" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="start_date" class="form-label">Start Date</label>
-                        <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="end_date" class="form-label">End Date</label>
-                        <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
-                    </div>
-                    <div class="col-md-4">
-                        <label for="agency_id" class="form-label">Agency</label>
-                        <select class="form-select" id="agency_id" name="agency_id">
-                            <option value="">All Agencies</option>
-                            @foreach ($agencies as $agency)
-                                <option value="{{ $agency->id }}">{{ $agency->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <button type="submit" class="btn btn-primary">Apply Filters</button>
-                    </div>
-                </form>
-            </div>
+                <div class="col-md-4">
+                    <label for="start_date" class="form-label">Start Date</label>
+                    <input type="date" class="form-control" id="start_date" name="start_date"
+                        value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="end_date" class="form-label">End Date</label>
+                    <input type="date" class="form-control" id="end_date" name="end_date"
+                        value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                </div>
+                <div class="col-md-4">
+                    <label for="agency_id" class="form-label">Agency</label>
+                    <select class="form-select" id="agency_id" name="agency_id">
+                        <option value="">All Agencies</option>
+                        @foreach ($agencies as $agency)
+                            <option value="{{ $agency->id }}">{{ $agency->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-12">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <!-- Summary Cards -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card bg-primary text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Calls</h5>
-                        <h2 class="card-text" id="total-calls">Loading...</h2>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card bg-info text-white">
-                    <div class="card-body">
-                        <h5 class="card-title">Total Requests</h5>
-                        <h2 class="card-text" id="total-requests">Loading...</h2>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Call Volume Chart -->
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">Daily Call Volume</div>
-                    <div class="card-body">
-                        <canvas id="callVolumeChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">Call Status Distribution</div>
-                    <div class="card-body">
-                        <canvas id="statusDistributionChart" height="300"></canvas>
-                    </div>
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Messages</h5>
+                    <h2 class="card-text" id="total-messages">Loading...</h2>
                 </div>
             </div>
         </div>
 
-        <!-- Top Agencies and Activity Section -->
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">Top Agencies by Requests</div>
-                    <div class="card-body">
-                        <canvas id="topAgenciesChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">Top Agencies by Activity</div>
-                    <div class="card-body">
-                        <canvas id="topAgenciesActivityChart" height="300"></canvas>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Agency Performance Table -->
-        <div class="card mb-4">
-            <div class="card-header">Agency Performance</div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-striped" id="agencyPerformanceTable">
-                        <thead>
-                            <tr>
-                                <th>Agency</th>
-                                <th>Total Requests</th>
-                                <th>Request Views</th>
-                                <th>Last Activity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td colspan="6" class="text-center">Loading data...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+        <div class="col-md-6">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Requests</h5>
+                    <h2 class="card-text" id="total-requests">Loading...</h2>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Message Volume Chart -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Daily Message Volume</div>
+                <div class="card-body">
+                    <canvas id="messageVolumeChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-header">Message Status Distribution</div>
+                <div class="card-body">
+                    <canvas id="statusDistributionChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Agencies and Activity Section -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Top Agencies by Message Requests</div>
+                <div class="card-body">
+                    <canvas id="topAgenciesChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">Top Agencies by Message Activity</div>
+                <div class="card-body">
+                    <canvas id="topAgenciesActivityChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Agency Performance Table -->
+    <div class="card mb-4">
+        <div class="card-header">Agency Performance (Messages)</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped" id="agencyPerformanceTable">
+                    <thead>
+                        <tr>
+                            <th>Agency</th>
+                            <th>Total Requests</th>
+                            <th>Request Views</th>
+                            <th>Last Activity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4" class="text-center">Loading data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Chart.js library before your script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
 @endsection
 
 @section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize charts
-            let callVolumeChart = null;
+            let messageVolumeChart = null;
             let statusDistributionChart = null;
             let topAgenciesChart = null;
             let topAgenciesActivityChart = null;
 
             // Load initial data
-            loadAllData();
+            loadMessageAllData();
 
             // Handle filter form submission
             document.getElementById('filterForm').addEventListener('submit', function(e) {
                 e.preventDefault();
-                loadAllData();
+                loadMessageAllData();
             });
 
-            function loadAllData() {
+            function loadMessageAllData() {
                 const startDate = document.getElementById('start_date').value;
                 const endDate = document.getElementById('end_date').value;
                 const agencyId = document.getElementById('agency_id').value;
 
-                loadAgencyPerformance(startDate, endDate, agencyId);
-                loadDailyCallVolume();
-                loadCallsStatusDistribution(startDate, endDate);
-                loadTopAgencies(startDate, endDate);
+                loadMessageAgencyPerformance(startDate, endDate, agencyId);
+                loadDailyMessageVolume();
+                loadMessagesStatusDistribution(startDate, endDate);
+                loadTopMessageAgencies(startDate, endDate);
             }
 
-            function loadAgencyPerformance(startDate, endDate, agencyId) {
+            function loadMessageAgencyPerformance(startDate, endDate, agencyId) {
                 fetch(
-                        `/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}${agencyId ? `&agency_id=${agencyId}` : ''}`
-                        )
+                        `/api/analytics/message-agency-performance?start_date=${startDate}&end_date=${endDate}${agencyId ? `&agency_id=${agencyId}` : ''}`
+                    )
                     .then(response => response.json())
                     .then(data => {
-                        updateAgencyPerformanceTable(data.agencies);
+                        updateAgencyMessagePerformanceTable(data.agencies);
 
                         // Update summary cards
                         let totalRequests = 0;
@@ -179,23 +176,21 @@
 
                         data.agencies.forEach(agency => {
                             totalRequests += agency.total_requests;
-                            totalProcessed += agency.processed_calls;
+                            totalProcessed += agency.processed_messages;
                         });
 
                         document.getElementById('total-requests').textContent = totalRequests;
-                        document.getElementById('processed-calls').textContent = totalProcessed;
-                        document.getElementById('active-agencies').textContent = data.agencies.length;
                     })
                     .catch(error => console.error('Error loading agency performance:', error));
             }
 
-            function updateAgencyPerformanceTable(agencies) {
+            function updateAgencyMessagePerformanceTable(agencies) {
                 const tbody = document.querySelector('#agencyPerformanceTable tbody');
                 tbody.innerHTML = '';
 
                 if (agencies.length === 0) {
                     const row = document.createElement('tr');
-                    row.innerHTML = '<td colspan="3" class="text-center">No data available</td>';
+                    row.innerHTML = '<td colspan="4" class="text-center">No data available</td>';
                     tbody.appendChild(row);
                     return;
                 }
@@ -207,53 +202,54 @@
                         'No activity';
 
                     row.innerHTML = `
-            <td>${agency.agency_name}</td>
-            <td>${agency.total_requests}</td>
-            <td>${agency.request_views}</td>
-            <td>${lastActivity}</td>
-        `;
+                <td>${agency.agency_name}</td>
+                <td>${agency.total_requests}</td>
+                <td>${agency.request_views}</td>
+                <td>${lastActivity}</td>
+            `;
                     tbody.appendChild(row);
                 });
             }
 
-            function loadDailyCallVolume() {
-                fetch('/api/analytics/daily-call-volume')
+            function loadDailyMessageVolume() {
+                fetch('/api/analytics/daily-message-volume')
                     .then(response => response.json())
                     .then(data => {
-                        const dates = data.daily_calls.map(item => item.date);
-                        const callCounts = data.daily_calls.map(item => item.count);
+                        const dates = data.daily_messages.map(item => item.date);
+                        const messageCounts = data.daily_messages.map(item => item.count);
                         const requestCounts = data.daily_requests.map(item => item.count);
 
-                        // Process the processed vs unprocessed calls data
-                        const processedCalls = [];
-                        const unprocessedCalls = [];
+                        // Process the processed vs unprocessed messages data
+                        const processedMessages = [];
+                        const unprocessedMessages = [];
 
                         dates.forEach(date => {
-                            if (data.calls_by_status[date]) {
-                                processedCalls.push(data.calls_by_status[date].processed || 0);
-                                unprocessedCalls.push(data.calls_by_status[date].unprocessed || 0);
+                            if (data.messages_by_status[date]) {
+                                processedMessages.push(data.messages_by_status[date].processed || 0);
+                                unprocessedMessages.push(data.messages_by_status[date].unprocessed ||
+                                    0);
                             } else {
-                                processedCalls.push(0);
-                                unprocessedCalls.push(0);
+                                processedMessages.push(0);
+                                unprocessedMessages.push(0);
                             }
                         });
 
-                        // Update total calls summary card
-                        const totalCalls = callCounts.reduce((sum, count) => sum + count, 0);
-                        document.getElementById('total-calls').textContent = totalCalls;
+                        // Update total messages summary card
+                        const totalMessages = messageCounts.reduce((sum, count) => sum + count, 0);
+                        document.getElementById('total-messages').textContent = totalMessages;
 
-                        if (callVolumeChart) {
-                            callVolumeChart.destroy();
+                        if (messageVolumeChart) {
+                            messageVolumeChart.destroy();
                         }
 
-                        const ctx = document.getElementById('callVolumeChart').getContext('2d');
-                        callVolumeChart = new Chart(ctx, {
+                        const ctx = document.getElementById('messageVolumeChart').getContext('2d');
+                        messageVolumeChart = new Chart(ctx, {
                             type: 'line',
                             data: {
                                 labels: dates,
                                 datasets: [{
-                                        label: 'Total Calls',
-                                        data: callCounts,
+                                        label: 'Total Messages',
+                                        data: messageCounts,
                                         borderColor: 'rgba(75, 192, 192, 1)',
                                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                         tension: 0.4
@@ -288,11 +284,11 @@
                             }
                         });
                     })
-                    .catch(error => console.error('Error loading call volume data:', error));
+                    .catch(error => console.error('Error loading message volume data:', error));
             }
 
-            function loadCallsStatusDistribution(startDate, endDate) {
-                fetch(`/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}`)
+            function loadMessagesStatusDistribution(startDate, endDate) {
+                fetch(`/api/analytics/messages-status-distribution?start_date=${startDate}&end_date=${endDate}`)
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -339,8 +335,8 @@
                     .catch(error => console.error('Error loading status distribution data:', error));
             }
 
-            function loadTopAgencies(startDate, endDate) {
-                fetch(`/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}`)
+            function loadTopMessageAgencies(startDate, endDate) {
+                fetch(`/api/analytics/message-top-agencies?start_date=${startDate}&end_date=${endDate}`)
                     .then(response => response.json())
                     .then(data => {
                         // Top agencies by requests
@@ -435,59 +431,5 @@
                 return colors;
             }
         });
-    </script>
-    <script>
-        // Load appropriate scripts based on which dashboard is active
-        document.addEventListener('DOMContentLoaded', function() {
-            const isMessageAnalytics = {{ request()->is('*/message-analytics') ? 'true' : 'false' }};
-
-            if (isMessageAnalytics) {
-                loadMessageAnalytics();
-            } else {
-                loadCallAnalytics();
-            }
-        });
-
-        function loadMessageAnalytics() {
-            // Initialize message analytics code
-            // This should be the content of your message-analytics.js file
-            let messageVolumeChart = null;
-            let statusDistributionChart = null;
-            let topAgenciesChart = null;
-            let topAgenciesActivityChart = null;
-
-            // Load data
-            loadMessageAllData();
-
-            // Handle filter form submission
-            document.getElementById('filterForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                loadMessageAllData();
-            });
-
-            // Your existing message analytics functions here...
-            // The rest of the message analytics script follows
-        }
-
-        function loadCallAnalytics() {
-            // Initialize call analytics code
-            // This should be the content of your call-analytics.js file
-            let callVolumeChart = null;
-            let statusDistributionChart = null;
-            let topAgenciesChart = null;
-            let topAgenciesActivityChart = null;
-
-            // Load data
-            loadAllData();
-
-            // Handle filter form submission
-            document.getElementById('filterForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                loadAllData();
-            });
-
-            // Your existing call analytics functions here...
-            // The rest of the call analytics script follows
-        }
     </script>
 @endsection

@@ -12,85 +12,101 @@ use Illuminate\Support\Facades\DB;
 class AnalyticsController extends Controller
 {
     public function agencyPerformance(Request $request)
-    {
-        // Get parameters or use defaults
-        $startDate = $request->input('start_date', Carbon::now()->subMonth()->format('Y-m-d'));
-        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
-        $agencyId = $request->input('agency_id');
-        
-        // Base query for request calls
-        $query = RequestCall::whereBetween('created_at', [$startDate, $endDate]);
-        
-        // Filter by agency if specified
-        if ($agencyId) {
-            $query->whereHas('agencies', function($q) use ($agencyId) {
-                $q->where('agency_id', $agencyId);
-            });
-        }
-        
-        // Get all agencies or a specific one
-        $agencies = $agencyId 
-            ? Agency::where('id', $agencyId)->get() 
-            : Agency::all();
-            
-        $results = [];
-        
-        foreach ($agencies as $agency) {
-            // Get requests assigned to this agency
-            $agencyRequests = DB::table('request_call_agency')
-                ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
-                ->where('request_call_agency.agency_id', $agency->id)
-                ->whereBetween('request_calls.created_at', [$startDate, $endDate])
-                ->count();
-                
-            // Get calls processed by this agency (via requests)
-            $processedCalls = DB::table('request_call_agency')
-                ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
-                ->join('calls', 'calls.id', '=', 'request_calls.call_id')
-                ->where('request_call_agency.agency_id', $agency->id)
-                ->where('calls.is_processed', true)
-                ->whereBetween('request_calls.created_at', [$startDate, $endDate])
-                ->count();
-                
-            // Views count by users of this agency
-            $requestViews = DB::table('request_call_views')
-                ->join('users', 'users.id', '=', 'request_call_views.user_id')
-                ->where('users.agency_id', $agency->id)
-                ->whereBetween('request_call_views.created_at', [$startDate, $endDate])
-                ->count();
-                
-            // Most recent activity timestamps
-            $lastRequestTimestamp = DB::table('request_call_agency')
-                ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
-                ->where('request_call_agency.agency_id', $agency->id)
-                ->whereBetween('request_calls.created_at', [$startDate, $endDate])
-                ->max('request_calls.created_at');
-                
-            $lastViewTimestamp = DB::table('request_call_views')
-                ->join('users', 'users.id', '=', 'request_call_views.user_id')
-                ->where('users.agency_id', $agency->id)
-                ->whereBetween('request_call_views.created_at', [$startDate, $endDate])
-                ->max('request_call_views.created_at');
-                
-            $results[] = [
-                'agency_id' => $agency->id,
-                'agency_name' => $agency->name,
-                'total_requests' => $agencyRequests,
-                'processed_calls' => $processedCalls,
-                'request_views' => $requestViews,
-                'views_per_request' => $agencyRequests > 0 ? round($requestViews / $agencyRequests, 2) : 0,
-                'last_activity' => $lastViewTimestamp ?? $lastRequestTimestamp ?? null
-            ];
-        }
-        
+{
+    // Get parameters or use defaults
+    $startDate = $request->input('start_date', Carbon::now()->subMonth()->format('Y-m-d'));
+    $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+    $agencyId = $request->input('agency_id');
+    
+    // First, make sure we have agencies
+    $agenciesQuery = Agency::query();
+    
+    // If agency_id is provided, filter to just that agency
+    if ($agencyId) {
+        $agenciesQuery->where('id', $agencyId);
+    } else {
+        // Exclude Default agency only when not specifically requested
+        $agenciesQuery->where('id', '!=', 1);
+    }
+    
+    $agencies = $agenciesQuery->get();
+    
+    // Check if we have any agencies
+    if ($agencies->isEmpty()) {
         return response()->json([
             'timeframe' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate
             ],
-            'agencies' => $results
+            'agencies' => [],
+            'debug' => 'No agencies found matching the criteria'
         ]);
     }
+    
+    $results = [];
+    
+    foreach ($agencies as $agency) {
+        // Get requests assigned to this agency
+        $agencyRequests = DB::table('request_call_agency')
+            ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
+            ->where('request_call_agency.agency_id', $agency->id)
+            ->whereBetween('request_calls.created_at', [$startDate, $endDate])
+            ->count();
+            
+        // Skip agencies with no activity in the time period
+        // Remove this if you want to show all agencies even with no activity
+        // if ($agencyRequests == 0) {
+        //     continue;
+        // }
+            
+        // Get calls processed by this agency (via requests)
+        $processedCalls = DB::table('request_call_agency')
+            ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
+            ->join('calls', 'calls.id', '=', 'request_calls.call_id')
+            ->where('request_call_agency.agency_id', $agency->id)
+            ->where('calls.is_processed', true)
+            ->whereBetween('request_calls.created_at', [$startDate, $endDate])
+            ->count();
+            
+        // Views count by users of this agency
+        $requestViews = DB::table('request_call_views')
+            ->join('users', 'users.id', '=', 'request_call_views.user_id')
+            ->where('users.agency_id', $agency->id)
+            ->whereBetween('request_call_views.created_at', [$startDate, $endDate])
+            ->count();
+            
+        // Most recent activity timestamps
+        $lastRequestTimestamp = DB::table('request_call_agency')
+            ->join('request_calls', 'request_calls.id', '=', 'request_call_agency.request_call_id')
+            ->where('request_call_agency.agency_id', $agency->id)
+            ->whereBetween('request_calls.created_at', [$startDate, $endDate])
+            ->max('request_calls.created_at');
+            
+        $lastViewTimestamp = DB::table('request_call_views')
+            ->join('users', 'users.id', '=', 'request_call_views.user_id')
+            ->where('users.agency_id', $agency->id)
+            ->whereBetween('request_call_views.created_at', [$startDate, $endDate])
+            ->max('request_call_views.created_at');
+            
+        $results[] = [
+            'agency_id' => $agency->id,
+            'agency_name' => $agency->name,
+            'total_requests' => $agencyRequests,
+            'processed_calls' => $processedCalls,
+            'request_views' => $requestViews,
+            'views_per_request' => $agencyRequests > 0 ? round($requestViews / $agencyRequests, 2) : 0,
+            'last_activity' => $lastViewTimestamp ?? $lastRequestTimestamp ?? null
+        ];
+    }
+    
+    return response()->json([
+        'timeframe' => [
+            'start_date' => $startDate,
+            'end_date' => $endDate
+        ],
+        'agencies' => $results
+    ]);
+}
     
     public function dailyCallVolume(Request $request)
     {
@@ -188,12 +204,12 @@ class AnalyticsController extends Controller
         $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
         
         // Distribution of calls by status
-        $statusDistribution = Call::whereBetween('created_at', [$startDate, $endDate])
-            ->join('statuses', 'statuses.id', '=', 'calls.status_id')
-            ->select('statuses.id', 'statuses.name', DB::raw('COUNT(*) as count'))
-            ->groupBy('statuses.id', 'statuses.name')
-            ->orderBy('count', 'DESC')
-            ->get();
+        $statusDistribution = Call::whereBetween('calls.created_at', [$startDate, $endDate])
+                        ->join('statuses', 'statuses.id', '=', 'calls.status_id')
+                        ->select('statuses.id', 'statuses.name', DB::raw('COUNT(*) as count'))
+                        ->groupBy('statuses.id', 'statuses.name')
+                        ->orderBy('count', 'DESC')
+                        ->get();
             
         // Get total for percentage calculation
         $total = $statusDistribution->sum('count');

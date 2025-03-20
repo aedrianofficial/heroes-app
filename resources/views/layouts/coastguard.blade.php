@@ -66,11 +66,11 @@
                             href="{{ route('coastguard.emergencycall.index') }}">Emergency
                             Calls</a>
                     </li>
-                    <li class="nav-item">
+                    <!--<li class="nav-item">
                         <a class="nav-link active" aria-current="page"
                             href="{{ route('coastguard.reports.index') }}">Activity
                             Logs</a>
-                    </li>
+                    </li>-->
                 </ul>
 
                 <ul class="navbar-nav d-flex">

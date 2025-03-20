@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Agency;
 use App\Models\Call;
 use App\Models\IncidentType;
 use App\Models\Message;
@@ -32,8 +33,8 @@ class MhoController extends Controller
         $pendingReports = $reports->where('status_id', 1)->count();
         $ongoingReports = $reports->where('status_id', 2)->count();
         $completedReports = $reports->where('status_id', 3)->count();
-    
-        return view('admin.mho.dashboard', compact('totalReports', 'pendingReports', 'completedReports','ongoingReports', 'reports'));
+        $agencies = Agency::all();
+        return view('admin.mho.dashboard', compact('totalReports', 'pendingReports', 'completedReports','ongoingReports', 'reports','agencies'));
     }
     public function allReports()
     {

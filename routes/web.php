@@ -7,7 +7,9 @@ use App\Http\Controllers\Admin\MdrrmoController;
 use App\Http\Controllers\Admin\MhoController;
 use App\Http\Controllers\Admin\PnpController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\MessageAnalyticsController;
 use App\Http\Controllers\User\ReportController;
 use App\Models\CallView;
 use App\Models\MessageView;
@@ -18,6 +20,7 @@ use App\Http\Controllers\CallController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WebsiteController;
+use App\Models\Agency;
 use App\Models\Call;
 use App\Models\Message;
 use App\Models\RequestCallView;
@@ -25,19 +28,33 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
+
+Route::get('/view-logs', function () {
+    return response()->json(['log' => file_get_contents(storage_path('logs/laravel.log'))]);
+});
+Route::get('/auth-check', function () {
+    return Auth::check() ? 'User is logged in' : 'User is not logged in';
+});
+
+
 Route::get('/', function () {
     return view('website.welcome');
 })->name('welcome');
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/analytics', 'App\Http\Controllers\Admin\AnalyticsController@index')->name('admin.analytics');
-});
+    Route::get('/admin/analytics', 'App\Http\Controllers\AnalyticsController@index')->name('admin.analytics');
+}); 
+Route::get('analytics/agency-performance', [AnalyticsController::class, 'agencyPerformance']);
+Route::middleware(['auth:sanctum'])->prefix('api/analytics')->group(function (): void {
+    Route::get('analytics/agency-performance', [AnalyticsController::class, 'agencyPerformance']);
+    Route::get('/daily-call-volume', [AnalyticsController::class,'dailyCallVolume']);
+    Route::get('/top-agencies', [AnalyticsController::class,'topAgencies']);
+    Route::get('/calls-status-distribution', [AnalyticsController::class,'callsStatusDistribution']);
 
-// routes/api.php
-Route::middleware(['auth:sanctum'])->prefix('api/analytics')->group(function () {
-    Route::get('/agency-performance', 'App\Http\Controllers\AnalyticsController@agencyPerformance');
-    Route::get('/daily-call-volume', 'App\Http\Controllers\AnalyticsController@dailyCallVolume');
-    Route::get('/calls-status-distribution', 'App\Http\Controllers\AnalyticsController@callsStatusDistribution');
-    Route::get('/top-agencies', 'App\Http\Controllers\AnalyticsController@topAgencies');
+    // New message analytics routes
+    Route::get('/message-agency-performance', [MessageAnalyticsController::class, 'agencyPerformance']);
+    Route::get('/daily-message-volume', [MessageAnalyticsController::class, 'dailyMessageVolume']);
+    Route::get('/message-top-agencies', [MessageAnalyticsController::class, 'topAgencies']);
+    Route::get('/messages-status-distribution', [MessageAnalyticsController::class, 'messagesStatusDistribution']);
 });
 
 
@@ -50,7 +67,7 @@ Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/news', [WebsiteController::class, 'news'])->name('news');
 Route::get('/safety-guide', [WebsiteController::class, 'safetyGuide'])->name('safetyguide');
 Route::get('/about-us', [WebsiteController::class, 'aboutUs'])->name('aboutus');
-Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact');
+Route::get('/contact', [WebsiteController::class, 'contact'])->name('contact'); 
 
 
 // Route to mark call as seen
@@ -332,6 +349,16 @@ Route::middleware(['auth'])->group(function () {
 
     // Bureau of Fire Protection (BFP)
     Route::middleware(['role:admin,BFP'])->group(function () {
+
+        Route::get('/admin/bfp-dashboard/call-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.bfp.partials.call-analytics',compact('agencies'));
+        });
+
+        Route::get('/admin/bfp-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.bfp.partials.message-analytics',compact('agencies'));
+        })->name('admin.bfp.message-analytics');
         //dashboard
         Route::get('/admin/bfp-dashboard', [BfpController::class, 'bfpDashboard'])->name('admin.bfp');
         Route::post('admin/bfp/reports/{id}/ongoing', [BfpController::class, 'markAsOngoing'])->name('bfp.reports.ongoing');
@@ -358,6 +385,11 @@ Route::middleware(['auth'])->group(function () {
     
     //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
     Route::middleware( ['role:admin,MDRRMO'])->group(function () {
+        Route::get('/admin/mdrrmo-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.mdrrmo.partials.message-analytics',compact('agencies'));
+        })->name('admin.mdrrmo.message-analytics');
+
          Route::get('/admin/mdrrmo-dashboard', action: [MdrrmoController::class, 'mdrrmoDashboard'])->name('admin.mdrrmo');
          Route::get('admin/mdrrmo/all-reports', [MdrrmoController::class, 'allReports'])->name('admin.mdrrmo.reports');
          Route::post('admin/mdrrmo/reports/{id}/ongoing', [MdrrmoController::class, 'markAsOngoing'])->name('mdrrmo.reports.ongoing');
@@ -384,6 +416,11 @@ Route::middleware(['auth'])->group(function () {
     
     //Municipal Health Office (MHO)
     Route::middleware( ['role:admin,MHO'])->group(function () {
+        Route::get('/admin/mho-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.mho.partials.message-analytics',compact('agencies'));
+        })->name('admin.mho.message-analytics');
+
         Route::get('/admin/mho-dashboard', [MhoController::class, 'mhoDashboard'])->name('admin.mho');
         Route::get('admin/mho/all-reports', [MhoController::class, 'allReports'])->name('admin.mho.reports');
         Route::post('admin/mho/reports/{id}/ongoing', [MhoController::class, 'markAsOngoing'])->name('mho.reports.ongoing');
@@ -409,6 +446,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Coast Guard
     Route::middleware(['role:admin,COAST GUARD'])->group(function () {
+        Route::get('/admin/coastguard-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.coastguard.partials.message-analytics',compact('agencies'));
+        })->name('admin.coastguard.message-analytics');
+
         Route::get('/admin/coast-guard-dashboard', [CoastGuardController::class, 'coastGuardDashboard'])->name('admin.coastguard');
         Route::get('admin/coast-guard/all-reports', [CoastGuardController::class, 'allReports'])->name('admin.coastguard.reports');
         Route::post('admin/coast-guard/reports/{id}/ongoing', [CoastGuardController::class, 'markAsOngoing'])->name('coastguard.reports.ongoing');
@@ -434,6 +476,11 @@ Route::middleware(['auth'])->group(function () {
     
     //Local Government Unit (LGU)
     Route::middleware(['role:admin,LGU'])->group(function () {
+        Route::get('/admin/lgu-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.lgu.partials.message-analytics',compact('agencies'));
+        })->name('admin.lgu.message-analytics');
+
         Route::get('/admin/lgu-dashboard', [LguController::class, 'lguDashboard'])->name('admin.lgu');
         Route::get('admin/lgu/all-reports', [LguController::class, 'allReports'])->name('admin.lgu.reports');
         Route::post('admin/lgu/reports/{id}/ongoing', [LguController::class, 'markAsOngoing'])->name('lgu.reports.ongoing');
@@ -460,11 +507,35 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {
-
+        Route::get('/admin/super-admin-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.superadmin.partials.message-analytics',compact('agencies'));
+        })->name('admin.superadmin.message-analytics');
         // Super Admin Dashboard (Only Super Admins in DEFAULT Agency)
         Route::get('/super-admin/dashboard', [SuperAdminController::class, 'superAdminDashboard'])->name('superadmin.dashboard');
         Route::get('/super-admin/users', [SuperAdminController::class, 'usersList'])->name('superadmin.users');
         Route::get('/super-admin/users/{id}', [SuperAdminController::class, 'viewUser'])->name('superadmin.users.view');
+        Route::get('/superadmin/users/{id}/edit', [SuperAdminController::class, 'edit'])->name('superadmin.users.edit');
+        Route::put('/superadmin/users/{id}/update', [SuperAdminController::class, 'update'])->name('superadmin.users.update');
+        Route::post('/superadmin/users/store', [SuperAdminController::class, 'store'])->name('superadmin.users.store');
+        Route::get('/superadmin/users/create', [SuperAdminController::class, 'create'])->name('superadmin.users.create');
 
+        //reports
+        Route::get('superadmin/reports/create', [SuperAdminController::class, 'createReport'])->name('superadmin.reports.create');
+        Route::post('superadmin/reports', [SuperAdminController::class, 'storeReport'])->name('superadmin.reports.store');
+        Route::get('superadmin/all-reports', [SuperAdminController::class, 'reportList'])->name('superadmin.reports.index');
+        Route::get('admin/superadmin/reports/{id}/view', [SuperAdminController::class, 'viewReport'])->name('superadmin.reports.view');
+
+          //emergency message
+          Route::get('superadmin/all-emergency-message', [SuperAdminController::class, 'emergencyMessageList'])->name('superadmin.emergencymessage.index');
+          Route::get('admin/superadmin/emergency-message/{id}/view', [SuperAdminController::class, 'viewEmergencyMessage'])->name('superadmin.emergencymessage.view');
+          Route::post('admin/superadmin/emergency-message/{id}/ongoing', [SuperAdminController::class, 'markAsOngoingForMessage'])->name('superadmin.emergencymessage.ongoing');
+          Route::post('admin/superadmin/emergency-message/{id}/complete', [SuperAdminController::class, 'markAsCompletedForMessage'])->name('superadmin.emergencymessage.complete');
+  
+          //emergency call
+          Route::get('superadmin/all-emergency-call', [SuperAdminController::class, 'emergencyCallList'])->name('superadmin.emergencycall.index');
+          Route::get('admin/superadmin/emergency-call/{id}/view', [SuperAdminController::class, 'viewEmergencyCall'])->name('superadmin.emergencycall.view');
+          Route::post('admin/superadmin/emergency-call/{id}/ongoing', [SuperAdminController::class, 'markAsOngoingForCall'])->name('superadmin.emergencycall.ongoing');
+          Route::post('admin/superadmin/emergency-call/{id}/complete', [SuperAdminController::class, 'markAsCompletedForCall'])->name('superadmin.emergencycall.complete');
     });
 });

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Agency;
 use App\Models\Call;
 use App\Models\IncidentType;
 use App\Models\Message;
@@ -20,7 +21,7 @@ class PnpController extends Controller
     {
         $user = Auth::user();
 
-        // Fetch reports assigned to PNP (agency_id = 2)
+        // Fetch reports assigned to pnp (agency_id = 2)
         $reports = Report::whereHas('user', function ($query) {
             $query->where('agency_id', 2); 
         })->with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])
@@ -32,8 +33,8 @@ class PnpController extends Controller
         $pendingReports = $reports->where('status_id', 1)->count();
         $ongoingReports = $reports->where('status_id', 2)->count();
         $completedReports = $reports->where('status_id', 3)->count();
-    
-        return view('admin.pnp.dashboard', compact('totalReports', 'pendingReports', 'completedReports','ongoingReports', 'reports'));
+        $agencies = Agency::all();
+        return view('admin.pnp.dashboard', compact('totalReports', 'pendingReports', 'completedReports','ongoingReports', 'reports','agencies'));
     }
 
     public function viewReport($id)
@@ -141,12 +142,12 @@ class PnpController extends Controller
     {
         $reports = Report::with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])
             ->whereHas('user', function ($query) {
-                $query->where('agency_id', 2); // Filtering users by agency_id = 2 (PNP)
+                $query->where('agency_id', 2); // Filtering users by agency_id = 2 (pnp)
             })
             ->latest()
             ->get();
     
-        return view('admin.PNP.report.all-report', compact('reports'));
+        return view('admin.pnp.report.all-report', compact('reports'));
     }    
 
     public function emergencyMessageList()
@@ -155,7 +156,7 @@ class PnpController extends Controller
 
 
         // Return view with data
-        return view('admin.PNP.emergency-messages.index', compact('messages'));
+        return view('admin.pnp.emergency-messages.index', compact('messages'));
     }
     public function viewEmergencyMessage($id)
     {

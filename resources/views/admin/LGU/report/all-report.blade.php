@@ -9,51 +9,53 @@
                 <h5>Reports</h5>
             </div>
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>Incident Type</th>
-                            <th>Location</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($reports as $report)
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
                             <tr>
-                                <td>{{ $report->name }}</td>
-                                <td>{{ $report->incidentType->name }}</td>
-                                <td>{{ $report->location->address }}</td>
-                                <td>
-                                    <span
-                                        class="badge bg-{{ $report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                        {{ $report->status->name }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <a href="{{ route('lgu.reports.view', $report->id) }}"
-                                        class="btn btn-sm btn-primary">View</a>
-
-                                </td>
-                                <td>
-                                    <form action="{{ route('lgu.reports.ongoing', $report->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" onclick="confirmOngoing(event)"
-                                            class="btn btn-sm btn-warning ">Ongoing</button>
-                                    </form>
-                                </td>
-                                <td>
-                                    <form action="{{ route('lgu.reports.complete', $report->id) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" onclick="confirmComplete(event)"
-                                            class="btn btn-sm btn-success ">Complete</button>
-                                    </form>
-                                </td>
+                                <th>Name</th>
+                                <th>Incident Type</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Actions</th>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            @foreach ($reports as $report)
+                                <tr>
+                                    <td>{{ $report->name }}</td>
+                                    <td>{{ $report->incidentType->name }}</td>
+                                    <td>{{ $report->location->address }}</td>
+                                    <td>
+                                        <span
+                                            class="badge bg-{{ $report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success') }}">
+                                            {{ $report->status->name }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ route('lgu.reports.view', $report->id) }}"
+                                            class="btn btn-sm btn-primary">View</a>
+    
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('lgu.reports.ongoing', $report->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" onclick="confirmOngoing(event)"
+                                                class="btn btn-sm btn-warning ">Ongoing</button>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form action="{{ route('lgu.reports.complete', $report->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" onclick="confirmComplete(event)"
+                                                class="btn btn-sm btn-success ">Complete</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
