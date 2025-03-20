@@ -22,8 +22,9 @@ use Illuminate\Support\Facades\Hash;
 class SuperAdminController extends Controller
 {
     public function superAdminDashboard()
-    {
-        return view('super-admin.dashboard');
+    { 
+        $agencies = Agency::all();
+        return view('super-admin.dashboard',compact('agencies'));
     }
     public function usersList()
     {

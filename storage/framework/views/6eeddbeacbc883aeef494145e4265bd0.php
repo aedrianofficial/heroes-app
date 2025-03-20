@@ -1,22 +1,21 @@
-@extends('layouts.superadmin')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
 
         <!-- Date Range Selector -->
         <div class="card my-4">
-            <div class="card-header">Filter Call Analytics</div>
+            <div class="card-header">Filter Analytics</div>
             <div class="card-body">
                 <div class="dropdown mb-3">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                         data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics' }}
+                        <?php echo e(request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics'); ?>
+
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
-                        <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                href="{{ route('superadmin.dashboard') }}">Call Analytics</a></li>
-                        <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                href="{{ route('superadmin.dashboard') }}/message-analytics">Message Analytics</a></li>
+                        <li><a class="dropdown-item <?php echo e(!request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                href="<?php echo e(route('superadmin.dashboard')); ?>">Call Analytics</a></li>
+                        <li><a class="dropdown-item <?php echo e(request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                href="<?php echo e(route('superadmin.dashboard')); ?>/message-analytics">Message Analytics</a></li>
                     </ul>
                 </div>
 
@@ -24,20 +23,20 @@
                     <div class="col-md-4">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->subMonth()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="end_date" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-4">
                         <label for="agency_id" class="form-label">Agency</label>
                         <select class="form-select" id="agency_id" name="agency_id">
                             <option value="">All Agencies</option>
-                            @foreach ($agencies as $agency)
-                                <option value="{{ $agency->id }}">{{ $agency->name }}</option>
-                            @endforeach
+                            <?php $__currentLoopData = $agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <option value="<?php echo e($agency->id); ?>"><?php echo e($agency->name); ?></option>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </select>
                     </div>
                     <div class="col-12">
@@ -161,9 +160,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -513,7 +512,7 @@
             }
             // Load appropriate scripts based on which dashboard is active
             document.addEventListener('DOMContentLoaded', function() {
-                const isMessageAnalytics = {{ request()->is('*/message-analytics') ? 'true' : 'false' }};
+                const isMessageAnalytics = <?php echo e(request()->is('*/message-analytics') ? 'true' : 'false'); ?>;
 
                 if (isMessageAnalytics) {
                     loadMessageAnalytics();
@@ -566,4 +565,6 @@
         });
     </script>
     <script></script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.superadmin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/super-admin/dashboard.blade.php ENDPATH**/ ?>

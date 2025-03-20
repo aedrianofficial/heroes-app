@@ -81,13 +81,19 @@ class MessageAnalyticsController extends Controller
                 ->where('users.agency_id', $agency->id)
                 ->whereBetween('request_message_views.created_at', [$startDate, $endDate])
                 ->max('request_message_views.created_at');
-                
+            $messageViews = DB::table('message_views')
+                ->join('users', 'users.id', '=', 'message_views.user_id')
+                ->join('messages', 'messages.id', '=', 'message_views.message_id')
+                ->where('users.agency_id', $agency->id)
+                ->whereBetween('message_views.created_at', [$startDate, $endDate])
+                ->count();   
             $results[] = [
                 'agency_id' => $agency->id,
                 'agency_name' => $agency->name,
                 'total_requests' => $agencyRequests,
                 'processed_messages' => $processedMessages,
                 'request_views' => $requestViews,
+                'message_views' => $messageViews,
                 'views_per_request' => $agencyRequests > 0 ? round($requestViews / $agencyRequests, 2) : 0,
                 'last_activity' => $lastViewTimestamp ?? $lastRequestTimestamp ?? null
             ];
@@ -172,23 +178,32 @@ class MessageAnalyticsController extends Controller
             ->get();
             
         // Top agencies by view activity
-        $topByViews = DB::table('message_views')
-            ->join('users', 'users.id', '=', 'message_views.user_id')
+        $topByRequestViews = DB::table('request_message_views')
+            ->join('users', 'users.id', '=', 'request_message_views.user_id')
             ->join('agencies', 'agencies.id', '=', 'users.agency_id')
-            ->whereBetween('message_views.created_at', [$startDate, $endDate])
+            ->whereBetween('request_message_views.created_at', [$startDate, $endDate])
             ->select('agencies.id', 'agencies.name', DB::raw('COUNT(*) as view_count'))
             ->groupBy('agencies.id', 'agencies.name')
             ->orderBy('view_count', 'DESC')
             ->limit($limit)
             ->get();
-            
+        $topByMessageViews = DB::table('message_views')
+            ->join('users', 'users.id', '=', 'message_views.user_id')
+            ->join('agencies', 'agencies.id', '=', 'users.agency_id')
+            ->whereBetween('message_views.created_at', [$startDate, $endDate])
+            ->select('agencies.id', 'agencies.name', DB::raw('COUNT(*) as message_view_count'))
+            ->groupBy('agencies.id', 'agencies.name')
+            ->orderBy('message_view_count', 'DESC')
+            ->limit($limit)
+            ->get();   
         return response()->json([
             'timeframe' => [
                 'start_date' => $startDate,
                 'end_date' => $endDate
             ],
             'top_by_requests' => $topByRequests,
-            'top_by_views' => $topByViews
+            'top_by_views' => $topByRequestViews,
+            'top_by_message_views' => $topByMessageViews,
         ]);
     }
     

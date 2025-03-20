@@ -507,12 +507,14 @@ Route::middleware(['auth'])->group(function () {
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {
-        Route::get('/admin/super-admin-dashboard/message-analytics', function () {
+        Route::get('/super-admin/dashboard/message-analytics', function () {
             $agencies = Agency::all();
-            return view('admin.superadmin.partials.message-analytics',compact('agencies'));
+            return view('super-admin.partials.message-analytics',compact('agencies'));
         })->name('admin.superadmin.message-analytics');
+
         // Super Admin Dashboard (Only Super Admins in DEFAULT Agency)
         Route::get('/super-admin/dashboard', [SuperAdminController::class, 'superAdminDashboard'])->name('superadmin.dashboard');
+
         Route::get('/super-admin/users', [SuperAdminController::class, 'usersList'])->name('superadmin.users');
         Route::get('/super-admin/users/{id}', [SuperAdminController::class, 'viewUser'])->name('superadmin.users.view');
         Route::get('/superadmin/users/{id}/edit', [SuperAdminController::class, 'edit'])->name('superadmin.users.edit');
