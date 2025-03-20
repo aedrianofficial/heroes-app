@@ -323,6 +323,15 @@ Route::middleware(['auth'])->group(function () {
     
     // Philippine National Police (PNP)
     Route::middleware(['role:admin,PNP'])->group(function () {
+        Route::get('/admin/pnp-dashboard/call-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.pnp.partials.call-analytics',compact('agencies'));
+        });
+
+        Route::get('/admin/pnp-dashboard/message-analytics', function () {
+            $agencies = Agency::all();
+            return view('admin.pnp.partials.message-analytics',compact('agencies'));
+        })->name('admin.pnp.message-analytics');
         //dashboard
         Route::get('/admin/pnp-dashboard', [PnpController::class, 'pnpDashboard'])->name('admin.pnp');
         Route::post('admin/pnp/reports/{id}/ongoing', [PnpController::class, 'markAsOngoing'])->name('pnp.reports.ongoing');

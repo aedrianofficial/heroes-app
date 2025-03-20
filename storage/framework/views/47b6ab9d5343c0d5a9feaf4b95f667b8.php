@@ -1,39 +1,39 @@
-@extends('layouts.mdrrmo')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">MDRRMO Agency</h1>
+            <h1 class="h3 mb-0 text-gray-800">PNP Agency</h1>
         </div>
 
         <!-- Date Range Selector -->
         <div class="card my-4">
-            <div class="card-header">Filter Call Analytics</div>
+            <div class="card-header">Filter Message Analytics</div>
+
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
                     <div class="dropdown mb-3">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics' }}
+                            <?php echo e(request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics'); ?>
+
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
-                            <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}">Call Analytics</a></li>
-                            <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}/message-analytics">Message Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(!request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.pnp')); ?>">Call Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.pnp')); ?>/message-analytics">Message Analytics</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->subMonth()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="end_date" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -47,8 +47,8 @@
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
-                        <h5 class="card-title">Total Calls</h5>
-                        <h2 class="card-text" id="total-calls">Loading...</h2>
+                        <h5 class="card-title">Total Messages</h5>
+                        <h2 class="card-text" id="total-messages">Loading...</h2>
                     </div>
                 </div>
             </div>
@@ -71,26 +71,26 @@
             <div class="col-md-3">
                 <div class="card bg-warning text-white">
                     <div class="card-body">
-                        <h5 class="card-title">Total Call Views</h5>
-                        <h2 class="card-text" id="total-call-views">Loading...</h2>
+                        <h5 class="card-title">Total Message Views</h5>
+                        <h2 class="card-text" id="total-message-views">Loading...</h2>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Call Volume Chart -->
+        <!-- Message Volume Chart -->
         <div class="row mb-4">
             <div class="col-md-8">
                 <div class="card">
-                    <div class="card-header">Daily Call Volume</div>
+                    <div class="card-header">Daily Message Volume</div>
                     <div class="card-body">
-                        <canvas id="callVolumeChart" height="300"></canvas>
+                        <canvas id="messageVolumeChart" height="300"></canvas>
                     </div>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-header">Call Status Distribution</div>
+                    <div class="card-header">Message Status Distribution</div>
                     <div class="card-body">
                         <canvas id="statusDistributionChart" height="300"></canvas>
                     </div>
@@ -118,18 +118,18 @@
             </div>
         </div>
 
-        <!-- Call Views Chart -->
+        <!-- Message Views Chart -->
         <div class="row mb-4">
             <div class="col-md-12">
                 <div class="card">
-                    <div class="card-header">Call Views Activity</div>
+                    <div class="card-header">Message Views Activity</div>
                     <div class="card-body">
-                        <canvas id="callViewActivityChart" height="300"></canvas>
+                        <canvas id="messageViewActivityChart" height="300"></canvas>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <!-- Performance Table -->
         <div class="card mb-4">
             <div class="card-header">Performance Metrics</div>
@@ -154,21 +154,21 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize charts
-            let callVolumeChart = null;
+            let messageVolumeChart = null;
             let statusDistributionChart = null;
             let requestActivityChart = null;
             let viewActivityChart = null;
-            let callViewActivityChart = null;
-            
-            // Set the agency ID as a constant (MDRRMO agency_id=2)
-            const AGENCY_ID = 4;
+            let messageViewActivityChart = null;
+
+            // Set the agency ID as a constant (PNP agency_id=2)
+            const AGENCY_ID = 2;
 
             // Load initial data
             loadAllData();
@@ -184,13 +184,14 @@
                 const endDate = document.getElementById('end_date').value;
 
                 loadAgencyPerformance(startDate, endDate);
-                loadDailyCallVolume(startDate, endDate);
-                loadCallsStatusDistribution(startDate, endDate);
+                loadDailyMessageVolume(startDate, endDate);
+                loadMessagesStatusDistribution(startDate, endDate);
                 loadActivityCharts(startDate, endDate);
             }
 
             function loadAgencyPerformance(startDate, endDate) {
-                fetch(`/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/message-agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
                     .then(response => response.json())
                     .then(data => {
                         // Find the agency data (should be only one since we're filtering by agency_id)
@@ -198,8 +199,10 @@
 
                         // Update summary cards
                         document.getElementById('total-requests').textContent = agencyData.total_requests || 0;
-                        document.getElementById('total-request-views').textContent = agencyData.request_views || 0;
-                        document.getElementById('total-call-views').textContent = agencyData.call_views || 0;
+                        document.getElementById('total-request-views').textContent = agencyData.request_views ||
+                            0;
+                        document.getElementById('total-message-views').textContent = agencyData.message_views ||
+                            0;
 
                         // Update performance table
                         updatePerformanceTable(agencyData);
@@ -221,17 +224,47 @@
                 // Calculate metrics
                 const avgRequestsPerDay = agencyData.total_requests / 30; // Assuming 30 days
                 const avgViewsPerRequest = agencyData.request_views / (agencyData.total_requests || 1);
-                const avgCallViewsPerDay = agencyData.call_views / 30;
-                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity).toLocaleString() : 'Never';
+                const avgMessageViewsPerDay = agencyData.message_views / 30;
+                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity)
+                    .toLocaleString() : 'Never';
 
                 // Add rows to the table
-                const metrics = [
-                    { name: 'Total Requests', value: agencyData.total_requests, change: '+5%', lastUpdated: lastActivity },
-                    { name: 'Request Views', value: agencyData.request_views, change: '+3%', lastUpdated: lastActivity },
-                    { name: 'Call Views', value: agencyData.call_views, change: '+7%', lastUpdated: lastActivity },
-                    { name: 'Average Requests per Day', value: avgRequestsPerDay.toFixed(2), change: '-2%', lastUpdated: lastActivity },
-                    { name: 'Average Views per Request', value: avgViewsPerRequest.toFixed(2), change: '+1%', lastUpdated: lastActivity },
-                    { name: 'Average Call Views per Day', value: avgCallViewsPerDay.toFixed(2), change: '+4%', lastUpdated: lastActivity }
+                const metrics = [{
+                        name: 'Total Requests',
+                        value: agencyData.total_requests,
+                        change: '+5%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Request Views',
+                        value: agencyData.request_views,
+                        change: '+3%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Message Views',
+                        value: agencyData.message_views,
+                        change: '+7%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Requests per Day',
+                        value: avgRequestsPerDay.toFixed(2),
+                        change: '-2%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Views per Request',
+                        value: avgViewsPerRequest.toFixed(2),
+                        change: '+1%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Message Views per Day',
+                        value: avgMessageViewsPerDay.toFixed(2),
+                        change: '+4%',
+                        lastUpdated: lastActivity
+                    }
                 ];
 
                 metrics.forEach(metric => {
@@ -246,30 +279,32 @@
                 });
             }
 
-            function loadDailyCallVolume(startDate, endDate) {
-                fetch(`/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+            function loadDailyMessageVolume(startDate, endDate) {
+                fetch(
+                        `/api/analytics/daily-message-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
-                        const dates = data.daily_calls.map(item => item.date);
-                        const callCounts = data.daily_calls.map(item => item.count);
+                        const dates = data.daily_messages.map(item => item.date);
+                        const messageCounts = data.daily_messages.map(item => item.count);
                         const requestCounts = data.daily_requests.map(item => item.count);
 
-                        // Update total calls summary card
-                        const totalCalls = callCounts.reduce((sum, count) => sum + count, 0);
-                        document.getElementById('total-calls').textContent = totalCalls;
+                        // Update total messages summary card
+                        const totalMessages = messageCounts.reduce((sum, count) => sum + count, 0);
+                        document.getElementById('total-messages').textContent = totalMessages;
 
-                        if (callVolumeChart) {
-                            callVolumeChart.destroy();
+                        if (messageVolumeChart) {
+                            messageVolumeChart.destroy();
                         }
 
-                        const ctx = document.getElementById('callVolumeChart').getContext('2d');
-                        callVolumeChart = new Chart(ctx, {
+                        const ctx = document.getElementById('messageVolumeChart').getContext('2d');
+                        messageVolumeChart = new Chart(ctx, {
                             type: 'line',
                             data: {
                                 labels: dates,
                                 datasets: [{
-                                        label: 'Total Calls',
-                                        data: callCounts,
+                                        label: 'Total Messages',
+                                        data: messageCounts,
                                         borderColor: 'rgba(75, 192, 192, 1)',
                                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                                         tension: 0.4
@@ -304,11 +339,13 @@
                             }
                         });
                     })
-                    .catch(error => console.error('Error loading call volume data:', error));
+                    .catch(error => console.error('Error loading message volume data:', error));
             }
 
-            function loadCallsStatusDistribution(startDate, endDate) {
-                fetch(`/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+            function loadMessagesStatusDistribution(startDate, endDate) {
+                fetch(
+                        `/api/analytics/messages-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -342,7 +379,8 @@
                                             label: function(context) {
                                                 const label = context.label || '';
                                                 const value = context.raw || 0;
-                                                const percentage = (value / data.total * 100).toFixed(1);
+                                                const percentage = (value / data.total * 100)
+                                                    .toFixed(1);
                                                 return `${label}: ${value} (${percentage}%)`;
                                             }
                                         }
@@ -355,21 +393,63 @@
             }
 
             function loadActivityCharts(startDate, endDate) {
-                fetch(`/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/message-top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
-                        // Since we're filtering by agency_id, we need to adjust the data structure
-                        // We'll use the date as the label instead of agency names
-                        
-                        // Create a dummy data structure for demonstration
-                        // In a real implementation, you'd need to adjust the API to return time-series data
-                        const timeLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                        
+                        const weeklyData = data.weekly_data || {
+                            requests: [{
+                                week: 'Week 1',
+                                count: 12
+                            }, {
+                                week: 'Week 2',
+                                count: 19
+                            }, {
+                                week: 'Week 3',
+                                count: 15
+                            }, {
+                                week: 'Week 4',
+                                count: 17
+                            }],
+                            views: [{
+                                week: 'Week 1',
+                                count: 42
+                            }, {
+                                week: 'Week 2',
+                                count: 38
+                            }, {
+                                week: 'Week 3',
+                                count: 47
+                            }, {
+                                week: 'Week 4',
+                                count: 55
+                            }],
+                            message_views: [{
+                                week: 'Week 1',
+                                count: 35
+                            }, {
+                                week: 'Week 2',
+                                count: 42
+                            }, {
+                                week: 'Week 3',
+                                count: 38
+                            }, {
+                                week: 'Week 4',
+                                count: 47
+                            }]
+                        };
+
+                        const timeLabels = weeklyData.requests.map(item => 'Week ' + item.week);
+                        const requestCounts = weeklyData.requests.map(item => item.count);
+                        const viewCounts = weeklyData.views.map(item => item.count);
+                        const messageViewCounts = weeklyData.message_views.map(item => item.count);
+
                         // Request Activity Chart
                         if (requestActivityChart) {
                             requestActivityChart.destroy();
                         }
-                        
+
                         const ctxRequests = document.getElementById('requestActivityChart').getContext('2d');
                         requestActivityChart = new Chart(ctxRequests, {
                             type: 'bar',
@@ -377,7 +457,7 @@
                                 labels: timeLabels,
                                 datasets: [{
                                     label: 'Number of Requests',
-                                    data: [12, 19, 15, 17], // Sample data
+                                    data: requestCounts,
                                     backgroundColor: 'rgba(75, 192, 192, 0.7)',
                                     borderColor: 'rgba(75, 192, 192, 1)',
                                     borderWidth: 1
@@ -397,12 +477,12 @@
                                 }
                             }
                         });
-                        
+
                         // View Activity Chart
                         if (viewActivityChart) {
                             viewActivityChart.destroy();
                         }
-                        
+
                         const ctxViews = document.getElementById('viewActivityChart').getContext('2d');
                         viewActivityChart = new Chart(ctxViews, {
                             type: 'bar',
@@ -410,7 +490,7 @@
                                 labels: timeLabels,
                                 datasets: [{
                                     label: 'Number of Request Views',
-                                    data: [42, 38, 47, 55], // Sample data
+                                    data: viewCounts,
                                     backgroundColor: 'rgba(153, 102, 255, 0.7)',
                                     borderColor: 'rgba(153, 102, 255, 1)',
                                     borderWidth: 1
@@ -430,20 +510,21 @@
                                 }
                             }
                         });
-                        
-                        // Call View Activity Chart
-                        if (callViewActivityChart) {
-                            callViewActivityChart.destroy();
+
+                        // Message View Activity Chart
+                        if (messageViewActivityChart) {
+                            messageViewActivityChart.destroy();
                         }
-                        
-                        const ctxCallViews = document.getElementById('callViewActivityChart').getContext('2d');
-                        callViewActivityChart = new Chart(ctxCallViews, {
+
+                        const ctxMessageViews = document.getElementById('messageViewActivityChart').getContext(
+                            '2d');
+                        messageViewActivityChart = new Chart(ctxMessageViews, {
                             type: 'line',
                             data: {
                                 labels: timeLabels,
                                 datasets: [{
-                                    label: 'Call Views',
-                                    data: [35, 42, 38, 47], // Sample data
+                                    label: 'Message Views',
+                                    data: messageViewCounts,
                                     borderColor: 'rgba(255, 99, 132, 1)',
                                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                                     tension: 0.4,
@@ -458,7 +539,7 @@
                                         beginAtZero: true,
                                         title: {
                                             display: true,
-                                            text: 'Call View Count'
+                                            text: 'Message View Count'
                                         }
                                     }
                                 }
@@ -484,4 +565,6 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.pnp', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/pnp/partials/message-analytics.blade.php ENDPATH**/ ?>

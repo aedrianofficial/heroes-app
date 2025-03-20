@@ -3,7 +3,7 @@
 
         <!-- Date Range Selector -->
         <div class="card my-4">
-            <div class="card-header">Filter Analytics</div>
+            <div class="card-header">Filter Call Analytics</div>
             <div class="card-body">
                 <div class="dropdown mb-3">
                     <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"

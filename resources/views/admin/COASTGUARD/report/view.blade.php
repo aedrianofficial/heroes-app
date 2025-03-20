@@ -77,7 +77,7 @@
 
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('admin.coastguard.reports') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('coastguard.reports.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">

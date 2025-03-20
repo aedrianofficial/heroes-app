@@ -1,39 +1,39 @@
-@extends('layouts.mdrrmo')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">MDRRMO Agency</h1>
+            <h1 class="h3 mb-0 text-gray-800">PNP Agency</h1>
         </div>
 
         <!-- Date Range Selector -->
         <div class="card my-4">
             <div class="card-header">Filter Call Analytics</div>
+
             <div class="card-body">
                 <form id="filterForm" class="row g-3">
                     <div class="dropdown mb-3">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics' }}
+                            <?php echo e(request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics'); ?>
+
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
-                            <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}">Call Analytics</a></li>
-                            <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}/message-analytics">Message Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(!request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.pnp')); ?>">Call Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.pnp')); ?>/message-analytics">Message Analytics</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->subMonth()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="end_date" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -129,7 +129,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Performance Table -->
         <div class="card mb-4">
             <div class="card-header">Performance Metrics</div>
@@ -154,9 +154,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -166,9 +166,9 @@
             let requestActivityChart = null;
             let viewActivityChart = null;
             let callViewActivityChart = null;
-            
-            // Set the agency ID as a constant (MDRRMO agency_id=2)
-            const AGENCY_ID = 4;
+
+            // Set the agency ID as a constant (PNP agency_id=2)
+            const AGENCY_ID = 2;
 
             // Load initial data
             loadAllData();
@@ -190,7 +190,8 @@
             }
 
             function loadAgencyPerformance(startDate, endDate) {
-                fetch(`/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
                     .then(response => response.json())
                     .then(data => {
                         // Find the agency data (should be only one since we're filtering by agency_id)
@@ -198,7 +199,8 @@
 
                         // Update summary cards
                         document.getElementById('total-requests').textContent = agencyData.total_requests || 0;
-                        document.getElementById('total-request-views').textContent = agencyData.request_views || 0;
+                        document.getElementById('total-request-views').textContent = agencyData.request_views ||
+                            0;
                         document.getElementById('total-call-views').textContent = agencyData.call_views || 0;
 
                         // Update performance table
@@ -222,16 +224,46 @@
                 const avgRequestsPerDay = agencyData.total_requests / 30; // Assuming 30 days
                 const avgViewsPerRequest = agencyData.request_views / (agencyData.total_requests || 1);
                 const avgCallViewsPerDay = agencyData.call_views / 30;
-                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity).toLocaleString() : 'Never';
+                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity)
+                .toLocaleString() : 'Never';
 
                 // Add rows to the table
-                const metrics = [
-                    { name: 'Total Requests', value: agencyData.total_requests, change: '+5%', lastUpdated: lastActivity },
-                    { name: 'Request Views', value: agencyData.request_views, change: '+3%', lastUpdated: lastActivity },
-                    { name: 'Call Views', value: agencyData.call_views, change: '+7%', lastUpdated: lastActivity },
-                    { name: 'Average Requests per Day', value: avgRequestsPerDay.toFixed(2), change: '-2%', lastUpdated: lastActivity },
-                    { name: 'Average Views per Request', value: avgViewsPerRequest.toFixed(2), change: '+1%', lastUpdated: lastActivity },
-                    { name: 'Average Call Views per Day', value: avgCallViewsPerDay.toFixed(2), change: '+4%', lastUpdated: lastActivity }
+                const metrics = [{
+                        name: 'Total Requests',
+                        value: agencyData.total_requests,
+                        change: '+5%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Request Views',
+                        value: agencyData.request_views,
+                        change: '+3%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Call Views',
+                        value: agencyData.call_views,
+                        change: '+7%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Requests per Day',
+                        value: avgRequestsPerDay.toFixed(2),
+                        change: '-2%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Views per Request',
+                        value: avgViewsPerRequest.toFixed(2),
+                        change: '+1%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Call Views per Day',
+                        value: avgCallViewsPerDay.toFixed(2),
+                        change: '+4%',
+                        lastUpdated: lastActivity
+                    }
                 ];
 
                 metrics.forEach(metric => {
@@ -247,7 +279,8 @@
             }
 
             function loadDailyCallVolume(startDate, endDate) {
-                fetch(`/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
                     .then(response => response.json())
                     .then(data => {
                         const dates = data.daily_calls.map(item => item.date);
@@ -308,7 +341,8 @@
             }
 
             function loadCallsStatusDistribution(startDate, endDate) {
-                fetch(`/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -342,7 +376,8 @@
                                             label: function(context) {
                                                 const label = context.label || '';
                                                 const value = context.raw || 0;
-                                                const percentage = (value / data.total * 100).toFixed(1);
+                                                const percentage = (value / data.total * 100)
+                                                    .toFixed(1);
                                                 return `${label}: ${value} (${percentage}%)`;
                                             }
                                         }
@@ -355,21 +390,22 @@
             }
 
             function loadActivityCharts(startDate, endDate) {
-                fetch(`/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
                     .then(response => response.json())
                     .then(data => {
                         // Since we're filtering by agency_id, we need to adjust the data structure
                         // We'll use the date as the label instead of agency names
-                        
+
                         // Create a dummy data structure for demonstration
                         // In a real implementation, you'd need to adjust the API to return time-series data
                         const timeLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                        
+
                         // Request Activity Chart
                         if (requestActivityChart) {
                             requestActivityChart.destroy();
                         }
-                        
+
                         const ctxRequests = document.getElementById('requestActivityChart').getContext('2d');
                         requestActivityChart = new Chart(ctxRequests, {
                             type: 'bar',
@@ -397,12 +433,12 @@
                                 }
                             }
                         });
-                        
+
                         // View Activity Chart
                         if (viewActivityChart) {
                             viewActivityChart.destroy();
                         }
-                        
+
                         const ctxViews = document.getElementById('viewActivityChart').getContext('2d');
                         viewActivityChart = new Chart(ctxViews, {
                             type: 'bar',
@@ -430,12 +466,12 @@
                                 }
                             }
                         });
-                        
+
                         // Call View Activity Chart
                         if (callViewActivityChart) {
                             callViewActivityChart.destroy();
                         }
-                        
+
                         const ctxCallViews = document.getElementById('callViewActivityChart').getContext('2d');
                         callViewActivityChart = new Chart(ctxCallViews, {
                             type: 'line',
@@ -484,4 +520,6 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.pnp', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/pnp/dashboard.blade.php ENDPATH**/ ?>

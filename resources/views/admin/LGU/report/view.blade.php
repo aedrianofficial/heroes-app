@@ -77,7 +77,7 @@
 
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('admin.lgu.reports') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('lgu.reports.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
