@@ -1,6 +1,4 @@
-@extends('layouts.app')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-10">
@@ -9,11 +7,11 @@
                         <!-- Left Column - Logo -->
                         <div class="col-md-4 bg-light d-flex align-items-center justify-content-center p-4">
                             <div class="text-center">
-                                <a href="{{ route('welcome') }}"><img src="{{ asset('asset/image/logo.png') }}" alt="Heroes Logo"
+                                <a href="<?php echo e(route('welcome')); ?>"><img src="<?php echo e(asset('asset/image/logo.png')); ?>" alt="Heroes Logo"
                                         class="img-fluid p-3"></a>
                                 <div class="mt-4">
                                     <h5 class="text-danger fw-bold">Create an Account</h5>
-                                    <p class="text-muted">Join us! {{-- to access all features and services. --}}</p>
+                                    <p class="text-muted">Join us! </p>
                                 </div>
                             </div>
                         </div>
@@ -24,8 +22,8 @@
                                 <h4 class="mb-0">Register</h4>
                             </div>
                             <div class="card-body p-4">
-                                <form method="POST" action="{{ route('register') }}">
-                                    @csrf
+                                <form method="POST" action="<?php echo e(route('register')); ?>">
+                                    <?php echo csrf_field(); ?>
                                     <div class="row">
                                         <!-- Left Column of Form -->
                                         <div class="col-md-6">
@@ -35,12 +33,19 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                                     <input type="text" name="username" class="form-control"
-                                                        value="{{ old('username') }}" placeholder="Choose a username"
+                                                        value="<?php echo e(old('username')); ?>" placeholder="Choose a username"
                                                         required>
                                                 </div>
-                                                @error('username')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['username'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Email -->
@@ -49,12 +54,19 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-envelope"></i></span>
                                                     <input type="email" name="email" class="form-control"
-                                                        value="{{ old('email') }}" placeholder="Your email address"
+                                                        value="<?php echo e(old('email')); ?>" placeholder="Your email address"
                                                         required>
                                                 </div>
-                                                @error('email')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['email'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Contact Number -->
@@ -63,13 +75,20 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-phone"></i></span>
                                                     <input type="text" name="contact_number" id="contact_number"
-                                                        class="form-control" value="{{ old('contact_number') }}" required
+                                                        class="form-control" value="<?php echo e(old('contact_number')); ?>" required
                                                         pattern="\d{11}" maxlength="11"
                                                         placeholder="11-digit number (09123456789)">
                                                 </div>
-                                                @error('contact_number')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['contact_number'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Password -->
@@ -80,9 +99,16 @@
                                                     <input type="password" name="password" class="form-control"
                                                         placeholder="Create a password" required>
                                                 </div>
-                                                @error('password')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['password'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Confirm Password -->
@@ -104,12 +130,19 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                                     <input type="text" name="firstname" class="form-control"
-                                                        value="{{ old('firstname') }}" placeholder="Your first name"
+                                                        value="<?php echo e(old('firstname')); ?>" placeholder="Your first name"
                                                         required>
                                                 </div>
-                                                @error('firstname')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['firstname'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Middle Name -->
@@ -118,7 +151,7 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                                     <input type="text" name="middlename" class="form-control"
-                                                        value="{{ old('middlename') }}"
+                                                        value="<?php echo e(old('middlename')); ?>"
                                                         placeholder="Your middle name (optional)">
                                                 </div>
                                             </div>
@@ -129,12 +162,19 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                                     <input type="text" name="lastname" class="form-control"
-                                                        value="{{ old('lastname') }}" placeholder="Your last name"
+                                                        value="<?php echo e(old('lastname')); ?>" placeholder="Your last name"
                                                         required>
                                                 </div>
-                                                @error('lastname')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['lastname'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
 
                                             <!-- Extension Name -->
@@ -143,7 +183,7 @@
                                                 <div class="input-group">
                                                     <span class="input-group-text"><i class="fas fa-user-tag"></i></span>
                                                     <input type="text" name="extname" class="form-control"
-                                                        value="{{ old('extname') }}"
+                                                        value="<?php echo e(old('extname')); ?>"
                                                         placeholder="Jr., Sr., III, etc. (optional)">
                                                 </div>
                                             </div>
@@ -155,11 +195,18 @@
                                                     <span class="input-group-text"><i
                                                             class="fas fa-calendar-alt"></i></span>
                                                     <input type="date" name="bday" class="form-control"
-                                                        value="{{ old('bday') }}" required>
+                                                        value="<?php echo e(old('bday')); ?>" required>
                                                 </div>
-                                                @error('bday')
-                                                    <small class="text-danger">{{ $message }}</small>
-                                                @enderror
+                                                <?php $__errorArgs = ['bday'];
+$__bag = $errors->getBag($__errorArgs[1] ?? 'default');
+if ($__bag->has($__errorArgs[0])) :
+if (isset($message)) { $__messageOriginal = $message; }
+$message = $__bag->first($__errorArgs[0]); ?>
+                                                    <small class="text-danger"><?php echo e($message); ?></small>
+                                                <?php unset($message);
+if (isset($__messageOriginal)) { $message = $__messageOriginal; }
+endif;
+unset($__errorArgs, $__bag); ?>
                                             </div>
                                         </div>
                                     </div>
@@ -171,7 +218,7 @@
 
                                     <!-- Already have an account? -->
                                     <div class="text-center mt-3">
-                                        <p class="mb-0">Already have an account? <a href="{{ route('login') }}"
+                                        <p class="mb-0">Already have an account? <a href="<?php echo e(route('login')); ?>"
                                                 class="text-danger fw-bold">Login here</a></p>
                                     </div>
                                 </form>
@@ -182,8 +229,8 @@
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             const contactInput = document.getElementById("contact_number");
@@ -199,4 +246,6 @@
             });
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.app', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/auth/register.blade.php ENDPATH**/ ?>

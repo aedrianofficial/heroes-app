@@ -56,7 +56,12 @@
                         </tbody>
                     </table>
                 </div>
+                 <!-- Pagination -->
+                 <div class="d-flex justify-content-center mt-3">
+                    {{ $reports->links('pagination::bootstrap-5', ['paginator' => $reports, 'elements' => [1 => $reports->getUrlRange(1, $reports->lastPage())], 'onEachSide' => 1]) }}
+                </div>
             </div>
+            
         </div>
     </div>
 @endsection

@@ -152,13 +152,13 @@ class CoastGuardController extends Controller
                 $query->where('agency_id', 6); // Filtering users by agency_id = 2 (coastguard)
             })
             ->latest()
-            ->get();
+            ->paginate(10);
     
         return view('admin.coastguard.report.all-report', compact('reports'));
     }    
     public function emergencyMessageList()
     {
-        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->paginate(10);
 
 
         // Return view with data
@@ -237,7 +237,7 @@ class CoastGuardController extends Controller
     }
     public function emergencyCallList()
     {
-        $calls = Call::with([ 'status'])->latest()->get();
+        $calls = Call::with([ 'status'])->latest()->paginate(10);
         // Return view with data
         return view('admin.coastguard.emergency-calls.index', compact('calls'));
     }

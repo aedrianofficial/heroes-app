@@ -63,7 +63,7 @@ class RegisterController extends Controller
         Auth::login($user);
 
         // Redirect to the dashboard after registration
-        return redirect()->route('user.dashboard')->with('success', 'Registration successful! Welcome to your dashboard.');
+        return redirect()->route('welcome')->with('success', 'Registration successful! Welcome to your dashboard.');
     }
 
 }

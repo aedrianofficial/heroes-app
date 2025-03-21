@@ -145,14 +145,14 @@ class PnpController extends Controller
                 $query->where('agency_id', 2); // Filtering users by agency_id = 2 (pnp)
             })
             ->latest()
-            ->get();
+            ->paginate(10);
     
         return view('admin.pnp.report.all-report', compact('reports'));
     }    
 
     public function emergencyMessageList()
     {
-        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->paginate(10);
 
 
         // Return view with data
@@ -232,7 +232,7 @@ class PnpController extends Controller
      //call
      public function emergencyCallList()
      {
-         $calls = Call::with([ 'status'])->latest()->get();
+         $calls = Call::with([ 'status'])->latest()->paginate(10);
          // Return view with data
          return view('admin.pnp.emergency-calls.index', compact('calls'));
      }

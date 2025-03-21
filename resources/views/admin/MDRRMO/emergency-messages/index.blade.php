@@ -142,6 +142,10 @@
                         </tbody>
                     </table>
                 </div>
+                 <!-- Pagination -->
+                 <div class="d-flex justify-content-center mt-3">
+                    {{ $messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1]) }}
+                </div>
             </div>
         </div>
     </div>

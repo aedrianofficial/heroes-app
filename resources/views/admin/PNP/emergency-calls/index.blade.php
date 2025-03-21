@@ -96,7 +96,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($calls as $call)
+                            @forelse ($calls as $call)
                                 <tr>
                                     <td data-label="Contact">{{ $call->caller_contact }}</td>
                                     <td data-label="Date">{{ $call->created_at->format('F j, Y g:i A') }}</td>
@@ -109,15 +109,15 @@
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('pnp.emergencycall.view', $call->id) }}"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                <a href="{{ route('bfp.emergencycall.view', $call->id) }}"
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <form id="ongoingForm-{{ $call->id }}"
-                                                action="{{ route('pnp.emergencycall.ongoing', $call->id) }}" method="POST"
+                                                action="{{ route('bfp.emergencycall.ongoing', $call->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
@@ -125,9 +125,9 @@
                                                     onclick="confirmOngoing(event, 'ongoingForm-{{ $call->id }}')"
                                                     class="btn btn-sm btn-warning action-btn">Ongoing</button>
                                             </form>
-
+            
                                             <form id="completeForm-{{ $call->id }}"
-                                                action="{{ route('pnp.emergencycall.complete', $call->id) }}"
+                                                action="{{ route('bfp.emergencycall.complete', $call->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="button"
@@ -139,9 +139,18 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center">No emergency calls found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
                 </div>
             </div>
         </div>

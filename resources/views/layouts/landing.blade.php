@@ -64,8 +64,10 @@
                                 @endif
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                @if (Auth::user()->role === 'user')
-                                    <li><a class="dropdown-item" href="{{ url('/') }}">User Dashboard</a></li>
+                                @if (Auth::user()->role->name === 'user')
+                                    @if (Auth::user()->agency->name === 'DEFAULT')
+                                        <li><a class="dropdown-item" href="{{ url('/') }}">User Dashboard</a></li>
+                                    @endif
                                 @elseif(Auth::user()->role->name === 'admin')
                                     @if (Auth::user()->agency->name === 'PNP')
                                         <li><a class="dropdown-item" href="{{ url('/admin/pnp-dashboard') }}">PNP

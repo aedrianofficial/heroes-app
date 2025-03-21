@@ -170,7 +170,7 @@
                                 </div>
                             @endforeach
                         @else
-                            <p class="text-muted">No requests found for this message$message.</p>
+                            <p class="text-muted">No requests found for this message.</p>
                         @endif
                         <hr>
                         <div class="mb-3">

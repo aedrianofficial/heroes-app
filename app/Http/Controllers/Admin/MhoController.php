@@ -152,13 +152,13 @@ class MhoController extends Controller
                 $query->where('agency_id', 5); // Filtering users by agency_id = 2 (mho)
             })
             ->latest()
-            ->get();
+            ->paginate(10);
     
         return view('admin.mho.report.all-report', compact('reports'));
     }    
     public function emergencyMessageList()
     {
-        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->paginate(10);
 
 
         // Return view with data
@@ -237,7 +237,7 @@ class MhoController extends Controller
     }
     public function emergencyCallList()
     {
-        $calls = Call::with([ 'status'])->latest()->get();
+        $calls = Call::with([ 'status'])->latest()->paginate(10);
         // Return view with data
         return view('admin.mho.emergency-calls.index', compact('calls'));
     }

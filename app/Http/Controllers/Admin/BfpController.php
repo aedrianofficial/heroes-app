@@ -150,13 +150,13 @@ class BfpController extends Controller
                 $query->where('agency_id', 3); // Filtering users by agency_id = 2 (bfp)
             })
             ->latest()
-            ->get();
+            ->paginate(10);
     
         return view('admin.bfp.report.all-report', compact('reports'));
     }   
     public function emergencyMessageList()
     {
-        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->paginate(10);
 
 
         // Return view with data
@@ -235,7 +235,7 @@ class BfpController extends Controller
     }
     public function emergencyCallList()
     {
-        $calls = Call::with([ 'status'])->latest()->get();
+        $calls = Call::with([ 'status'])->latest()->paginate(10);
         // Return view with data
         return view('admin.bfp.emergency-calls.index', compact('calls'));
     }

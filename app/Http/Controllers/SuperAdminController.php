@@ -38,7 +38,7 @@ class SuperAdminController extends Controller
     }
     public function emergencyMessageList()
     {
-        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->get();
+        $messages = Message::with(['incidentTypes', 'agencies', 'user', 'status'])->latest()->paginate(10);
         // Return view with data
         return view('super-admin.emergency-messages.index', compact('messages'));
     }
@@ -117,7 +117,7 @@ class SuperAdminController extends Controller
     //call
     public function emergencyCallList()
     {
-        $calls = Call::with([ 'status'])->latest()->get();
+        $calls = Call::with([ 'status'])->latest()->paginate(10);
         // Return view with data
         return view('super-admin.emergency-calls.index', compact('calls'));
     }
@@ -353,7 +353,7 @@ class SuperAdminController extends Controller
                     $query->where('agency_id', 7); // Filtering users by agency_id = 2 (lgu)
                 })
                 ->latest()
-                ->get();
+                ->paginate(10);
         
             return view('super-admin.report.all-report', compact('reports'));
         }

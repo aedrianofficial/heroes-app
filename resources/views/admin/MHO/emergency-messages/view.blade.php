@@ -171,7 +171,7 @@
                             @endforeach
                         @else
                             <p class="text-muted">No requests found for this message.</p>
-                        @endifs
+                        @endif
                         <hr>
                         <div class="mb-3">
                             <h5 class="fw-bold text-muted">Status Log</h5>

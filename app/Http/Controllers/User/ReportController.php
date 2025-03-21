@@ -86,7 +86,7 @@ class ReportController extends Controller
     
     public function index()
     {
-        $reports = Report::with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])->where('user_id', Auth::id())->latest()->get();
+        $reports = Report::with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])->where('user_id', Auth::id())->latest()->paginate(10);
         return view('user.report.index', compact('reports'));
         
     }

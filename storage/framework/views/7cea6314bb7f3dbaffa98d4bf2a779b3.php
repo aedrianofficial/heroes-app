@@ -64,8 +64,10 @@
                                 <?php endif; ?>
                             </a>
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <?php if(Auth::user()->role === 'user'): ?>
-                                    <li><a class="dropdown-item" href="<?php echo e(url('/')); ?>">User Dashboard</a></li>
+                                <?php if(Auth::user()->role->name === 'user'): ?>
+                                    <?php if(Auth::user()->agency->name === 'DEFAULT'): ?>
+                                        <li><a class="dropdown-item" href="<?php echo e(url('/')); ?>">User Dashboard</a></li>
+                                    <?php endif; ?>
                                 <?php elseif(Auth::user()->role->name === 'admin'): ?>
                                     <?php if(Auth::user()->agency->name === 'PNP'): ?>
                                         <li><a class="dropdown-item" href="<?php echo e(url('/admin/pnp-dashboard')); ?>">PNP

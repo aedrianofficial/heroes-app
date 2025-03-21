@@ -1,6 +1,4 @@
-@extends('layouts.bfp')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
@@ -12,30 +10,17 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Sender Contact</h5>
-                                    <p class="text-dark">{{ $message->sender_contact }}</p>
+                                    <p class="text-dark"><?php echo e($message->sender_contact); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Message Content</h5>
-                                    <p class="text-dark">{{ $message->message_content }}</p>
+                                    <p class="text-dark"><?php echo e($message->message_content); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Date recieve</h5>
-                                    <p class="text-dark">{{ $message->created_at->format('F j, Y g:i A') }}</p>
+                                    <p class="text-dark"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></p>
                                 </div>
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Address</h5>
-                                    <p class="text-dark">{{ $message->location->address }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Contact Number</h5>
-                                    <p class="text-dark">{{ $message->contact_number }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Coordinates</h5>
-                                    <p>({{ $message->location->latitude }},
-                                        {{ $message->location->longitude }})
-                                    </p>
-                                </div> --}}
+                                
 
                             </div>
 
@@ -44,44 +29,22 @@
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Status</h5>
                                     <span
-                                        class="badge bg-{{ $message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                        {{ $message->status->name }}
+                                        class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                        <?php echo e($message->status->name); ?>
+
                                     </span>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Incident Type</h5>
-                                    {{-- <p>
-                                      @foreach ($message->agencies as $agency)
-                                          <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
-                                      @endforeach
-                                  </p> --}}
+                                    
                                     <p>Test</p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Agencies Involved</h5>
-                                    {{-- <p>
-                                        @foreach ($message->agencies as $agency)
-                                            <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
-                                        @endforeach
-                                    </p> --}}
+                                    
                                     <p>Test</p>
                                 </div>
-                                {{-- <div class="mb-4">
-                                    <h5 class="fw-bold text-muted">Attachments</h5>
-                                    @if ($message->messageAttachments->count() > 0)
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($message->messageAttachments as $attachment)
-                                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $attachment->file_path) }}"
-                                                        alt="Attachment" class="rounded shadow-sm border border-primary"
-                                                        width="200" height="200" style="object-fit: cover;">
-                                                </a>
-                                            @endforeach
-                                        </div>
-                                    @else
-                                        <p class="text-muted">No attachments available.</p>
-                                    @endif
-                                </div> --}}
+                                
                             </div>
                         </div>
                         <hr>
@@ -89,131 +52,136 @@
                             <!-- Left Column -->
                             <div class="col-md-6">
                                 <h5 class="fw-bold text-muted">Sender Profile</h5>
-                                @if ($profile)
+                                <?php if($profile): ?>
                                     <div class="mb-3">
-                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }}
-                                            {{ $profile->last_name }} {{ $profile->suffix }}</p>
+                                        <p><strong>Name:</strong> <?php echo e($profile->first_name); ?> <?php echo e($profile->middle_name); ?>
+
+                                            <?php echo e($profile->last_name); ?> <?php echo e($profile->suffix); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
+                                        <p><strong>Date of Birth:</strong> <?php echo e($profile->dob); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Sex:</strong> {{ $profile->sex }}</p>
+                                        <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                        <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
                                     </div>
-                                @else
+                                <?php else: ?>
                                     <p class="text-muted">No profile information available.</p>
-                                @endif
+                                <?php endif; ?>
                             </div>
 
                             <!-- Right Column -->
                             <div class="col-md-6">
-                                @if ($profile)
+                                <?php if($profile): ?>
                                     <div class="mb-3">
-                                        <p><strong>Religion:</strong> {{ $profile->religion }}</p>
+                                        <p><strong>Religion:</strong> <?php echo e($profile->religion); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Ethnicity:</strong> {{ $profile->ethnicity }}</p>
+                                        <p><strong>Ethnicity:</strong> <?php echo e($profile->ethnicity); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Birth Place:</strong> {{ $profile->birth_place }}</p>
+                                        <p><strong>Birth Place:</strong> <?php echo e($profile->birth_place); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Zone:</strong> {{ $profile->zone }}</p>
+                                        <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
                                     </div>
                                     <div class="mb-3">
-                                        <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                        <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
                                     </div>
-                                @endif
+                                <?php endif; ?>
                             </div>
                         </div>
                         <hr>
-                        @if ($message->requests->isNotEmpty())
-                            @foreach ($message->requests as $index => $request)
+                        <?php if($message->requests->isNotEmpty()): ?>
+                            <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <div class="border rounded p-3 mb-4 shadow-sm">
-                                    <h5 class="fw-bold text-muted">Request {{ $index + 1 }}</h5>
+                                    <h5 class="fw-bold text-muted">Request <?php echo e($index + 1); ?></h5>
                                     <div class="row">
                                         <!-- Left Column -->
                                         <div class="col-md-6">
                                             <div class="mb-3">
-                                                <p><strong>Name:</strong> {{ $request->name }}</p>
+                                                <p><strong>Name:</strong> <?php echo e($request->name); ?></p>
                                             </div>
                                             <div class="mb-3">
-                                                <p><strong>Address:</strong> {{ $request->address }}</p>
+                                                <p><strong>Address:</strong> <?php echo e($request->address); ?></p>
                                             </div>
                                             <div class="mb-3">
-                                                <p><strong>Description:</strong> {{ $request->description }}</p>
+                                                <p><strong>Description:</strong> <?php echo e($request->description); ?></p>
                                             </div>
                                             <div class="mb-3">
-                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                                <p><strong>Time:</strong> <?php echo e($request->created_at->format('F j, Y g:i A')); ?></p>
                                             </div>
                                         </div>
 
                                         <!-- Right Column -->
                                         <div class="col-md-6">
                                             <h5 class="fw-bold text-muted">Assigned Agencies</h5>
-                                            @if ($request->agencies->isNotEmpty())
+                                            <?php if($request->agencies->isNotEmpty()): ?>
                                                 <div class="mb-3">
                                                     <ul>
-                                                        @foreach ($request->agencies as $agency)
-                                                            <li>{{ $agency->name }}</li>
-                                                        @endforeach
+                                                        <?php $__currentLoopData = $request->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <li><?php echo e($agency->name); ?></li>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                     </ul>
                                                 </div>
-                                            @else
+                                            <?php else: ?>
                                                 <p class="text-muted">No assigned agencies</p>
-                                            @endif
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
-                        @else
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                        <?php else: ?>
                             <p class="text-muted">No requests found for this message.</p>
-                        @endif
+                        @endifs
                         <hr>
                         <div class="mb-3">
                             <h5 class="fw-bold text-muted">Status Log</h5>
-                            @if ($message->statusLogMessages->isNotEmpty())
+                            <?php if($message->statusLogMessages->isNotEmpty()): ?>
                                 <ul class="list-group">
-                                    @foreach ($message->statusLogMessages as $log)
+                                    <?php $__currentLoopData = $message->statusLogMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <li class="list-group-item">
-                                            <strong>{{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                            <strong><?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
+
+                                                <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+
 
                                             </strong> marked this message as
                                             <span
-                                                class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                                {{ $log->status->name }}
+                                                class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                                <?php echo e($log->status->name); ?>
+
                                             </span>
-                                            on {{ $log->created_at->format('F j, Y g:i A') }}.
+                                            on <?php echo e($log->created_at->format('F j, Y g:i A')); ?>.
                                             <br>
-                                            <strong>Log Details:</strong> {{ $log->log_details }}
+                                            <strong>Log Details:</strong> <?php echo e($log->log_details); ?>
+
                                         </li>
-                                    @endforeach
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                 </ul>
-                            @else
+                            <?php else: ?>
                                 <p class="text-muted">No status logs available.</p>
-                            @endif
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('bfp.emergencymessage.index') }}" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('mho.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="ongoingForm-{{ $message->id }}"
-                                action="{{ route('bfp.emergencymessage.ongoing', $message->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="message_id" value="{{ $message->id }}">
-                                <button type="button" onclick="confirmOngoing(event, 'ongoingForm-{{ $message->id }}')"
+                            <form id="ongoingForm-<?php echo e($message->id); ?>"
+                                action="<?php echo e(route('mho.emergencymessage.ongoing', $message->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
+                                <button type="button" onclick="confirmOngoing(event, 'ongoingForm-<?php echo e($message->id); ?>')"
                                     class="btn btn-sm btn-warning">Ongoing</button>
                             </form>
-                            <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('bfp.emergencymessage.complete', $message->id) }}" method="POST">
-                                @csrf
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
+                            <form id="completeForm-<?php echo e($message->id); ?>"
+                                action="<?php echo e(route('mho.emergencymessage.complete', $message->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <button type="button" onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
                                     class="btn btn-sm btn-success">
                                     Complete
                                 </button>
@@ -224,14 +192,14 @@
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Ongoing-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -298,8 +266,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -360,4 +328,5 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+<?php echo $__env->make('layouts.mho', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mho/emergency-messages/view.blade.php ENDPATH**/ ?>

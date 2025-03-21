@@ -1,11 +1,9 @@
-@extends('layouts.coastguard')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">COASTGUARD Agency</h1>
+            <h1 class="h3 mb-0 text-gray-800">LGU Agency</h1>
         </div>
 
         <!-- Date Range Selector -->
@@ -17,24 +15,25 @@
                     <div class="dropdown mb-3">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics' }}
+                            <?php echo e(request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics'); ?>
+
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
-                            <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.coastguard') }}">Call Analytics</a></li>
-                            <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.coastguard') }}/message-analytics">Message Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(!request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.lgu')); ?>">Call Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.lgu')); ?>/message-analytics">Message Analytics</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->subMonth()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="end_date" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -152,13 +151,12 @@
                         </tbody>
                     </table>
                 </div>
-                
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -169,8 +167,8 @@
             let viewActivityChart = null;
             let messageViewActivityChart = null;
 
-            // Set the agency ID as a constant (COASTGUARD agency_id=2)
-            const AGENCY_ID = 6;
+            // Set the agency ID as a constant (LGU agency_id=2)
+            const AGENCY_ID = 7;
 
             // Load initial data
             loadAllData();
@@ -567,4 +565,6 @@
             }
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/partials/message-analytics.blade.php ENDPATH**/ ?>

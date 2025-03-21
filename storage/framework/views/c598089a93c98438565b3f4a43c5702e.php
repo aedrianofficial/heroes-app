@@ -1,5 +1,4 @@
-@extends('layouts.bfp')
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Equal-sized buttons */
         .action-btn {
@@ -73,8 +72,8 @@
             }
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
         <!--All Emergency Messages Table -->
@@ -96,67 +95,64 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($messages as $message)
+                            <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td data-label="Contact">{{ $message->sender_contact }}</td>
-                                    <td data-label="Message">{{ Str::limit($message->message_content, 50) }}</td>
-                                    <td data-label="Date">{{ $message->created_at->format('F j, Y g:i A') }}</td>
+                                    <td data-label="Contact"><?php echo e($message->sender_contact); ?></td>
+                                    <td data-label="Message"><?php echo e(Str::limit($message->message_content, 50)); ?></td>
+                                    <td data-label="Date"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $message->status->name }}
+                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($message->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('bfp.emergencymessage.view', $message->id) }}"
+                                                <a href="<?php echo e(route('lgu.emergencymessage.view', $message->id)); ?>"
                                                     class="btn btn-sm btn-primary action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="ongoingForm-{{ $message->id }}"
-                                                action="{{ route('bfp.emergencymessage.ongoing', $message->id) }}"
+                                            <form id="ongoingForm-<?php echo e($message->id); ?>"
+                                                action="<?php echo e(route('lgu.emergencymessage.ongoing', $message->id)); ?>"
                                                 method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="message_id" value="{{ $message->id }}">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
                                                 <button type="button"
-                                                    onclick="confirmOngoing(event, 'ongoingForm-{{ $message->id }}')"
+                                                    onclick="confirmOngoing(event, 'ongoingForm-<?php echo e($message->id); ?>')"
                                                     class="btn btn-sm btn-warning action-btn">Ongoing</button>
                                             </form>
 
-                                            <form id="completeForm-{{ $message->id }}"
-                                                action="{{ route('bfp.emergencymessage.complete', $message->id) }}"
+                                            <form id="completeForm-<?php echo e($message->id); ?>"
+                                                action="<?php echo e(route('lgu.emergencymessage.complete', $message->id)); ?>"
                                                 method="POST" class="d-inline">
-                                                @csrf
+                                                <?php echo csrf_field(); ?>
                                                 <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
+                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
                                                     class="btn btn-sm btn-success action-btn">Complete</button>
                                             </form>
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
-                </div>
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1]) }}
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Ongoing-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -223,8 +219,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -285,4 +281,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/emergency-messages/index.blade.php ENDPATH**/ ?>
