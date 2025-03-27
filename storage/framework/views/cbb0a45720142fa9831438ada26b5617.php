@@ -1,39 +1,36 @@
-@extends('layouts.superadmin')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card shadow-lg mt-4">
-                  
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><?php echo e($report->title); ?></h4>
+
+                    </div>
                     <div class="card-body">
                         <div class="row">
                             <!-- Left Column -->
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Name</h5>
-                                    <p class="text-dark">{{ $report->name }}</p>
-                                </div>
-                                <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Description</h5>
-                                    <p class="text-dark">{{ $report->description }}</p>
+                                    <p class="text-dark"><?php echo e($report->description); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Incident Type</h5>
-                                    <p class="badge bg-danger px-3 py-2">{{ $report->incidentType->name }}</p>
+                                    <p class="badge bg-danger px-3 py-2"><?php echo e($report->incidentType->name); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Address</h5>
-                                    <p class="text-dark">{{ $report->location->address }}</p>
+                                    <p class="text-dark"><?php echo e($report->location->address); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Contact Number</h5>
-                                    <p class="text-dark">{{ $report->contact_number }}</p>
+                                    <p class="text-dark"><?php echo e($report->contact_number); ?></p>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Coordinates</h5>
-                                    <p>({{ $report->location->latitude }},
-                                        {{ $report->location->longitude }})
+                                    <p>(<?php echo e($report->location->latitude); ?>,
+                                        <?php echo e($report->location->longitude); ?>)
                                     </p>
                                 </div>
 
@@ -44,33 +41,34 @@
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Status</h5>
                                     <span
-                                        class="badge bg-{{ $report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                        {{ $report->status->name }}
+                                        class="badge bg-<?php echo e($report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                        <?php echo e($report->status->name); ?>
+
                                     </span>
                                 </div>
                                 <div class="mb-3">
                                     <h5 class="fw-bold text-muted">Agencies Involved</h5>
                                     <p>
-                                        @foreach ($report->agencies as $agency)
-                                            <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
-                                        @endforeach
+                                        <?php $__currentLoopData = $report->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <span class="badge bg-primary px-3 py-2"><?php echo e($agency->name); ?></span>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     </p>
                                 </div>
                                 <div class="mb-4">
                                     <h5 class="fw-bold text-muted">Attachments</h5>
-                                    @if ($report->reportAttachments->count() > 0)
+                                    <?php if($report->reportAttachments->count() > 0): ?>
                                         <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($report->reportAttachments as $attachment)
-                                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $attachment->file_path) }}"
+                                            <?php $__currentLoopData = $report->reportAttachments; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $attachment): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <a href="<?php echo e(asset('storage/' . $attachment->file_path)); ?>" target="_blank">
+                                                    <img src="<?php echo e(asset('storage/' . $attachment->file_path)); ?>"
                                                         alt="Attachment" class="rounded shadow-sm border border-primary"
                                                         width="200" height="200" style="object-fit: cover;">
                                                 </a>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <p class="text-muted">No attachments available.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
@@ -78,17 +76,17 @@
 
                     </div>
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('superadmin.reports.index') }}" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('lgu.reports.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form action="{{ route('superadmin.reports.responded', $report->id) }}" method="POST">
-                                @csrf
+                            <form action="<?php echo e(route('lgu.reports.responded', $report->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" onclick="confirmResponded(event)" class="btn btn-sm btn-warning">Mark
                                     as Responded</button>
                             </form>
-                            <form action="{{ route('superadmin.reports.complete', $report->id) }}" method="POST">
-                                @csrf
+                            <form action="<?php echo e(route('lgu.reports.complete', $report->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
                                 <button type="submit" onclick="confirmComplete(event)" class="btn btn-sm btn-success">Mark
                                     as Completed</button>
                             </form>
@@ -98,14 +96,14 @@
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -152,8 +150,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -215,4 +213,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/report/view.blade.php ENDPATH**/ ?>

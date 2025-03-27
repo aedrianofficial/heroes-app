@@ -116,14 +116,14 @@
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="ongoingForm-<?php echo e($call->id); ?>"
-                                                action="<?php echo e(route('lgu.emergencycall.ongoing', $call->id)); ?>" method="POST"
+                                            <form id="respondedForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('lgu.emergencycall.responded', $call->id)); ?>" method="POST"
                                                 class="d-inline">
                                                 <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                                 <button type="button"
-                                                    onclick="confirmOngoing(event, 'ongoingForm-<?php echo e($call->id); ?>')"
-                                                    class="btn btn-sm btn-warning action-btn">Ongoing</button>
+                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
+                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
                                             </form>
 
                                             <form id="completeForm-<?php echo e($call->id); ?>"
@@ -143,13 +143,18 @@
                         </tbody>
                     </table>
                 </div>
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
+                    <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
+
+                </div>
             </div>
         </div>
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
-    <!--Mark as Ongoing-->
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successCall = "<?php echo e(session('success')); ?>";
@@ -176,12 +181,12 @@
             }
         });
 
-        function confirmOngoing(event, formId) {
+        function confirmResponded(event, formId) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as ongoing?",
+                text: "Do you want to mark this call as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -192,7 +197,7 @@
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark'
                 },

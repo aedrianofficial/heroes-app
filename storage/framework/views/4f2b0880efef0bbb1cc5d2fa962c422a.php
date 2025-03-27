@@ -1,6 +1,4 @@
-@extends('layouts.mho')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
         <!--All Reports Table -->
@@ -21,56 +19,58 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($reports as $report)
+                            <?php $__currentLoopData = $reports; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $report): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td>{{ $report->name }}</td>
-                                    <td>{{ $report->incidentType->name }}</td>
-                                    <td>{{ $report->location->address }}</td>
+                                    <td><?php echo e($report->name); ?></td>
+                                    <td><?php echo e($report->incidentType->name); ?></td>
+                                    <td><?php echo e($report->location->address); ?></td>
                                     <td>
                                         <span
-                                            class="badge bg-{{ $report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $report->status->name }}
+                                            class="badge bg-<?php echo e($report->status_id == 1 ? 'danger' : ($report->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($report->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td>
-                                        <a href="{{ route('mho.reports.view', $report->id) }}"
+                                        <a href="<?php echo e(route('lgu.reports.view', $report->id)); ?>"
                                             class="btn btn-sm btn-primary">View</a>
 
                                     </td>
                                     <td>
-                                        <form action="{{ route('mho.reports.responded', $report->id) }}" method="POST">
-                                            @csrf
+                                        <form action="<?php echo e(route('lgu.reports.responded', $report->id)); ?>" method="POST">
+                                            <?php echo csrf_field(); ?>
                                             <button type="submit" onclick="confirmResponded(event)"
                                                 class="btn btn-sm btn-warning ">Responded</button>
                                         </form>
                                     </td>
                                     <td>
-                                        <form action="{{ route('mho.reports.complete', $report->id) }}" method="POST">
-                                            @csrf
+                                        <form action="<?php echo e(route('lgu.reports.complete', $report->id)); ?>" method="POST">
+                                            <?php echo csrf_field(); ?>
                                             <button type="submit" onclick="confirmComplete(event)"
                                                 class="btn btn-sm btn-success ">Complete</button>
                                         </form>
                                     </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $reports->links('pagination::bootstrap-5', ['paginator' => $reports, 'elements' => [1 => $reports->getUrlRange(1, $reports->lastPage())], 'onEachSide' => 1]) }}
+                    <?php echo e($reports->links('pagination::bootstrap-5', ['paginator' => $reports, 'elements' => [1 => $reports->getUrlRange(1, $reports->lastPage())], 'onEachSide' => 1])); ?>
+
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -117,8 +117,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
             if (successMessage) {
                 Swal.fire({
@@ -180,4 +180,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/report/all-report.blade.php ENDPATH**/ ?>

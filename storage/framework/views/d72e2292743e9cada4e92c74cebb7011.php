@@ -1,5 +1,4 @@
-@extends('layouts.pnp')
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid my-2">
         <div class="row justify-content-center">
             <div class="col-lg-12">
@@ -14,39 +13,40 @@
                                     <div class="row mb-3">
                                         <div class="col-6">
                                             <h5 class="text-muted">Caller Contact</h5>
-                                            <p class="text-dark">{{ $call->caller_contact }}</p>
+                                            <p class="text-dark"><?php echo e($call->caller_contact); ?></p>
                                         </div>
                                         <div class="col-6">
                                             <h5 class="text-muted">Date Received</h5>
-                                            <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
+                                            <p class="text-dark"><?php echo e($call->created_at->format('F j, Y g:i A')); ?></p>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <h5 class="text-muted">Status</h5>
-                                        <span class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                            {{ $call->status->name }}
+                                        <span class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                            <?php echo e($call->status->name); ?>
+
                                         </span>
                                     </div>
 
                                     <hr>
 
                                     <h3 class="mb-4 text-primary">Caller Profile</h3>
-                                    @if ($profile)
+                                    <?php if($profile): ?>
                                         <div class="row">
                                             <div class="col-6">
-                                                <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }} {{ $profile->last_name }} {{ $profile->suffix }}</p>
-                                                <p><strong>Sex:</strong> {{ $profile->sex }}</p>
-                                                <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                                <p><strong>Name:</strong> <?php echo e($profile->first_name); ?> <?php echo e($profile->middle_name); ?> <?php echo e($profile->last_name); ?> <?php echo e($profile->suffix); ?></p>
+                                                <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
+                                                <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
                                             </div>
                                             <div class="col-6">
-                                                <p><strong>Zone:</strong> {{ $profile->zone }}</p>
-                                                <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                                <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
+                                                <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
                                             </div>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <p class="text-muted">No profile information available.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -54,90 +54,93 @@
                             <div class="col-md-6">
                                 <div class="px-4">
                                     <h3 class="mb-4 text-primary">Requests</h3>
-                                    @if ($call->requests->isNotEmpty())
-                                        @foreach ($call->requests as $index => $request)
+                                    <?php if($call->requests->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="card mb-3 shadow-sm">
                                                 <div class="card-body">
-                                                    <h5 class="card-title text-muted">Request {{ $index + 1 }}</h5>
+                                                    <h5 class="card-title text-muted">Request <?php echo e($index + 1); ?></h5>
                                                     <div class="row">
                                                         <div class="col-6">
-                                                            <p><strong>Name:</strong> {{ $request->name }}</p>
-                                                            <p><strong>Address:</strong> {{ $request->address }}</p>
-                                                            <p><strong>Description:</strong> {{ $request->description }}</p>
-                                                            <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                                            <p><strong>Name:</strong> <?php echo e($request->name); ?></p>
+                                                            <p><strong>Address:</strong> <?php echo e($request->address); ?></p>
+                                                            <p><strong>Description:</strong> <?php echo e($request->description); ?></p>
+                                                            <p><strong>Time:</strong> <?php echo e($request->created_at->format('F j, Y g:i A')); ?></p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
-                                                            @if ($request->agencies->isNotEmpty())
+                                                            <?php if($request->agencies->isNotEmpty()): ?>
                                                                 <ul class="list-unstyled">
-                                                                    @foreach ($request->agencies as $agency)
-                                                                        <li>{{ $agency->name }}</li>
-                                                                    @endforeach
+                                                                    <?php $__currentLoopData = $request->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <li><?php echo e($agency->name); ?></li>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </ul>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <p class="text-muted">No assigned agencies</p>
-                                                            @endif
+                                                            <?php endif; ?>
 
-                                                            @if ($request->incidentCase)
+                                                            <?php if($request->incidentCase): ?>
                                                                 <h6 class="text-muted mt-3">Incident Case</h6>
-                                                                <p><strong>Case Number:</strong> {{ $request->incidentCase->case_number }}</p>
-                                                            @else
+                                                                <p><strong>Case Number:</strong> <?php echo e($request->incidentCase->case_number); ?></p>
+                                                            <?php else: ?>
                                                                 <p class="text-muted">No Incident Case Assigned</p>
-                                                            @endif                                                           
+                                                            <?php endif; ?>                                                           
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    @else
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
                                         <p class="text-muted">No requests found for this call.</p>
-                                    @endif
+                                    <?php endif; ?>
 
                                     <hr>
 
                                     <h3 class="mb-4 text-primary">Status Log</h3>
-                                    @if ($call->statusLogCalls->isNotEmpty())
+                                    <?php if($call->statusLogCalls->isNotEmpty()): ?>
                                         <div class="list-group">
-                                            @foreach ($call->statusLogCalls as $log)
+                                            <?php $__currentLoopData = $call->statusLogCalls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <h5 class="mb-1">
-                                                            {{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                            {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                                            <?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
+
+                                                            <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+
                                                         </h5>
-                                                        <small>{{ $log->created_at->format('F j, Y g:i A') }}</small>
+                                                        <small><?php echo e($log->created_at->format('F j, Y g:i A')); ?></small>
                                                     </div>
                                                     <p class="mb-1">
                                                         Marked as 
-                                                        <span class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                                            {{ $log->status->name }}
+                                                        <span class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                                            <?php echo e($log->status->name); ?>
+
                                                         </span>
                                                     </p>
-                                                    <small><strong>Log Details:</strong> {{ $log->log_details }}</small>
+                                                    <small><strong>Log Details:</strong> <?php echo e($log->log_details); ?></small>
                                                 </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <p class="text-muted">No status logs available.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('pnp.emergencycall.index') }}" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('pnp.emergencycall.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="respondedForm-{{ $call->id }}" action="{{ route('pnp.emergencycall.responded', $call->id) }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="call_id" value="{{ $call->id }}">
-                                <button type="button" onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')" class="btn btn-sm btn-warning">Responded</button>
+                            <form id="respondedForm-<?php echo e($call->id); ?>" action="<?php echo e(route('pnp.emergencycall.responded', $call->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
+                                <button type="button" onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')" class="btn btn-sm btn-warning">Responded</button>
                             </form>
-                            <form id="completeForm-{{ $call->id }}" action="{{ route('pnp.emergencycall.complete', $call->id) }}" method="POST">
-                                @csrf
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')" class="btn btn-sm btn-success">
+                            <form id="completeForm-<?php echo e($call->id); ?>" action="<?php echo e(route('pnp.emergencycall.complete', $call->id)); ?>" method="POST">
+                                <?php echo csrf_field(); ?>
+                                <button type="button" onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')" class="btn btn-sm btn-success">
                                     Complete
                                 </button>
                             </form>
@@ -147,14 +150,14 @@
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -221,8 +224,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -283,4 +286,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.pnp', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/pnp/emergency-calls/view.blade.php ENDPATH**/ ?>

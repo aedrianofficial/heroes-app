@@ -116,14 +116,14 @@
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="ongoingForm-{{ $call->id }}"
-                                                action="{{ route('mho.emergencycall.ongoing', $call->id) }}" method="POST"
+                                            <form id="respondedForm-{{ $call->id }}"
+                                                action="{{ route('mho.emergencycall.responded', $call->id) }}" method="POST"
                                                 class="d-inline">
                                                 @csrf
                                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
                                                 <button type="button"
-                                                    onclick="confirmOngoing(event, 'ongoingForm-{{ $call->id }}')"
-                                                    class="btn btn-sm btn-warning action-btn">Ongoing</button>
+                                                    onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
                                             </form>
 
                                             <form id="completeForm-{{ $call->id }}"
@@ -153,7 +153,7 @@
 @endsection
 @section('scripts')
     <!--sweet alert-->
-    <!--Mark as Ongoing-->
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successCall = "{{ session('success') }}";
@@ -180,12 +180,12 @@
             }
         });
 
-        function confirmOngoing(event, formId) {
+        function confirmResponded(event, formId) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as ongoing?",
+                text: "Do you want to mark this call as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -196,7 +196,7 @@
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark'
                 },

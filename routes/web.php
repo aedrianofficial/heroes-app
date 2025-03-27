@@ -334,7 +334,7 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.pnp.message-analytics');
         //dashboard
         Route::get('/admin/pnp-dashboard', [PnpController::class, 'pnpDashboard'])->name('admin.pnp');
-        Route::post('admin/pnp/reports/{id}/ongoing', [PnpController::class, 'markAsOngoing'])->name('pnp.reports.ongoing');
+        Route::post('admin/pnp/reports/{id}/responded', [PnpController::class, 'markAsResponded'])->name('pnp.reports.responded');
         Route::post('admin/pnp/reports/{id}/complete', [PnpController::class, 'markAsCompleted'])->name('pnp.reports.complete');
         
         //report
@@ -346,14 +346,18 @@ Route::middleware(['auth'])->group(function () {
         //emergency message
         Route::get('pnp/all-emergency-message', [PnpController::class, 'emergencyMessageList'])->name('pnp.emergencymessage.index');
         Route::get('admin/pnp/emergency-message/{id}/view', [PnpController::class, 'viewEmergencyMessage'])->name('pnp.emergencymessage.view');
-        Route::post('admin/pnp/emergency-message/{id}/ongoing', [PnpController::class, 'markAsOngoingForMessage'])->name('pnp.emergencymessage.ongoing');
+        Route::post('admin/pnp/emergency-message/{id}/responded', [PnpController::class, 'markAsRespondedForMessage'])->name('pnp.emergencymessage.responded');
         Route::post('admin/pnp/emergency-message/{id}/complete', [PnpController::class, 'markAsCompletedForMessage'])->name('pnp.emergencymessage.complete');
 
          //emergency call
          Route::get('pnp/all-emergency-call', [PnpController::class, 'emergencyCallList'])->name('pnp.emergencycall.index');
          Route::get('admin/pnp/emergency-call/{id}/view', [PnpController::class, 'viewEmergencyCall'])->name('pnp.emergencycall.view');
-         Route::post('admin/pnp/emergency-call/{id}/ongoing', [PnpController::class, 'markAsOngoingForCall'])->name('pnp.emergencycall.ongoing');
+         Route::post('admin/pnp/emergency-call/{id}/responded', [PnpController::class, 'markAsRespondedForCall'])->name('pnp.emergencycall.responded');
          Route::post('admin/pnp/emergency-call/{id}/complete', [PnpController::class, 'markAsCompletedForCall'])->name('pnp.emergencycall.complete');
+
+         //cases
+         Route::get('pnp/all-cases', [PnpController::class, 'caseLists'])->name('pnp.cases.index');
+         Route::get('admin/pnp/cases/{id}/view', [PnpController::class, 'viewCase'])->name('pnp.cases.view');
     });
 
     // Bureau of Fire Protection (BFP)
@@ -370,7 +374,7 @@ Route::middleware(['auth'])->group(function () {
         })->name('admin.bfp.message-analytics');
         //dashboard
         Route::get('/admin/bfp-dashboard', [BfpController::class, 'bfpDashboard'])->name('admin.bfp');
-        Route::post('admin/bfp/reports/{id}/ongoing', [BfpController::class, 'markAsOngoing'])->name('bfp.reports.ongoing');
+        Route::post('admin/bfp/reports/{id}/responded', [BfpController::class, 'markAsResponded'])->name('bfp.reports.responded');
         Route::post('admin/bfp/reports/{id}/complete', [BfpController::class, 'markAsCompleted'])->name('bfp.reports.complete');
 
         //report
@@ -382,13 +386,13 @@ Route::middleware(['auth'])->group(function () {
         //emergency message
         Route::get('bfp/all-emergency-message', [BfpController::class, 'emergencyMessageList'])->name('bfp.emergencymessage.index');
         Route::get('admin/bfp/emergency-message/{id}/view', [BfpController::class, 'viewEmergencyMessage'])->name('bfp.emergencymessage.view');
-        Route::post('admin/bfp/emergency-message/{id}/ongoing', [BfpController::class, 'markAsOngoingForMessage'])->name('bfp.emergencymessage.ongoing');
+        Route::post('admin/bfp/emergency-message/{id}/responded', [BfpController::class, 'markAsRespondedForMessage'])->name('bfp.emergencymessage.responded');
         Route::post('admin/bfp/emergency-message/{id}/complete', [BfpController::class, 'markAsCompletedForMessage'])->name('bfp.emergencymessage.complete');
 
          //emergency call
          Route::get('bfp/all-emergency-call', [BfpController::class, 'emergencyCallList'])->name('bfp.emergencycall.index');
          Route::get('admin/bfp/emergency-call/{id}/view', [BfpController::class, 'viewEmergencyCall'])->name('bfp.emergencycall.view');
-         Route::post('admin/bfp/emergency-call/{id}/ongoing', [BfpController::class, 'markAsOngoingForCall'])->name('bfp.emergencycall.ongoing');
+         Route::post('admin/bfp/emergency-call/{id}/responded', [BfpController::class, 'markAsRespondedForCall'])->name('bfp.emergencycall.responded');
          Route::post('admin/bfp/emergency-call/{id}/complete', [BfpController::class, 'markAsCompletedForCall'])->name('bfp.emergencycall.complete');
     });
     
@@ -401,7 +405,7 @@ Route::middleware(['auth'])->group(function () {
 
          Route::get('/admin/mdrrmo-dashboard', action: [MdrrmoController::class, 'mdrrmoDashboard'])->name('admin.mdrrmo');
          Route::get('admin/mdrrmo/all-reports', [MdrrmoController::class, 'allReports'])->name('admin.mdrrmo.reports');
-         Route::post('admin/mdrrmo/reports/{id}/ongoing', [MdrrmoController::class, 'markAsOngoing'])->name('mdrrmo.reports.ongoing');
+         Route::post('admin/mdrrmo/reports/{id}/responded', [MdrrmoController::class, 'markAsResponded'])->name('mdrrmo.reports.responded');
          Route::post('admin/mdrrmo/reports/{id}/complete', [MdrrmoController::class, 'markAsCompleted'])->name('mdrrmo.reports.complete');
 
          
@@ -413,13 +417,13 @@ Route::middleware(['auth'])->group(function () {
           //emergency message
         Route::get('mdrrmo/all-emergency-message', [MdrrmoController::class, 'emergencyMessageList'])->name('mdrrmo.emergencymessage.index');
         Route::get('admin/mdrrmo/emergency-message/{id}/view', [MdrrmoController::class, 'viewEmergencyMessage'])->name('mdrrmo.emergencymessage.view');
-        Route::post('admin/mdrrmo/emergency-message/{id}/ongoing', [MdrrmoController::class, 'markAsOngoingForMessage'])->name('mdrrmo.emergencymessage.ongoing');
+        Route::post('admin/mdrrmo/emergency-message/{id}/responded', [MdrrmoController::class, 'markAsRespondedForMessage'])->name('mdrrmo.emergencymessage.responded');
         Route::post('admin/mdrrmo/emergency-message/{id}/complete', [MdrrmoController::class, 'markAsCompletedForMessage'])->name('mdrrmo.emergencymessage.complete');
 
          //emergency call
          Route::get('mdrrmo/all-emergency-call', [MdrrmoController::class, 'emergencyCallList'])->name('mdrrmo.emergencycall.index');
          Route::get('admin/mdrrmo/emergency-call/{id}/view', [MdrrmoController::class, 'viewEmergencyCall'])->name('mdrrmo.emergencycall.view');
-         Route::post('admin/mdrrmo/emergency-call/{id}/ongoing', [MdrrmoController::class, 'markAsOngoingForCall'])->name('mdrrmo.emergencycall.ongoing');
+         Route::post('admin/mdrrmo/emergency-call/{id}/responded', [MdrrmoController::class, 'markAsRespondedForCall'])->name('mdrrmo.emergencycall.responded');
          Route::post('admin/mdrrmo/emergency-call/{id}/complete', [MdrrmoController::class, 'markAsCompletedForCall'])->name('mdrrmo.emergencycall.complete');
     });
     
@@ -432,7 +436,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/admin/mho-dashboard', [MhoController::class, 'mhoDashboard'])->name('admin.mho');
         Route::get('admin/mho/all-reports', [MhoController::class, 'allReports'])->name('admin.mho.reports');
-        Route::post('admin/mho/reports/{id}/ongoing', [MhoController::class, 'markAsOngoing'])->name('mho.reports.ongoing');
+        Route::post('admin/mho/reports/{id}/responded', [MhoController::class, 'markAsResponded'])->name('mho.reports.responded');
         Route::post('admin/mho/reports/{id}/complete', [MhoController::class, 'markAsCompleted'])->name('mho.reports.complete');
 
         Route::get('mho/reports/create', [MhoController::class, 'createReport'])->name('mho.reports.create');
@@ -443,13 +447,13 @@ Route::middleware(['auth'])->group(function () {
         //emergency message
         Route::get('mho/all-emergency-message', [MhoController::class, 'emergencyMessageList'])->name('mho.emergencymessage.index');
         Route::get('admin/mho/emergency-message/{id}/view', [MhoController::class, 'viewEmergencyMessage'])->name('mho.emergencymessage.view');
-        Route::post('admin/mho/emergency-message/{id}/ongoing', [MhoController::class, 'markAsOngoingForMessage'])->name('mho.emergencymessage.ongoing');
+        Route::post('admin/mho/emergency-message/{id}/responded', [MhoController::class, 'markAsRespondedForMessage'])->name('mho.emergencymessage.responded');
         Route::post('admin/mho/emergency-message/{id}/complete', [MhoController::class, 'markAsCompletedForMessage'])->name('mho.emergencymessage.complete');
 
          //emergency call
          Route::get('mho/all-emergency-call', [MhoController::class, 'emergencyCallList'])->name('mho.emergencycall.index');
          Route::get('admin/mho/emergency-call/{id}/view', [MhoController::class, 'viewEmergencyCall'])->name('mho.emergencycall.view');
-         Route::post('admin/mho/emergency-call/{id}/ongoing', [MhoController::class, 'markAsOngoingForCall'])->name('mho.emergencycall.ongoing');
+         Route::post('admin/mho/emergency-call/{id}/responded', [MhoController::class, 'markAsRespondedForCall'])->name('mho.emergencycall.responded');
          Route::post('admin/mho/emergency-call/{id}/complete', [MhoController::class, 'markAsCompletedForCall'])->name('mho.emergencycall.complete');
     });
 
@@ -462,7 +466,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/admin/coast-guard-dashboard', [CoastGuardController::class, 'coastGuardDashboard'])->name('admin.coastguard');
         Route::get('admin/coast-guard/all-reports', [CoastGuardController::class, 'allReports'])->name('admin.coastguard.reports');
-        Route::post('admin/coast-guard/reports/{id}/ongoing', [CoastGuardController::class, 'markAsOngoing'])->name('coastguard.reports.ongoing');
+        Route::post('admin/coast-guard/reports/{id}/responded', [CoastGuardController::class, 'markAsResponded'])->name('coastguard.reports.responded');
         Route::post('admin/coast-guard/reports/{id}/complete', [CoastGuardController::class, 'markAsCompleted'])->name('coastguard.reports.complete');
 
         Route::get('coast-guard/reports/create', [CoastGuardController::class, 'createReport'])->name('coastguard.reports.create');
@@ -473,13 +477,13 @@ Route::middleware(['auth'])->group(function () {
          //emergency message
          Route::get('coast-guard/all-emergency-message', [CoastGuardController::class, 'emergencyMessageList'])->name('coastguard.emergencymessage.index');
          Route::get('admin/coastguard/emergency-message/{id}/view', [CoastGuardController::class, 'viewEmergencyMessage'])->name('coastguard.emergencymessage.view');
-         Route::post('admin/coastguard/emergency-message/{id}/ongoing', [CoastGuardController::class, 'markAsOngoingForMessage'])->name('coastguard.emergencymessage.ongoing');
+         Route::post('admin/coastguard/emergency-message/{id}/responded', [CoastGuardController::class, 'markAsRespondedForMessage'])->name('coastguard.emergencymessage.responded');
          Route::post('admin/coastguard/emergency-message/{id}/complete', [CoastGuardController::class, 'markAsCompletedForMessage'])->name('coastguard.emergencymessage.complete');
 
            //emergency call
            Route::get('coast-guard/all-emergency-call', [CoastGuardController::class, 'emergencyCallList'])->name('coastguard.emergencycall.index');
            Route::get('admin/coast-guard/emergency-call/{id}/view', [CoastGuardController::class, 'viewEmergencyCall'])->name('coastguard.emergencycall.view');
-           Route::post('admin/coast-guard/emergency-call/{id}/ongoing', [CoastGuardController::class, 'markAsOngoingForCall'])->name('coastguard.emergencycall.ongoing');
+           Route::post('admin/coast-guard/emergency-call/{id}/responded', [CoastGuardController::class, 'markAsRespondedForCall'])->name('coastguard.emergencycall.responded');
            Route::post('admin/coast-guard/emergency-call/{id}/complete', [CoastGuardController::class, 'markAsCompletedForCall'])->name('coastguard.emergencycall.complete');
     });
     
@@ -492,7 +496,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::get('/admin/lgu-dashboard', [LguController::class, 'lguDashboard'])->name('admin.lgu');
         Route::get('admin/lgu/all-reports', [LguController::class, 'allReports'])->name('admin.lgu.reports');
-        Route::post('admin/lgu/reports/{id}/ongoing', [LguController::class, 'markAsOngoing'])->name('lgu.reports.ongoing');
+        Route::post('admin/lgu/reports/{id}/responded', [LguController::class, 'markAsResponded'])->name('lgu.reports.responded');
         Route::post('admin/lgu/reports/{id}/complete', [LguController::class, 'markAsCompleted'])->name('lgu.reports.complete');
 
         //reports
@@ -504,13 +508,13 @@ Route::middleware(['auth'])->group(function () {
         //emergency message
         Route::get('lgu/all-emergency-message', [LguController::class, 'emergencyMessageList'])->name('lgu.emergencymessage.index');
         Route::get('admin/lgu/emergency-message/{id}/view', [LguController::class, 'viewEmergencyMessage'])->name('lgu.emergencymessage.view');
-        Route::post('admin/lgu/emergency-message/{id}/ongoing', [LguController::class, 'markAsOngoingForMessage'])->name('lgu.emergencymessage.ongoing');
+        Route::post('admin/lgu/emergency-message/{id}/responded', [LguController::class, 'markAsRespondedForMessage'])->name('lgu.emergencymessage.responded');
         Route::post('admin/lgu/emergency-message/{id}/complete', [LguController::class, 'markAsCompletedForMessage'])->name('lgu.emergencymessage.complete');
 
         //emergency call
         Route::get('lgu/all-emergency-call', [LguController::class, 'emergencyCallList'])->name('lgu.emergencycall.index');
         Route::get('admin/lgu/emergency-call/{id}/view', [LguController::class, 'viewEmergencyCall'])->name('lgu.emergencycall.view');
-        Route::post('admin/lgu/emergency-call/{id}/ongoing', [LguController::class, 'markAsOngoingForCall'])->name('lgu.emergencycall.ongoing');
+        Route::post('admin/lgu/emergency-call/{id}/responded', [LguController::class, 'markAsRespondedForCall'])->name('lgu.emergencycall.responded');
         Route::post('admin/lgu/emergency-call/{id}/complete', [LguController::class, 'markAsCompletedForCall'])->name('lgu.emergencycall.complete');
 
     });
@@ -540,13 +544,13 @@ Route::middleware(['auth'])->group(function () {
           //emergency message
           Route::get('superadmin/all-emergency-message', [SuperAdminController::class, 'emergencyMessageList'])->name('superadmin.emergencymessage.index');
           Route::get('admin/superadmin/emergency-message/{id}/view', [SuperAdminController::class, 'viewEmergencyMessage'])->name('superadmin.emergencymessage.view');
-          Route::post('admin/superadmin/emergency-message/{id}/ongoing', [SuperAdminController::class, 'markAsOngoingForMessage'])->name('superadmin.emergencymessage.ongoing');
+          Route::post('admin/superadmin/emergency-message/{id}/responded', [SuperAdminController::class, 'markAsRespondedForMessage'])->name('superadmin.emergencymessage.responded');
           Route::post('admin/superadmin/emergency-message/{id}/complete', [SuperAdminController::class, 'markAsCompletedForMessage'])->name('superadmin.emergencymessage.complete');
   
           //emergency call
           Route::get('superadmin/all-emergency-call', [SuperAdminController::class, 'emergencyCallList'])->name('superadmin.emergencycall.index');
           Route::get('admin/superadmin/emergency-call/{id}/view', [SuperAdminController::class, 'viewEmergencyCall'])->name('superadmin.emergencycall.view');
-          Route::post('admin/superadmin/emergency-call/{id}/ongoing', [SuperAdminController::class, 'markAsOngoingForCall'])->name('superadmin.emergencycall.ongoing');
+          Route::post('admin/superadmin/emergency-call/{id}/responded', [SuperAdminController::class, 'markAsRespondedForCall'])->name('superadmin.emergencycall.responded');
           Route::post('admin/superadmin/emergency-call/{id}/complete', [SuperAdminController::class, 'markAsCompletedForCall'])->name('superadmin.emergencycall.complete');
     });
 });

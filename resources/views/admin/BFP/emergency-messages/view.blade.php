@@ -203,12 +203,12 @@
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="ongoingForm-{{ $message->id }}"
-                                action="{{ route('bfp.emergencymessage.ongoing', $message->id) }}" method="POST">
+                            <form id="respondedForm-{{ $message->id }}"
+                                action="{{ route('bfp.emergencymessage.responded', $message->id) }}" method="POST">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
-                                <button type="button" onclick="confirmOngoing(event, 'ongoingForm-{{ $message->id }}')"
-                                    class="btn btn-sm btn-warning">Ongoing</button>
+                                <button type="button" onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
+                                    class="btn btn-sm btn-warning">Responded</button>
                             </form>
                             <form id="completeForm-{{ $message->id }}"
                                 action="{{ route('bfp.emergencymessage.complete', $message->id) }}" method="POST">
@@ -227,7 +227,7 @@
 @endsection
 @section('scripts')
     <!--sweet alert-->
-    <!--Mark as Ongoing-->
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "{{ session('success') }}";
@@ -254,12 +254,12 @@
             }
         });
 
-        function confirmOngoing(event, formId) {
+        function confirmResponded(event, formId) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as ongoing?",
+                text: "Do you want to mark this message as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -270,7 +270,7 @@
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark'
                 },

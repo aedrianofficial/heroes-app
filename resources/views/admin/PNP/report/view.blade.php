@@ -82,10 +82,10 @@
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form action="{{ route('pnp.reports.ongoing', $report->id) }}" method="POST">
+                            <form action="{{ route('pnp.reports.responded', $report->id) }}" method="POST">
                                 @csrf
-                                <button type="submit" onclick="confirmOngoing(event)" class="btn btn-sm btn-warning">Mark
-                                    as Ongoing</button>
+                                <button type="submit" onclick="confirmResponded(event)" class="btn btn-sm btn-warning">Mark
+                                    as Responded</button>
                             </form>
                             <form action="{{ route('pnp.reports.complete', $report->id) }}" method="POST">
                                 @csrf
@@ -101,7 +101,7 @@
 @endsection
 @section('scripts')
     <!--sweet alert-->
-    <!--Mark as Ongoing-->
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "{{ session('success') }}";
@@ -128,17 +128,17 @@
             }
         });
 
-        function confirmOngoing(event) {
+        function confirmResponded(event) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this report as ongoing?",
+                text: "Do you want to mark this report as responded?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark' // Add this line to change the text color to black
                 }
@@ -176,17 +176,17 @@
             }
         });
 
-        function confirmOngoing(event) {
+        function confirmResponded(event) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this report as ongoing?",
+                text: "Do you want to mark this report as responded?",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark'
                 }

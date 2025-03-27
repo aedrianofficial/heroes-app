@@ -31,10 +31,10 @@ class BfpController extends Controller
         // Count reports by status
         $totalReports = $reports->count();
         $pendingReports = $reports->where('status_id', 1)->count();
-        $ongoingReports = $reports->where('status_id', 2)->count();
+        $respondedReports = $reports->where('status_id', 2)->count();
         $completedReports = $reports->where('status_id', 3)->count();
         $agencies = Agency::all();
-        return view('admin.bfp.dashboard', compact('totalReports', 'pendingReports', 'completedReports','ongoingReports', 'reports','agencies'));
+        return view('admin.bfp.dashboard', compact('totalReports', 'pendingReports', 'completedReports','respondedReports', 'reports','agencies'));
     }
     public function allReports()
     {
@@ -50,14 +50,14 @@ class BfpController extends Controller
         
         return view('admin.bfp.report.view', compact('report'));
     }
-    public function markAsOngoing($id)
+    public function markAsResponded($id)
     {
         try {
             $report = Report::findOrFail($id);
-            $report->status_id = 2; // 2 = Ongoing
+            $report->status_id = 2; // 2 = Responded
             $report->save();
 
-            return redirect()->back()->with('success', 'Report marked as ongoing.');
+            return redirect()->back()->with('success', 'Report marked as responded.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update report.');
         }
@@ -111,7 +111,7 @@ class BfpController extends Controller
             'incident_type_id' => $request->incident_type_id,
             'name' => $request->name,
             'description' => $request->description,
-            'status_id' => 2, // Ongoing
+            'status_id' => 2, // Responded
             'contact_number' => $contactNumber,
         ]);
     
@@ -140,7 +140,7 @@ class BfpController extends Controller
             }
         }
     
-        return redirect()->route('bfp.reports.index')->with('success', 'Report marked as ongoing.');
+        return redirect()->route('bfp.reports.index')->with('success', 'Report marked as responded.');
     }
 
     public function reportList()
@@ -191,22 +191,22 @@ class BfpController extends Controller
         return view('admin.bfp.emergency-messages.view', compact('message', 'profile'));
     }
 
-    public function markAsOngoingForMessage($id, Request $request)
+    public function markAsRespondedForMessage($id, Request $request)
     {
         try {
             $message = Message::findOrFail($id);
-            $message->status_id = 2; // 2 = Ongoing
+            $message->status_id = 2; // 2 = Responded
             $message->save();
 
             // Save log entry
             StatusLogMessage::create([
                 'message_id' => $message->id,
-                'status_id' => 2, // Ongoing
+                'status_id' => 2, // Responded
                 'user_id' => Auth::id(),
                 'log_details' => $request->log_details
             ]);
 
-            return redirect()->back()->with('success', 'Marked as ongoing.');
+            return redirect()->back()->with('success', 'Marked as responded.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update.');
         }
@@ -223,7 +223,7 @@ class BfpController extends Controller
             // Save log entry
             StatusLogMessage::create([
                 'message_id' => $message->id,
-                'status_id' => 3, // Ongoing
+                'status_id' => 3, // Responded
                 'user_id' => Auth::id(),
                 'log_details' => $request->log_details
             ]);
@@ -264,22 +264,22 @@ class BfpController extends Controller
 
         return view('admin.bfp.emergency-calls.view', compact('call', 'profile'));
     }
-        public function markAsOngoingForCall($id, Request $request)
+        public function markAsRespondedForCall($id, Request $request)
     {
         try {
             $call = Call::findOrFail($id);
-            $call->status_id = 2; // 2 = Ongoing
+            $call->status_id = 2; // 2 = Responded
             $call->save();
 
             // Save log entry
             StatusLogCall::create([
                 'call_id' => $call->id,
-                'status_id' => 2, // Ongoing
+                'status_id' => 2, // Responded
                 'user_id' => Auth::id(),
                 'log_details' => $request->log_details
             ]);
 
-            return redirect()->back()->with('success', 'Marked as ongoing.');
+            return redirect()->back()->with('success', 'Marked as responded.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update.');
         }
@@ -296,7 +296,7 @@ class BfpController extends Controller
             // Save log entry
             StatusLogCall::create([
                 'call_id' => $call->id,
-                'status_id' => 3, // Ongoing
+                'status_id' => 3, // Responded
                 'user_id' => Auth::id(),
                 'log_details' => $request->log_details
             ]);

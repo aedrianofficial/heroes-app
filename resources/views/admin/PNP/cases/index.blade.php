@@ -1,4 +1,4 @@
-@extends('layouts.superadmin')
+@extends('layouts.pnp')
 @section('styles')
     <style>
         /* Equal-sized buttons */
@@ -71,80 +71,97 @@
             .table-responsive .table td.action-btns .action-btn {
                 width: 100px;
             }
+
         }
     </style>
 @endsection
 @section('content')
     <div class="container">
 
-        <!--All Emergency Messages Table -->
+        <!--All Emergency Calls Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Messages</h5>
+                <h5>Cases</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Sender Contact</th>
-                                <th>Message Content</th>
-                                <th>Date Received</th>
+                                <th>Incident Case</th>
+                                <th>Caller Contact</th>
+                                <th>Call Date</th>
+                               
                                 <th>Status</th>
                                 <th class="text-center">View</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($messages as $message)
+                            @forelse ($calls as $call)
                                 <tr>
-                                    <td data-label="Contact">{{ $message->sender_contact }}</td>
-                                    <td data-label="Message">{{ Str::limit($message->message_content, 50) }}</td>
-                                    <td data-label="Date">{{ $message->created_at->format('F j, Y g:i A') }}</td>
+                                    <td>
+                                        @if ($call->requests->isNotEmpty())
+                                            @foreach ($call->requests as $request)
+                                                {{ optional($request->incidentCase)->case_number ?? 'N/A' }}<br>
+                                            @endforeach
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>    
+                                    <td>{{ $call->caller_contact }}</td>
+                                    <td>{{ $call->created_at }}</td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $message->status->name }}
+                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
+                                            {{ $call->status->name }}
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('superadmin.emergencymessage.view', $message->id) }}"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                <a href="{{ route('pnp.emergencycall.view', $call->id) }}"
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-{{ $message->id }}"
-                                                action="{{ route('superadmin.emergencymessage.responded', $message->id) }}"
+                                            <form id="respondedForm-{{ $call->id }}"
+                                                action="{{ route('pnp.emergencycall.responded', $call->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
-                                                <input type="hidden" name="message_id" value="{{ $message->id }}">
+                                                <input type="hidden" name="call_id" value="{{ $call->id }}">
                                                 <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
+                                                    onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
                                                     class="btn btn-sm btn-warning action-btn">Responded</button>
                                             </form>
 
-                                            <form id="completeForm-{{ $message->id }}"
-                                                action="{{ route('superadmin.emergencymessage.complete', $message->id) }}"
+                                            <form id="completeForm-{{ $call->id }}"
+                                                action="{{ route('pnp.emergencycall.complete', $call->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
-                                                    class="btn btn-sm btn-success action-btn">Complete</button>
+                                                    onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                                    class="btn btn-sm btn-success action-btn">
+                                                    Complete
+                                                </button>
                                             </form>
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="5" class="text-center">No emergency calls found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
-                 <!-- Pagination -->
-                 <div class="d-flex justify-content-center mt-3">
-                    {{ $messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1]) }}
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
+                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
                 </div>
             </div>
         </div>
@@ -155,23 +172,23 @@
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successCall = "{{ session('success') }}";
+            let errorCall = "{{ session('error') }}";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -184,7 +201,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as responded?",
+                text: "Do you want to mark this call as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -201,7 +218,7 @@
                 },
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationMessage("Log details are required!");
+                        Swal.showValidationCall("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -223,23 +240,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successCall = "{{ session('success') }}";
+            let errorCall = "{{ session('error') }}";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -253,7 +270,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as completed?",
+                text: "Do you want to mark this call as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -267,7 +284,7 @@
                 confirmButtonText: "Yes, mark as completed!",
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationMessage("Log details are required!");
+                        Swal.showValidationCall("Log details are required!");
                     }
                     return logDetails;
                 }
