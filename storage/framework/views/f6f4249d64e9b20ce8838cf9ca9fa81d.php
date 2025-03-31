@@ -1,5 +1,4 @@
-@extends('layouts.coastguard')
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Equal-sized buttons */
         .action-btn {
@@ -74,8 +73,8 @@
 
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
         <!--All Emergency Calls Table -->
@@ -92,49 +91,51 @@
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                              
+                               
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($calls as $call)
+                            <?php $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td data-label="Contact">{{ $call->caller_contact }}</td>
-                                    <td data-label="Date">{{ $call->created_at->format('F j, Y g:i A') }}</td>
+                                    <td data-label="Contact"><?php echo e($call->caller_contact); ?></td>
+                                    <td data-label="Date"><?php echo e($call->created_at->format('F j, Y g:i A')); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $call->status->name }}
+                                            class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($call->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('coastguard.emergencycall.view', $call->id) }}"
+                                                <a href="<?php echo e(route('mdrrmo.emergencycall.view', $call->id)); ?>"
                                                     class="btn btn-sm btn-primary action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
-                                   
+                                  
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
+                    <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
+
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -201,8 +202,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -263,4 +264,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-calls/index.blade.php ENDPATH**/ ?>

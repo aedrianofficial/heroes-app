@@ -237,32 +237,39 @@ class PnpController extends Controller
          return view('admin.pnp.emergency-calls.index', compact('calls'));
      }
      public function viewEmergencyCall($id)
-     {
-         $call = Call::with([
-             'status',
-             'statusLogCalls.user.profile' => function ($query) {
-                 $query->orderBy('created_at', 'desc');
-             },
-             'requests.agencies',
-             'requests.incidentCase' // Include incident case data
-         ])->findOrFail($id);
- 
-         // Fetch the corresponding contact from aparrio1_dbbdc.m_contacts
-         $contact = DB::connection('aparrio_db')->table('m_contacts')
-             ->where('mobile_no', $call->caller_contact)
-             ->first();
- 
-         $profile = null;
-         if ($contact) {
-             // Fetch the profile from aparrio1_dbbdc.m_profiles using p_id from m_contacts
-             $profile = DB::connection('aparrio_db')->table('m_profiles')
-                 ->where('id', $contact->p_id)
-                 ->first();
-         }
- 
-         return view('admin.pnp.emergency-calls.view', compact('call', 'profile'));
-     }
+    {
+        $call = Call::with([
+            'status',
+            'statusLogCalls.user.profile' => function ($query) {
+                $query->orderBy('created_at', 'desc');
+            },
+            'requests.agencies',
+            'requests.incidentCase' // Include incident case data
+        ])->findOrFail($id);
 
+        // Fetch the corresponding contact from aparrio1_dbbdc.m_contacts
+        $contact = DB::connection('aparrio_db')->table('m_contacts')
+            ->where('mobile_no', $call->caller_contact)
+            ->first();
+
+        $profile = null;
+        if ($contact) {
+            // Fetch the profile from aparrio1_dbbdc.m_profiles using p_id from m_contacts
+            $profile = DB::connection('aparrio_db')->table('m_profiles')
+                ->where('id', $contact->p_id)
+                ->first();
+        }
+        
+        // Determine if the call can be marked as completed
+        $incidentTypeId = null;
+        if ($call->requests->isNotEmpty()) {
+            $incidentTypeId = optional($call->requests->first()->incidentCase)->incident_type_id;
+        }
+        
+        $call->can_complete = $this->canMarkAsCompleted($incidentTypeId, $call->id);
+
+        return view('admin.pnp.emergency-calls.view', compact('call', 'profile'));
+    }
      
  
  
@@ -308,11 +315,73 @@ class PnpController extends Controller
              return redirect()->back()->with('error', 'Failed to update.');
          }
      }
-     public function caseLists() {
-        $calls = Call::whereHas('requests', function ($query) {
-            $query->whereNotNull('incident_case_id'); // Only get calls with incident cases
-        })->with('requests.incidentCase')->paginate(10);
-    
-        return view('admin.pnp.cases.index', compact('calls'));
+     public function caseLists()
+     {
+         $calls = Call::whereHas('requests', function ($query) {
+             $query->whereNotNull('incident_case_id'); // Only get calls with incident cases
+         })->with(['requests.incidentCase', 'status'])->paginate(10);
+         
+         // For each call, check if it can be marked as completed
+         foreach ($calls as $call) {
+             $incidentTypeId = null;
+             
+             // Get the incident type from the first request (if any)
+             if ($call->requests->isNotEmpty()) {
+                 $incidentTypeId = optional($call->requests->first()->incidentCase)->incident_type_id;
+             }
+             
+             $call->can_complete = $this->canMarkAsCompleted($incidentTypeId, $call->id);
+         }
+         
+         return view('admin.pnp.cases.index', compact('calls'));
+     }
+   /**
+     * Check if all required agencies have responded based on incident type
+     * 
+     * @param int $incidentTypeId The type of incident
+     * @param int $callId The ID of the emergency call
+     * @return bool True if all required agencies have responded, false otherwise
+     */
+    private function canMarkAsCompleted($incidentTypeId, $callId)
+    {
+        // If no incident type is specified, complete button should be disabled
+        if (!$incidentTypeId) {
+            return false;
+        }
+        
+        // Define required agencies for each incident type
+        $requiredAgencies = [
+            1 => [2], // CRIME: PNP only
+            2 => [2, 4], // ROAD: PNP, MDRRMO
+            3 => [5, 4], // HEALTH: MHO, MDRRMO
+            4 => [2, 3, 4], // DISASTER: PNP, BFP, MDRRMO
+            5 => [6, 4], // SEA: COAST GUARD, MDRRMO
+            6 => [3, 4], // FIRE: BFP, MDRRMO
+        ];
+        
+        // Get the required agencies for this incident type
+        $mandatoryAgencies = $requiredAgencies[$incidentTypeId] ?? [];
+        
+        // If no mandatory agencies, default to disabled
+        if (empty($mandatoryAgencies)) {
+            return false;
+        }
+        
+        // Get all agencies that have responded to this call
+        $respondedAgencies = DB::table('status_log_calls')
+            ->join('users', 'status_log_calls.user_id', '=', 'users.id')
+            ->where('status_log_calls.call_id', $callId)
+            ->where('status_log_calls.status_id', 2) // Status 2 = Responded
+            ->pluck('users.agency_id')
+            ->toArray();
+        
+        // Check if all mandatory agencies have responded
+        foreach ($mandatoryAgencies as $agencyId) {
+            if (!in_array($agencyId, $respondedAgencies)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 }

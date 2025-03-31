@@ -92,7 +92,7 @@
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                                <th class="text-center">Actions</th>
+                            
                             </tr>
                         </thead>
                         <tbody>
@@ -114,30 +114,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="action-btns" data-label="Actions">
-                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-{{ $call->id }}"
-                                                action="{{ route('pnp.emergencycall.responded', $call->id) }}" method="POST"
-                                                class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="call_id" value="{{ $call->id }}">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
-                                            </form>
-            
-                                            <form id="completeForm-{{ $call->id }}"
-                                                action="{{ route('pnp.emergencycall.complete', $call->id) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
-                                                    class="btn btn-sm btn-success action-btn">
-                                                    Complete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                 
                                 </tr>
                             @empty
                                 <tr>

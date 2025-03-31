@@ -1,5 +1,4 @@
-@extends('layouts.coastguard')
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Equal-sized buttons */
         .action-btn {
@@ -71,85 +70,109 @@
             .table-responsive .table td.action-btns .action-btn {
                 width: 100px;
             }
-
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
-        <!--All Emergency Calls Table -->
+        <!--All Emergency Messages Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Calls</h5>
+                <h5>Emergency Messages</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Caller Contact</th>
+                                <th>Sender Contact</th>
+                                <th>Message Content</th>
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                              
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($calls as $call)
+                            <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                 <tr>
-                                    <td data-label="Contact">{{ $call->caller_contact }}</td>
-                                    <td data-label="Date">{{ $call->created_at->format('F j, Y g:i A') }}</td>
+                                    <td data-label="Contact"><?php echo e($message->sender_contact); ?></td>
+                                    <td data-label="Message"><?php echo e(Str::limit($message->message_content, 50)); ?></td>
+                                    <td data-label="Date"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $call->status->name }}
+                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($message->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('coastguard.emergencycall.view', $call->id) }}"
+                                                <a href="<?php echo e(route('mdrrmo.emergencymessage.view', $message->id)); ?>"
                                                     class="btn btn-sm btn-primary action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
-                                   
+                                    <td class="action-btns" data-label="Actions">
+                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                                            <form id="respondedForm-<?php echo e($message->id); ?>"
+                                                action="<?php echo e(route('mdrrmo.emergencymessage.responded', $message->id)); ?>"
+                                                method="POST" class="d-inline">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
+                                                <button type="button"
+                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
+                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
+                                            </form>
+
+                                            <form id="completeForm-<?php echo e($message->id); ?>"
+                                                action="<?php echo e(route('mdrrmo.emergencymessage.complete', $message->id)); ?>"
+                                                method="POST" class="d-inline">
+                                                <?php echo csrf_field(); ?>
+                                                <button type="button"
+                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
+                                                    class="btn btn-sm btn-success action-btn">Complete</button>
+                                            </form>
+                                        </div>
+                                    </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-3">
-                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
+                 <!-- Pagination -->
+                 <div class="d-flex justify-content-center mt-3">
+                    <?php echo e($messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1])); ?>
+
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
-            if (successCall) {
+            if (successMessage) {
                 Swal.fire({
                     title: "Success!",
-                    text: successCall,
+                    text: successMessage,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorCall) {
+            if (errorMessage) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorCall,
+                    text: errorMessage,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -162,7 +185,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as responded?",
+                text: "Do you want to mark this message as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -179,7 +202,7 @@
                 },
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -201,23 +224,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
-            if (successCall) {
+            if (successMessage) {
                 Swal.fire({
                     title: "Success!",
-                    text: successCall,
+                    text: successMessage,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorCall) {
+            if (errorMessage) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorCall,
+                    text: errorMessage,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -231,7 +254,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as completed?",
+                text: "Do you want to mark this message as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -245,7 +268,7 @@
                 confirmButtonText: "Yes, mark as completed!",
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -263,4 +286,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-messages/index.blade.php ENDPATH**/ ?>

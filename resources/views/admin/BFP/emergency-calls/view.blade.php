@@ -1,225 +1,171 @@
 @extends('layouts.bfp')
-
 @section('content')
-    <div class="container">
+    <div class="container-fluid my-2">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card shadow-lg mt-4">
-
+            <div class="col-lg-12">
+                <div class="card shadow-lg border-0">
                     <div class="card-body">
-                        <!-- Caller contact row -->
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Caller Contact</h5>
-                                    <p class="text-dark">{{ $call->caller_contact }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Date Received</h5>
-                                    <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
-                                </div>
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Date recieve</h5>
-                                    <p class="text-dark">{{ $call->created_at }}</p>
-                                </div> --}}
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Address</h5>
-                                    <p class="text-dark">{{ $call->location->address }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Contact Number</h5>
-                                    <p class="text-dark">{{ $call->contact_number }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Coordinates</h5>
-                                    <p>({{ $call->location->latitude }},
-                                        {{ $call->location->longitude }})
-                                    </p>
-                                </div> --}}
+                            <!-- Left Column: Call and Caller Information -->
+                            <div class="col-md-6 border-end">
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Call Details</h3>
 
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Caller Contact</h5>
+                                            <p class="text-dark">{{ $call->caller_contact }}</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Date Received</h5>
+                                            <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h5 class="text-muted">Status</h5>
+                                        <span
+                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
+                                            {{ $call->status->name }}
+                                        </span>
+                                    </div>
+
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Caller Profile</h3>
+                                    @if ($profile)
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p><strong>Name:</strong> {{ $profile->first_name }}
+                                                    {{ $profile->middle_name }} {{ $profile->last_name }}
+                                                    {{ $profile->suffix }}</p>
+                                                <p><strong>Sex:</strong> {{ $profile->sex }}</p>
+                                                <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <p><strong>Zone:</strong> {{ $profile->zone }}</p>
+                                                <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <p class="text-muted">No profile information available.</p>
+                                    @endif
+                                </div>
                             </div>
 
-                            <!-- Right Column -->
+                            <!-- Right Column: Requests and Status Log -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Status</h5>
-                                    <span
-                                        class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                        {{ $call->status->name }}
-                                    </span>
-                                </div>
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Incident Type</h5>
-                                    <p>
-                                      @foreach ($call->agencies as $agency)
-                                          <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
-                                      @endforeach
-                                  </p> 
-                                    <p>Test</p>
-                                </div> --}}
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Agencies Involved</h5>
-                                    <p>
-                                        @foreach ($call->agencies as $agency)
-                                            <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Requests</h3>
+                                    @if ($call->requests->isNotEmpty())
+                                        @foreach ($call->requests as $index => $request)
+                                            <div class="card mb-3 shadow-sm">
+                                                <div class="card-body">
+                                                    <h5 class="card-title text-muted">Request {{ $index + 1 }}</h5>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p><strong>Name:</strong> {{ $request->name }}</p>
+                                                            <p><strong>Address:</strong> {{ $request->address }}</p>
+                                                            <p><strong>Description:</strong> {{ $request->description }}
+                                                            </p>
+                                                            <p><strong>Time:</strong>
+                                                                {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <h6 class="text-muted">Assigned Agencies</h6>
+                                                            @if ($request->agencies->isNotEmpty())
+                                                                <ul class="list-unstyled">
+                                                                    @foreach ($request->agencies as $agency)
+                                                                        <li>{{ $agency->name }}</li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            @else
+                                                                <p class="text-muted">No assigned agencies</p>
+                                                            @endif
+
+                                                            @if ($request->incidentCase)
+                                                                <h6 class="text-muted mt-3">Incident Case</h6>
+                                                                <p><strong>Case Number:</strong>
+                                                                    {{ $request->incidentCase->case_number }}</p>
+                                                            @else
+                                                                <p class="text-muted">No Incident Case Assigned</p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endforeach
-                                    </p> 
-                                    <p>Test</p>
-                                </div> --}}
-                                {{-- <div class="mb-4">
-                                    <h5 class="fw-bold text-muted">Attachments</h5>
-                                    @if ($call->callAttachments->count() > 0)
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($call->callAttachments as $attachment)
-                                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $attachment->file_path) }}"
-                                                        alt="Attachment" class="rounded shadow-sm border border-primary"
-                                                        width="200" height="200" style="object-fit: cover;">
-                                                </a>
+                                    @else
+                                        <p class="text-muted">No requests found for this call.</p>
+                                    @endif
+
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Status Log</h3>
+                                    @if ($call->statusLogCalls->isNotEmpty())
+                                        <div class="list-group">
+                                            @foreach ($call->statusLogCalls as $log)
+                                                <div class="list-group-item list-group-item-action mb-2">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h5 class="mb-1">
+                                                            {{ $log->user->profile->firstname ?? 'Unknown User' }}
+                                                            {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                                        </h5>
+                                                        <small>{{ $log->created_at->format('F j, Y g:i A') }}</small>
+                                                    </div>
+                                                    <p class="mb-1">
+                                                        Marked as
+                                                        <span
+                                                            class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
+                                                            {{ $log->status->name }}
+                                                        </span>
+                                                    </p>
+                                                    <small><strong>Log Details:</strong> {{ $log->log_details }}</small>
+                                                </div>
                                             @endforeach
                                         </div>
                                     @else
-                                        <p class="text-muted">No attachments available.</p>
+                                        <p class="text-muted">No status logs available.</p>
                                     @endif
-                                </div> --}}
-                            </div>
-                        </div>
-
-                        <hr>
-                        <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <h5 class="fw-bold text-muted">Caller Profile</h5>
-                                @if ($profile)
-                                    <div class="mb-3">
-                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }}
-                                            {{ $profile->last_name }} {{ $profile->suffix }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Sex:</strong> {{ $profile->sex }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
-                                    </div>
-                                @else
-                                    <p class="text-muted">No profile information available.</p>
-                                @endif
-                            </div>
-
-                            <!-- Right Column -->
-                            <div class="col-md-6">
-                                @if ($profile)
-                                    <div class="mb-3">
-                                        <p><strong>Religion:</strong> {{ $profile->religion }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Ethnicity:</strong> {{ $profile->ethnicity }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Birth Place:</strong> {{ $profile->birth_place }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Zone:</strong> {{ $profile->zone }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        <hr>
-                        @if ($call->requests->isNotEmpty())
-                            @foreach ($call->requests as $index => $request)
-                                <div class="border rounded p-3 mb-4 shadow-sm">
-                                    <h5 class="fw-bold text-muted">Request {{ $index + 1 }}</h5>
-                                    <div class="row">
-                                        <!-- Left Column -->
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <p><strong>Name:</strong> {{ $request->name }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Address:</strong> {{ $request->address }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Description:</strong> {{ $request->description }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Right Column -->
-                                        <div class="col-md-6">
-                                            <h5 class="fw-bold text-muted">Assigned Agencies</h5>
-                                            @if ($request->agencies->isNotEmpty())
-                                                <div class="mb-3">
-                                                    <ul>
-                                                        @foreach ($request->agencies as $agency)
-                                                            <li>{{ $agency->name }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @else
-                                                <p class="text-muted">No assigned agencies</p>
-                                            @endif
-                                        </div>
-                                    </div>
                                 </div>
-                            @endforeach
-                        @else
-                            <p class="text-muted">No requests found for this call.</p>
-                        @endif
-
-                        <hr>
-                        <div class="mb-3">
-                            <h5 class="fw-bold text-muted">Status Log</h5>
-                            @if ($call->statusLogCalls->isNotEmpty())
-                                <ul class="list-group">
-                                    @foreach ($call->statusLogCalls as $log)
-                                        <li class="list-group-item">
-                                            <strong>{{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                {{ $log->user->profile->lastname ?? 'Unknown User' }}
-
-                                            </strong> marked this call as
-                                            <span
-                                                class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                                {{ $log->status->name }}
-                                            </span>
-                                            on {{ $log->created_at->format('F j, Y g:i A') }}.
-                                            <br>
-                                            <strong>Log Details:</strong> {{ $log->log_details }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-muted">No status logs available.</p>
-                            @endif
+                            </div>
                         </div>
                     </div>
+
                     <div class="card-footer bg-light d-flex justify-content-between">
                         <a href="{{ route('bfp.emergencycall.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $call->id }}"
-                                action="{{ route('bfp.emergencycall.responded', $call->id) }}" method="POST">
+                                action="{{ route('bfp.emergencycall.responded', $call->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
-                                <button type="button" onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
-                                    class="btn btn-sm btn-warning">Responded</button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
+                                    <button type="button"
+                                        onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                        class="btn btn-sm btn-warning action-btn"
+                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : '' }}>
+                                        Responded
+                                    </button>
+                                </span>
                             </form>
+                        
                             <form id="completeForm-{{ $call->id }}"
-                                action="{{ route('bfp.emergencycall.complete', $call->id) }}" method="POST">
+                                action="{{ route('bfp.emergencycall.complete', $call->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
-                                    class="btn btn-sm btn-success">
-                                    Complete
-                                </button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    <button type="button"
+                                        onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                        class="btn btn-sm btn-success action-btn"
+                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                        Complete
+                                    </button>
+                                </span>
                             </form>
                         </div>
                     </div>
@@ -229,8 +175,18 @@
     </div>
 @endsection
 @section('scripts')
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
     <!--sweet alert-->
     <!--Mark as Responded-->
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successCall = "{{ session('success') }}";

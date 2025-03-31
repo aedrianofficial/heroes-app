@@ -61,10 +61,19 @@
                             href="{{ route('coastguard.emergencymessage.index') }}">Emergency
                             Messages</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="{{ route('coastguard.emergencycall.index') }}">Emergency
-                            Calls</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Emergency Calls
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('coastguard.emergencycall.index') }}">Call logs</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('coastguard.cases.index') }}">Cases</a></li>
+                        </ul>
                     </li>
                     <!--<li class="nav-item">
                         <a class="nav-link active" aria-current="page"
@@ -371,7 +380,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/pnp/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/coastguard/emergency-message/${data.id}/view`;
                         }
                     });
                 });

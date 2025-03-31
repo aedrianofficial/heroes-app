@@ -37,7 +37,7 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('admin.mho')); ?>">Dashboard</a>
+                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('admin.mdrrmo')); ?>">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
@@ -45,17 +45,17 @@
                             Reports
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('mho.reports.create')); ?>">Create a Report</a>
+                            <li><a class="dropdown-item" href="<?php echo e(route('mdrrmo.reports.create')); ?>">Create a Report</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('mho.reports.index')); ?>">All Reports</a></li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('mdrrmo.reports.index')); ?>">All Reports</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page"
-                            href="<?php echo e(route('mho.emergencymessage.index')); ?>">Emergency
+                            href="<?php echo e(route('mdrrmo.emergencymessage.index')); ?>">Emergency
                             Messages</a>
                     </li>
                     <li class="nav-item dropdown">
@@ -64,16 +64,17 @@
                             Emergency Calls
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('mho.emergencycall.index')); ?>">Call logs</a>
+                            <li><a class="dropdown-item" href="<?php echo e(route('mdrrmo.emergencycall.index')); ?>">Call logs</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('mho.cases.index')); ?>">Cases</a></li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('mdrrmo.cases.index')); ?>">Cases</a></li>
                         </ul>
                     </li>
                     <!--<li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('mho.reports.index')); ?>">Activity
+                        <a class="nav-link active" aria-current="page"
+                            href="<?php echo e(route('mdrrmo.reports.index')); ?>">Activity
                             Logs</a>
                     </li>-->
                 </ul>
@@ -162,10 +163,10 @@
                         title: "📞 Incoming Call Alert",
                         html: `<b>Caller:</b> ${data.caller_name} (${data.caller_contact}) <br> 
                                 <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
-        month: 'long', day: 'numeric', year: 'numeric', 
-        hour: 'numeric', minute: 'numeric', hour12: true 
-    })}<br>
-                               <b>Address:</b> ${data.address}`,
+                                    month: 'long', day: 'numeric', year: 'numeric', 
+                                    hour: 'numeric', minute: 'numeric', hour12: true 
+                                })} <br>
+                                <b>Address:</b> ${data.address}`,
                         icon: "info",
                         showCancelButton: true,
                         cancelButtonText: "Close",
@@ -174,9 +175,10 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/mho/emergency-call/${data.id}/view`;
+                            window.location.href = `/admin/mdrrmo/emergency-call/${data.id}/view`;
                         }
                     });
+
                 });
 
                 window.callEventSource.onerror = () => {
@@ -237,7 +239,8 @@
                             <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
         month: 'long', day: 'numeric', year: 'numeric', 
         hour: 'numeric', minute: 'numeric', hour12: true 
-    })}`,
+    })} <br>
+                           <b>Address:</b> ${data.address}`,
                         icon: "info",
                         showCancelButton: true,
                         cancelButtonText: "Close",
@@ -246,7 +249,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/mho/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/mdrrmo/emergency-message/${data.id}/view`;
                         }
                     });
                 });
@@ -297,12 +300,12 @@
 
                     markRequestAsSeen(data.id, data.request_call_id);
 
-                    Swal.fire({ 
+                    Swal.fire({
                         title: "🚨 New Emergency Call Request",
                         html: `<b>Name:</b> ${data.name} <br>
-                           <b>Address:</b> ${data.address} <br>
-                           <b>Description:</b> ${data.description} <br>
-                            <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+                       <b>Address:</b> ${data.address} <br>
+                       <b>Description:</b> ${data.description} <br>
+                        <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
         month: 'long', day: 'numeric', year: 'numeric', 
         hour: 'numeric', minute: 'numeric', hour12: true 
     })}`,
@@ -314,7 +317,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/mho/emergency-call/${data.id}/view`;
+                            window.location.href = `/admin/mdrrmo/emergency-call/${data.id}/view`;
                         }
                     });
                 });
@@ -377,7 +380,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/mho/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/mdrrmo/emergency-message/${data.id}/view`;
                         }
                     });
                 });
@@ -403,4 +406,4 @@
 </body>
 
 </html>
-<?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/layouts/mho.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/layouts/mdrrmo.blade.php ENDPATH**/ ?>

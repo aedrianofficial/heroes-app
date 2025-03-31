@@ -1,5 +1,5 @@
-@extends('layouts.coastguard')
-@section('styles')
+
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Equal-sized buttons */
         .action-btn {
@@ -74,67 +74,130 @@
 
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
         <!--All Emergency Calls Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Calls</h5>
+                <h5>Cases</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Incident Case</th>
                                 <th>Caller Contact</th>
-                                <th>Date Received</th>
+                                <th>Call Date</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                              
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($calls as $call)
+                            <?php $__empty_1 = true; $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td data-label="Contact">{{ $call->caller_contact }}</td>
-                                    <td data-label="Date">{{ $call->created_at->format('F j, Y g:i A') }}</td>
+                                    <td data-label="Incident Case">
+                                        <?php if($call->requests->isNotEmpty()): ?>
+                                            <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php echo e(optional($request->incidentCase)->case_number ?? 'N/A'); ?><br>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Caller Contact"><?php echo e($call->caller_contact); ?></td>
+                                    <td data-label="Call Date"><?php echo e($call->created_at); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $call->status->name }}
+                                            class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($call->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('coastguard.emergencycall.view', $call->id) }}"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                <a href="<?php echo e(route('mho.emergencycall.view', $call->id)); ?>"
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
-                                   
+                                    <td class="action-btns" data-label="Actions">
+                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                                            <form id="respondedForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('mho.emergencycall.responded', $call->id)); ?>"
+                                                method="POST" class="d-inline">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This call is already completed' : 'Mark as responded'); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-warning action-btn"
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ''); ?>>
+                                                        Responded
+                                                    </button>
+                                                </span>
+                                            </form>
+
+                                            <form id="completeForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('mho.emergencycall.complete', $call->id)); ?>"
+                                                method="POST" class="d-inline">
+                                                <?php echo csrf_field(); ?>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This call is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-success action-btn"
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
+                                                        Complete
+                                                    </button>
+                                                </span>
+                                            </form>
+
+
+                                        </div>
+                                    </td>
                                 </tr>
-                            @endforeach
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">No emergency calls found</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
+                    <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
+
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -201,8 +264,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -263,4 +326,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.mho', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mho/cases/index.blade.php ENDPATH**/ ?>

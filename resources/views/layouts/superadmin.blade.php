@@ -61,10 +61,19 @@
                             href="{{ route('superadmin.emergencymessage.index') }}">Emergency
                             Messages</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="{{ route('superadmin.emergencycall.index') }}">Emergency
-                            Calls</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Emergency Calls
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('superadmin.emergencycall.index') }}">Call logs</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('superadmin.cases.index') }}">Cases</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdownMenuLink" role="button"

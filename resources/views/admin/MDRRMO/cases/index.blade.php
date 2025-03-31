@@ -1,4 +1,4 @@
-@extends('layouts.coastguard')
+@extends('layouts.mdrrmo')
 @section('styles')
     <style>
         /* Equal-sized buttons */
@@ -81,25 +81,35 @@
         <!--All Emergency Calls Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Calls</h5>
+                <h5>Cases</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Incident Case</th>
                                 <th>Caller Contact</th>
-                                <th>Date Received</th>
+                                <th>Call Date</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                              
+                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($calls as $call)
+                            @forelse ($calls as $call)
                                 <tr>
-                                    <td data-label="Contact">{{ $call->caller_contact }}</td>
-                                    <td data-label="Date">{{ $call->created_at->format('F j, Y g:i A') }}</td>
+                                    <td data-label="Incident Case">
+                                        @if ($call->requests->isNotEmpty())
+                                            @foreach ($call->requests as $request)
+                                                {{ optional($request->incidentCase)->case_number ?? 'N/A' }}<br>
+                                            @endforeach
+                                        @else
+                                            N/A
+                                        @endif
+                                    </td>
+                                    <td data-label="Caller Contact">{{ $call->caller_contact }}</td>
+                                    <td data-label="Call Date">{{ $call->created_at }}</td>
                                     <td data-label="Status">
                                         <span
                                             class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
@@ -109,17 +119,57 @@
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('coastguard.emergencycall.view', $call->id) }}"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                <a href="{{ route('mdrrmo.emergencycall.view', $call->id) }}"
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
-                                   
+                                    <td class="action-btns" data-label="Actions">
+                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
+                                            <form id="respondedForm-{{ $call->id }}"
+                                                action="{{ route('mdrrmo.emergencycall.responded', $call->id) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                <input type="hidden" name="call_id" value="{{ $call->id }}">
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : 'Mark as responded' }}">
+                                                    <button type="button"
+                                                        onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                                        class="btn btn-sm btn-warning action-btn"
+                                                        {{ $call->status_id == 3 ? 'disabled' : '' }}>
+                                                        Responded
+                                                    </button>
+                                                </span>
+                                            </form>
+
+                                            <form id="completeForm-{{ $call->id }}"
+                                                action="{{ route('mdrrmo.emergencycall.complete', $call->id) }}"
+                                                method="POST" class="d-inline">
+                                                @csrf
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
+                                                    <button type="button"
+                                                        onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                                        class="btn btn-sm btn-success action-btn"
+                                                        {{ $call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                                        Complete
+                                                    </button>
+                                                </span>
+                                            </form>
+
+
+                                        </div>
+                                    </td>
                                 </tr>
-                            @endforeach
+                            @empty
+                                <tr>
+                                    <td colspan="6" class="text-center">No emergency calls found</td>
+                                </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
+
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
                     {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
@@ -129,6 +179,17 @@
     </div>
 @endsection
 @section('scripts')
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>

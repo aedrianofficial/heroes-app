@@ -91,7 +91,6 @@
                                 <th>Incident Case</th>
                                 <th>Caller Contact</th>
                                 <th>Call Date</th>
-                               
                                 <th>Status</th>
                                 <th class="text-center">View</th>
                                 <th class="text-center">Actions</th>
@@ -100,7 +99,7 @@
                         <tbody>
                             <?php $__empty_1 = true; $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td>
+                                    <td data-label="Incident Case">
                                         <?php if($call->requests->isNotEmpty()): ?>
                                             <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <?php echo e(optional($request->incidentCase)->case_number ?? 'N/A'); ?><br>
@@ -108,9 +107,9 @@
                                         <?php else: ?>
                                             N/A
                                         <?php endif; ?>
-                                    </td>    
-                                    <td><?php echo e($call->caller_contact); ?></td>
-                                    <td><?php echo e($call->created_at); ?></td>
+                                    </td>
+                                    <td data-label="Caller Contact"><?php echo e($call->caller_contact); ?></td>
+                                    <td data-label="Call Date"><?php echo e($call->created_at); ?></td>
                                     <td data-label="Status">
                                         <span
                                             class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
@@ -133,27 +132,39 @@
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This call is already completed' : 'Mark as responded'); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-warning action-btn"
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ''); ?>>
+                                                        Responded
+                                                    </button>
+                                                </span>
                                             </form>
 
                                             <form id="completeForm-<?php echo e($call->id); ?>"
                                                 action="<?php echo e(route('pnp.emergencycall.complete', $call->id)); ?>"
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
-                                                    class="btn btn-sm btn-success action-btn">
-                                                    Complete
-                                                </button>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This call is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-success action-btn"
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
+                                                        Complete
+                                                    </button>
+                                                </span>
                                             </form>
+
+
                                         </div>
                                     </td>
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
-                                    <td colspan="5" class="text-center">No emergency calls found</td>
+                                    <td colspan="6" class="text-center">No emergency calls found</td>
                                 </tr>
                             <?php endif; ?>
                         </tbody>
@@ -170,6 +181,17 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('scripts'); ?>
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>

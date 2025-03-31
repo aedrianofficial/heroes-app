@@ -91,7 +91,7 @@
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                                <th class="text-center">Actions</th>
+                            
                             </tr>
                         </thead>
                         <tbody>
@@ -114,30 +114,7 @@
                                             </div>
                                         </div>
                                     </td>
-                                    <td class="action-btns" data-label="Actions">
-                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-<?php echo e($call->id); ?>"
-                                                action="<?php echo e(route('pnp.emergencycall.responded', $call->id)); ?>" method="POST"
-                                                class="d-inline">
-                                                <?php echo csrf_field(); ?>
-                                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
-                                            </form>
-            
-                                            <form id="completeForm-<?php echo e($call->id); ?>"
-                                                action="<?php echo e(route('pnp.emergencycall.complete', $call->id)); ?>"
-                                                method="POST" class="d-inline">
-                                                <?php echo csrf_field(); ?>
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
-                                                    class="btn btn-sm btn-success action-btn">
-                                                    Complete
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </td>
+                                 
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>

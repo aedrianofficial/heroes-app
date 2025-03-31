@@ -310,6 +310,14 @@ Route::get('/sse/request-message', function () {
     exit();
 });
 
+
+// Add this route to your web.php or api.php
+Route::get('/api/calls/{call}/can-complete', 'EmergencyCallController@canComplete');
+
+// Then add this method to your EmergencyCallController
+
+
+
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {
     // User Dashboard (Only Users in DEFAULT)
@@ -357,7 +365,6 @@ Route::middleware(['auth'])->group(function () {
 
          //cases
          Route::get('pnp/all-cases', [PnpController::class, 'caseLists'])->name('pnp.cases.index');
-         Route::get('admin/pnp/cases/{id}/view', [PnpController::class, 'viewCase'])->name('pnp.cases.view');
     });
 
     // Bureau of Fire Protection (BFP)
@@ -394,6 +401,9 @@ Route::middleware(['auth'])->group(function () {
          Route::get('admin/bfp/emergency-call/{id}/view', [BfpController::class, 'viewEmergencyCall'])->name('bfp.emergencycall.view');
          Route::post('admin/bfp/emergency-call/{id}/responded', [BfpController::class, 'markAsRespondedForCall'])->name('bfp.emergencycall.responded');
          Route::post('admin/bfp/emergency-call/{id}/complete', [BfpController::class, 'markAsCompletedForCall'])->name('bfp.emergencycall.complete');
+
+        //cases
+        Route::get('bfp/all-cases', [BfpController::class, 'caseLists'])->name('bfp.cases.index');
     });
     
     //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
@@ -425,6 +435,9 @@ Route::middleware(['auth'])->group(function () {
          Route::get('admin/mdrrmo/emergency-call/{id}/view', [MdrrmoController::class, 'viewEmergencyCall'])->name('mdrrmo.emergencycall.view');
          Route::post('admin/mdrrmo/emergency-call/{id}/responded', [MdrrmoController::class, 'markAsRespondedForCall'])->name('mdrrmo.emergencycall.responded');
          Route::post('admin/mdrrmo/emergency-call/{id}/complete', [MdrrmoController::class, 'markAsCompletedForCall'])->name('mdrrmo.emergencycall.complete');
+
+        //cases
+        Route::get('mdrrmo/all-cases', [MdrrmoController::class, 'caseLists'])->name('mdrrmo.cases.index');
     });
     
     //Municipal Health Office (MHO)
@@ -455,6 +468,9 @@ Route::middleware(['auth'])->group(function () {
          Route::get('admin/mho/emergency-call/{id}/view', [MhoController::class, 'viewEmergencyCall'])->name('mho.emergencycall.view');
          Route::post('admin/mho/emergency-call/{id}/responded', [MhoController::class, 'markAsRespondedForCall'])->name('mho.emergencycall.responded');
          Route::post('admin/mho/emergency-call/{id}/complete', [MhoController::class, 'markAsCompletedForCall'])->name('mho.emergencycall.complete');
+
+        //cases
+        Route::get('mho/all-cases', [MhoController::class, 'caseLists'])->name('mho.cases.index');
     });
 
     // Coast Guard
@@ -485,6 +501,9 @@ Route::middleware(['auth'])->group(function () {
            Route::get('admin/coast-guard/emergency-call/{id}/view', [CoastGuardController::class, 'viewEmergencyCall'])->name('coastguard.emergencycall.view');
            Route::post('admin/coast-guard/emergency-call/{id}/responded', [CoastGuardController::class, 'markAsRespondedForCall'])->name('coastguard.emergencycall.responded');
            Route::post('admin/coast-guard/emergency-call/{id}/complete', [CoastGuardController::class, 'markAsCompletedForCall'])->name('coastguard.emergencycall.complete');
+
+          //cases
+          Route::get('coastguard/all-cases', [CoastGuardController::class, 'caseLists'])->name('coastguard.cases.index');
     });
     
     //Local Government Unit (LGU)
@@ -517,6 +536,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/lgu/emergency-call/{id}/responded', [LguController::class, 'markAsRespondedForCall'])->name('lgu.emergencycall.responded');
         Route::post('admin/lgu/emergency-call/{id}/complete', [LguController::class, 'markAsCompletedForCall'])->name('lgu.emergencycall.complete');
 
+         //cases
+         Route::get('lgu/all-cases', [LguController::class, 'caseLists'])->name('lgu.cases.index');
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {
@@ -552,5 +573,8 @@ Route::middleware(['auth'])->group(function () {
           Route::get('admin/superadmin/emergency-call/{id}/view', [SuperAdminController::class, 'viewEmergencyCall'])->name('superadmin.emergencycall.view');
           Route::post('admin/superadmin/emergency-call/{id}/responded', [SuperAdminController::class, 'markAsRespondedForCall'])->name('superadmin.emergencycall.responded');
           Route::post('admin/superadmin/emergency-call/{id}/complete', [SuperAdminController::class, 'markAsCompletedForCall'])->name('superadmin.emergencycall.complete');
+
+            //cases
+         Route::get('superadmin/all-cases', [SuperAdminController::class, 'caseLists'])->name('superadmin.cases.index');
     });
 });
