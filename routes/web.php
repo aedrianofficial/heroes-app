@@ -43,6 +43,9 @@ Route::get('/', function () {
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/admin/analytics', 'App\Http\Controllers\AnalyticsController@index')->name('admin.analytics');
 }); 
+
+Route::get('/api/incident-counts', [AnalyticsController::class, 'getIncidentTypeCounts'])->name('api.incident-counts');
+
 Route::get('analytics/agency-performance', [AnalyticsController::class, 'agencyPerformance']);
 Route::middleware(['auth:sanctum'])->prefix('api/analytics')->group(function (): void {
     Route::get('analytics/agency-performance', [AnalyticsController::class, 'agencyPerformance']);

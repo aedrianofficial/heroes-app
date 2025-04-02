@@ -11,6 +11,35 @@ use Illuminate\Support\Facades\DB;
 
 class AnalyticsController extends Controller
 {
+
+    /**
+     * Get counts of incidents by type
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getIncidentTypeCounts()
+    {
+        // Query to get counts of incident cases grouped by incident type
+        $incidentCounts = DB::table('incident_cases')
+            ->join('incident_types', 'incident_cases.incident_type_id', '=', 'incident_types.id')
+            ->select('incident_types.name', DB::raw('count(*) as count'))
+            ->groupBy('incident_types.name')
+            ->get();
+        
+        // Convert to associative array with type names as keys
+        $countsArray = [];
+        $total = 0;
+        
+        foreach ($incidentCounts as $count) {
+            $countsArray[$count->name] = $count->count;
+            $total += $count->count;
+        }
+        
+        // Add total to the response
+        $countsArray['TOTAL'] = $total;
+        
+        return response()->json($countsArray);
+    }
     public function agencyPerformance(Request $request)
     {
         // Get parameters or use defaults

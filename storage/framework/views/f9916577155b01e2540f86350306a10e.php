@@ -91,6 +91,7 @@
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
+                             
                             </tr>
                         </thead>
                         <tbody>
@@ -108,18 +109,19 @@
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="<?php echo e(route('superadmin.emergencycall.view', $call->id)); ?>"
+                                                <a href="<?php echo e(route('bfp.emergencycall.view', $call->id)); ?>"
                                                     class="btn btn-sm btn-primary action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
+                                   
                                 </tr>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                         </tbody>
                     </table>
                 </div>
-                 <!-- Pagination -->
-                 <div class="d-flex justify-content-center mt-3">
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
                     <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
 
                 </div>
@@ -264,4 +266,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.superadmin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/super-admin/emergency-calls/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.bfp', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/bfp/emergency-calls/index.blade.php ENDPATH**/ ?>

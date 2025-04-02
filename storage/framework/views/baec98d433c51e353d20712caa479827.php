@@ -110,15 +110,50 @@
                                             <?php $__currentLoopData = $call->statusLogCalls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
-                                                        <h5 class="mb-1">
-                                                            <?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
+                                                        <div class="d-flex align-items-center">
+                                                            <?php if($log->user && $log->user->agency_id): ?>
+                                                                <?php
+                                                                    $agencyLogoPath = '';
+                                                                    switch ($log->user->agency_id) {
+                                                                        case 2:
+                                                                            $agencyLogoPath = 'pnp-logo.png';
+                                                                            break;
+                                                                        case 3:
+                                                                            $agencyLogoPath = 'bfp-logo.png';
+                                                                            break;
+                                                                        case 4:
+                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            break;
+                                                                        case 5:
+                                                                            $agencyLogoPath = 'mho-logo.jpg';
+                                                                            break;
+                                                                        case 6:
+                                                                            $agencyLogoPath = 'coastguard-logo.png';
+                                                                            break;
+                                                                        case 7:
+                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            break;
+                                                                        default:
+                                                                            $agencyLogoPath = '';
+                                                                    }
+                                                                ?>
 
-                                                            <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+                                                                <?php if($agencyLogoPath): ?>
+                                                                    <img src="<?php echo e(asset('asset/image/logo/' . $agencyLogoPath)); ?>"
+                                                                        alt="Agency Logo" class="me-2"
+                                                                        style="height: 24px; width: auto;">
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
+                                                            <h5 class="mb-0">
+                                                                <?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
 
-                                                        </h5>
+                                                                <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+
+                                                            </h5>
+                                                        </div>
                                                         <small><?php echo e($log->created_at->format('F j, Y g:i A')); ?></small>
                                                     </div>
-                                                    <p class="mb-1">
+                                                    <p class="mb-1 mt-2">
                                                         Marked as
                                                         <span
                                                             class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
@@ -144,8 +179,8 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('bfp.emergencycall.responded', $call->id)); ?>" method="POST"
-                                class="d-inline">
+                                action="<?php echo e(route('bfp.emergencycall.responded', $call->id)); ?>"
+                                method="POST" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -158,13 +193,13 @@
                                     </button>
                                 </span>
                             </form>
-                        
+
                             <form id="completeForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('bfp.emergencycall.complete', $call->id)); ?>" method="POST"
-                                class="d-inline">
+                                action="<?php echo e(route('bfp.emergencycall.complete', $call->id)); ?>"
+                                method="POST" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first'))); ?>">
+                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
                                         class="btn btn-sm btn-success action-btn"

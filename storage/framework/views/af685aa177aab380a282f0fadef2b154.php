@@ -42,7 +42,7 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
@@ -76,9 +76,60 @@
                 </div>
             </div>
         </div>
-
+        <h2 class="mb-4">Incident Case Summary</h2>
+        <!--Incident Case Summary -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">CRIME</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">ROAD</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">HEALTH</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-dark text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">DISASTER</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">SEA</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-orange text-white h-100" style="background-color: #fd7e14;">
+                    <div class="card-body">
+                        <h5 class="card-title">FIRE</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Call Volume Chart -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Daily Call Volume</div>
@@ -98,7 +149,7 @@
         </div>
 
         <!-- Activity Charts -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">Request Activity</div>
@@ -128,7 +179,7 @@
                 </div>
             </div>
         </div>
-        
+
         <!-- Performance Table -->
         <div class="card mb-4">
             <div class="card-header">Performance Metrics</div>
@@ -159,13 +210,54 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Fetch incident counts from the API
+            fetch('/api/incident-counts')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update each incident type card
+                    updateCardValue('CRIME', data.CRIME || 0);
+                    updateCardValue('ROAD', data.ROAD || 0);
+                    updateCardValue('HEALTH', data.HEALTH || 0);
+                    updateCardValue('DISASTER', data.DISASTER || 0);
+                    updateCardValue('SEA', data.SEA || 0);
+                    updateCardValue('FIRE', data.FIRE || 0);
+
+                    // Update total incidents card
+                    updateCardValue('TOTAL INCIDENTS', data.TOTAL || 0);
+                })
+                .catch(error => {
+                    console.error('Error fetching incident counts:', error);
+                    document.querySelectorAll('.card-text').forEach(element => {
+                        element.textContent = 'Error loading data';
+                    });
+                });
+
+            // Helper function to update card values
+            function updateCardValue(title, value) {
+                const cards = document.querySelectorAll('.card-title');
+                for (let i = 0; i < cards.length; i++) {
+                    if (cards[i].textContent === title) {
+                        cards[i].nextElementSibling.textContent = value;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             // Initialize charts
             let callVolumeChart = null;
             let statusDistributionChart = null;
             let requestActivityChart = null;
             let viewActivityChart = null;
             let callViewActivityChart = null;
-            
+
             // Set the agency ID as a constant (BFP agency_id=2)
             const AGENCY_ID = 3;
 
@@ -189,7 +281,9 @@
             }
 
             function loadAgencyPerformance(startDate, endDate) {
-                fetch(`/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         // Find the agency data (should be only one since we're filtering by agency_id)
@@ -197,7 +291,8 @@
 
                         // Update summary cards
                         document.getElementById('total-requests').textContent = agencyData.total_requests || 0;
-                        document.getElementById('total-request-views').textContent = agencyData.request_views || 0;
+                        document.getElementById('total-request-views').textContent = agencyData.request_views ||
+                            0;
                         document.getElementById('total-call-views').textContent = agencyData.call_views || 0;
 
                         // Update performance table
@@ -221,16 +316,46 @@
                 const avgRequestsPerDay = agencyData.total_requests / 30; // Assuming 30 days
                 const avgViewsPerRequest = agencyData.request_views / (agencyData.total_requests || 1);
                 const avgCallViewsPerDay = agencyData.call_views / 30;
-                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity).toLocaleString() : 'Never';
+                const lastActivity = agencyData.last_activity ? new Date(agencyData.last_activity)
+                    .toLocaleString() : 'Never';
 
                 // Add rows to the table
-                const metrics = [
-                    { name: 'Total Requests', value: agencyData.total_requests, change: '+5%', lastUpdated: lastActivity },
-                    { name: 'Request Views', value: agencyData.request_views, change: '+3%', lastUpdated: lastActivity },
-                    { name: 'Call Views', value: agencyData.call_views, change: '+7%', lastUpdated: lastActivity },
-                    { name: 'Average Requests per Day', value: avgRequestsPerDay.toFixed(2), change: '-2%', lastUpdated: lastActivity },
-                    { name: 'Average Views per Request', value: avgViewsPerRequest.toFixed(2), change: '+1%', lastUpdated: lastActivity },
-                    { name: 'Average Call Views per Day', value: avgCallViewsPerDay.toFixed(2), change: '+4%', lastUpdated: lastActivity }
+                const metrics = [{
+                        name: 'Total Requests',
+                        value: agencyData.total_requests,
+                        change: '+5%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Request Views',
+                        value: agencyData.request_views,
+                        change: '+3%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Call Views',
+                        value: agencyData.call_views,
+                        change: '+7%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Requests per Day',
+                        value: avgRequestsPerDay.toFixed(2),
+                        change: '-2%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Views per Request',
+                        value: avgViewsPerRequest.toFixed(2),
+                        change: '+1%',
+                        lastUpdated: lastActivity
+                    },
+                    {
+                        name: 'Average Call Views per Day',
+                        value: avgCallViewsPerDay.toFixed(2),
+                        change: '+4%',
+                        lastUpdated: lastActivity
+                    }
                 ];
 
                 metrics.forEach(metric => {
@@ -246,7 +371,9 @@
             }
 
             function loadDailyCallVolume(startDate, endDate) {
-                fetch(`/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         const dates = data.daily_calls.map(item => item.date);
@@ -307,7 +434,9 @@
             }
 
             function loadCallsStatusDistribution(startDate, endDate) {
-                fetch(`/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -341,7 +470,8 @@
                                             label: function(context) {
                                                 const label = context.label || '';
                                                 const value = context.raw || 0;
-                                                const percentage = (value / data.total * 100).toFixed(1);
+                                                const percentage = (value / data.total * 100)
+                                                    .toFixed(1);
                                                 return `${label}: ${value} (${percentage}%)`;
                                             }
                                         }
@@ -354,21 +484,23 @@
             }
 
             function loadActivityCharts(startDate, endDate) {
-                fetch(`/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                fetch(
+                        `/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         // Since we're filtering by agency_id, we need to adjust the data structure
                         // We'll use the date as the label instead of agency names
-                        
+
                         // Create a dummy data structure for demonstration
                         // In a real implementation, you'd need to adjust the API to return time-series data
                         const timeLabels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
-                        
+
                         // Request Activity Chart
                         if (requestActivityChart) {
                             requestActivityChart.destroy();
                         }
-                        
+
                         const ctxRequests = document.getElementById('requestActivityChart').getContext('2d');
                         requestActivityChart = new Chart(ctxRequests, {
                             type: 'bar',
@@ -396,12 +528,12 @@
                                 }
                             }
                         });
-                        
+
                         // View Activity Chart
                         if (viewActivityChart) {
                             viewActivityChart.destroy();
                         }
-                        
+
                         const ctxViews = document.getElementById('viewActivityChart').getContext('2d');
                         viewActivityChart = new Chart(ctxViews, {
                             type: 'bar',
@@ -429,12 +561,12 @@
                                 }
                             }
                         });
-                        
+
                         // Call View Activity Chart
                         if (callViewActivityChart) {
                             callViewActivityChart.destroy();
                         }
-                        
+
                         const ctxCallViews = document.getElementById('callViewActivityChart').getContext('2d');
                         callViewActivityChart = new Chart(ctxCallViews, {
                             type: 'line',
@@ -484,4 +616,5 @@
         });
     </script>
 <?php $__env->stopSection(); ?>
+
 <?php echo $__env->make('layouts.bfp', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/bfp/dashboard.blade.php ENDPATH**/ ?>

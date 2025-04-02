@@ -44,7 +44,7 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-3">
                 <div class="card bg-primary text-white">
                     <div class="card-body">
@@ -78,9 +78,60 @@
                 </div>
             </div>
         </div>
-
+        <h2 class="mb-4">Incident Case Summary</h2>
+        <!--Incident Case Summary -->
+        <div class="row mb-4 g-3">
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-danger text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">CRIME</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-warning text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">ROAD</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-success text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">HEALTH</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-dark text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">DISASTER</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-info text-white h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">SEA</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 col-lg-2">
+                <div class="card bg-orange text-white h-100" style="background-color: #fd7e14;">
+                    <div class="card-body">
+                        <h5 class="card-title">FIRE</h5>
+                        <h2 class="card-text">Loading...</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Message Volume Chart -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-header">Daily Message Volume</div>
@@ -100,7 +151,7 @@
         </div>
 
         <!-- Activity Charts -->
-        <div class="row mb-4">
+        <div class="row mb-4 g-3">
             <div class="col-md-6">
                 <div class="card">
                     <div class="card-header">Request Activity</div>
@@ -161,6 +212,47 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Fetch incident counts from the API
+            fetch('/api/incident-counts')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Update each incident type card
+                    updateCardValue('CRIME', data.CRIME || 0);
+                    updateCardValue('ROAD', data.ROAD || 0);
+                    updateCardValue('HEALTH', data.HEALTH || 0);
+                    updateCardValue('DISASTER', data.DISASTER || 0);
+                    updateCardValue('SEA', data.SEA || 0);
+                    updateCardValue('FIRE', data.FIRE || 0);
+
+                    // Update total incidents card
+                    updateCardValue('TOTAL INCIDENTS', data.TOTAL || 0);
+                })
+                .catch(error => {
+                    console.error('Error fetching incident counts:', error);
+                    document.querySelectorAll('.card-text').forEach(element => {
+                        element.textContent = 'Error loading data';
+                    });
+                });
+
+            // Helper function to update card values
+            function updateCardValue(title, value) {
+                const cards = document.querySelectorAll('.card-title');
+                for (let i = 0; i < cards.length; i++) {
+                    if (cards[i].textContent === title) {
+                        cards[i].nextElementSibling.textContent = value;
+                        break;
+                    }
+                }
+            }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
             // Initialize charts
             let messageVolumeChart = null;
             let statusDistributionChart = null;
@@ -192,7 +284,8 @@
 
             function loadAgencyPerformance(startDate, endDate) {
                 fetch(
-                        `/api/analytics/message-agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`)
+                        `/api/analytics/message-agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
+                        )
                     .then(response => response.json())
                     .then(data => {
                         // Find the agency data (should be only one since we're filtering by agency_id)
@@ -283,7 +376,7 @@
             function loadDailyMessageVolume(startDate, endDate) {
                 fetch(
                         `/api/analytics/daily-message-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                        )
+                    )
                     .then(response => response.json())
                     .then(data => {
                         const dates = data.daily_messages.map(item => item.date);
@@ -346,7 +439,7 @@
             function loadMessagesStatusDistribution(startDate, endDate) {
                 fetch(
                         `/api/analytics/messages-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                        )
+                    )
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -396,7 +489,7 @@
             function loadActivityCharts(startDate, endDate) {
                 fetch(
                         `/api/analytics/message-top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                        )
+                    )
                     .then(response => response.json())
                     .then(data => {
                         const weeklyData = data.weekly_data || {
