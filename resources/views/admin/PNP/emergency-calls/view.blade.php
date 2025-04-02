@@ -108,10 +108,10 @@
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <div class="d-flex align-items-center">
-                                                            @if($log->user && $log->user->agency_id)
+                                                            @if ($log->user && $log->user->agency_id)
                                                                 @php
                                                                     $agencyLogoPath = '';
-                                                                    switch($log->user->agency_id) {
+                                                                    switch ($log->user->agency_id) {
                                                                         case 2:
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
@@ -134,12 +134,11 @@
                                                                             $agencyLogoPath = '';
                                                                     }
                                                                 @endphp
-                                                                
-                                                                @if($agencyLogoPath)
-                                                                    <img src="{{ asset('asset/image/logo/' . $agencyLogoPath) }}" 
-                                                                         alt="Agency Logo" 
-                                                                         class="me-2" 
-                                                                         style="height: 24px; width: auto;">
+
+                                                                @if ($agencyLogoPath)
+                                                                    <img src="{{ asset('asset/image/logo/' . $agencyLogoPath) }}"
+                                                                        alt="Agency Logo" class="me-2"
+                                                                        style="height: 24px; width: auto;">
                                                                 @endif
                                                             @endif
                                                             <h5 class="mb-0">
@@ -188,13 +187,13 @@
                                     </button>
                                 </span>
                             </form>
-                        
+
                             <form id="completeForm-{{ $call->id }}"
                                 action="{{ route('pnp.emergencycall.complete', $call->id) }}" method="POST"
                                 class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : ''))) }}">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
                                         class="btn btn-sm btn-success action-btn"

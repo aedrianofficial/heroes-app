@@ -132,11 +132,11 @@
                                                 <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : 'Mark as responded'); ?>">
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
                                                     <button type="button"
                                                         onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
                                                         class="btn btn-sm btn-warning action-btn"
-                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ''); ?>>
+                                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ''); ?>>
                                                         Responded
                                                     </button>
                                                 </span>
@@ -147,17 +147,15 @@
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')); ?>">
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
                                                     <button type="button"
                                                         onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
                                                         class="btn btn-sm btn-success action-btn"
-                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
+                                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
                                                         Complete
                                                     </button>
                                                 </span>
                                             </form>
-
-
                                         </div>
                                     </td>
                                 </tr>
@@ -189,7 +187,7 @@
             });
         });
     </script>
-    
+
 
     <!--sweet alert-->
     <!--Mark as Responded-->

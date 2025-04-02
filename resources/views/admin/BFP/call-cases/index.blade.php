@@ -132,11 +132,11 @@
                                                 @csrf
                                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : 'Mark as responded' }}">
+                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
                                                     <button type="button"
                                                         onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
                                                         class="btn btn-sm btn-warning action-btn"
-                                                        {{ $call->status_id == 3 ? 'disabled' : '' }}>
+                                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : '' }}>
                                                         Responded
                                                     </button>
                                                 </span>
@@ -147,17 +147,15 @@
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
+                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : ''))) }}">
                                                     <button type="button"
                                                         onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
                                                         class="btn btn-sm btn-success action-btn"
-                                                        {{ $call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
                                                         Complete
                                                     </button>
                                                 </span>
                                             </form>
-
-
                                         </div>
                                     </td>
                                 </tr>

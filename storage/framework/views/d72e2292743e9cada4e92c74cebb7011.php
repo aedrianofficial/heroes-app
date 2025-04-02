@@ -114,7 +114,7 @@
                                                             <?php if($log->user && $log->user->agency_id): ?>
                                                                 <?php
                                                                     $agencyLogoPath = '';
-                                                                    switch($log->user->agency_id) {
+                                                                    switch ($log->user->agency_id) {
                                                                         case 2:
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
@@ -137,12 +137,11 @@
                                                                             $agencyLogoPath = '';
                                                                     }
                                                                 ?>
-                                                                
+
                                                                 <?php if($agencyLogoPath): ?>
-                                                                    <img src="<?php echo e(asset('asset/image/logo/' . $agencyLogoPath)); ?>" 
-                                                                         alt="Agency Logo" 
-                                                                         class="me-2" 
-                                                                         style="height: 24px; width: auto;">
+                                                                    <img src="<?php echo e(asset('asset/image/logo/' . $agencyLogoPath)); ?>"
+                                                                        alt="Agency Logo" class="me-2"
+                                                                        style="height: 24px; width: auto;">
                                                                 <?php endif; ?>
                                                             <?php endif; ?>
                                                             <h5 class="mb-0">
@@ -194,13 +193,13 @@
                                     </button>
                                 </span>
                             </form>
-                        
+
                             <form id="completeForm-<?php echo e($call->id); ?>"
                                 action="<?php echo e(route('pnp.emergencycall.complete', $call->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first'))); ?>">
+                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
                                         class="btn btn-sm btn-success action-btn"

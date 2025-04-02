@@ -134,11 +134,11 @@
                                                 @csrf
                                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : 'Mark as responded' }}">
+                                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
                                                     <button type="button"
                                                         onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
                                                         class="btn btn-sm btn-warning action-btn"
-                                                        {{ $message->status_id == 3 ? 'disabled' : '' }}>
+                                                        {{ $message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : '' }}>
                                                         Responded
                                                     </button>
                                                 </span>
@@ -149,17 +149,15 @@
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
+                                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : ''))) }}">
                                                     <button type="button"
                                                         onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
                                                         class="btn btn-sm btn-success action-btn"
-                                                        {{ $message->status_id == 3 ? 'disabled' : ($message->can_complete ? '' : 'disabled') }}>
+                                                        {{ $message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled') }}>
                                                         Complete
                                                     </button>
                                                 </span>
                                             </form>
-
-
                                         </div>
                                     </td>
                                 </tr>
@@ -183,14 +181,14 @@
 @section('scripts')
     <!--Initialize tooltips-->
     <script>
-      document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function() {
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>
-    
+
 
     <!--sweet alert-->
     <!--Mark as Responded-->

@@ -249,19 +249,34 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $call->id }}"
-                                action="{{ route('superadmin.emergencycall.responded', $call->id) }}" method="POST">
+                                action="{{ route('superadmin.emergencycall.responded', $call->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
-                                <button type="button" onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
-                                    class="btn btn-sm btn-warning">Responded</button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
+                                    <button type="button"
+                                        onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                        class="btn btn-sm btn-warning action-btn"
+                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : '' }}>
+                                        Responded
+                                    </button>
+                                </span>
                             </form>
+
                             <form id="completeForm-{{ $call->id }}"
-                                action="{{ route('superadmin.emergencycall.complete', $call->id) }}" method="POST">
+                                action="{{ route('superadmin.emergencycall.complete', $call->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
-                                    class="btn btn-sm btn-success">
-                                    Complete
-                                </button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : ''))) }}">
+                                    <button type="button"
+                                        onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                        class="btn btn-sm btn-success action-btn"
+                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                        Complete
+                                    </button>
+                                </span>
                             </form>
                         </div>
                     </div>

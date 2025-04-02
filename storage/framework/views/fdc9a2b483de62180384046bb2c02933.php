@@ -192,8 +192,8 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('bfp.emergencymessage.responded', $message->id)); ?>" method="POST"
-                                class="d-inline">
+                                action="<?php echo e(route('pnp.emergencymessage.responded', $message->id)); ?>"
+                                method="POST" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -208,11 +208,11 @@
                             </form>
 
                             <form id="completeForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('bfp.emergencymessage.complete', $message->id)); ?>" method="POST"
-                                class="d-inline">
+                                action="<?php echo e(route('pnp.emergencymessage.complete', $message->id)); ?>"
+                                method="POST" class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first'))); ?>">
+                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : '')))); ?>">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
                                         class="btn btn-sm btn-success action-btn"
@@ -232,7 +232,7 @@
     <!--Initialize tooltips-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var tooltipTriggerList = [].slice.message(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });

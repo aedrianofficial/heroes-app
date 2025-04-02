@@ -173,8 +173,8 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $call->id }}"
-                                action="{{ route('coastguard.emergencycall.responded', $call->id) }}" method="POST"
-                                class="d-inline">
+                                action="{{ route('coastguard.emergencycall.responded', $call->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -189,11 +189,11 @@
                             </form>
 
                             <form id="completeForm-{{ $call->id }}"
-                                action="{{ route('coastguard.emergencycall.complete', $call->id) }}" method="POST"
-                                class="d-inline">
+                                action="{{ route('coastguard.emergencycall.complete', $call->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : ''))) }}">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
                                         class="btn btn-sm btn-success action-btn"

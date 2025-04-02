@@ -186,8 +186,8 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $message->id }}"
-                                action="{{ route('bfp.emergencymessage.responded', $message->id) }}" method="POST"
-                                class="d-inline">
+                                action="{{ route('superadmin.emergencymessage.responded', $message->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -202,11 +202,11 @@
                             </form>
 
                             <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('bfp.emergencymessage.complete', $message->id) }}" method="POST"
-                                class="d-inline">
+                                action="{{ route('superadmin.emergencymessage.complete', $message->id) }}"
+                                method="POST" class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : ''))) }}">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
                                         class="btn btn-sm btn-success action-btn"
