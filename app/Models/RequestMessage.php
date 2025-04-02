@@ -47,4 +47,7 @@ class RequestMessage extends Model
     public function views() {
         return $this->hasMany(RequestMessageView::class);
     }
+    public function incidentCase() {
+        return $this->belongsTo(IncidentCase::class, 'incident_case_id');
+    }
 }

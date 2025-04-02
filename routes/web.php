@@ -364,7 +364,8 @@ Route::middleware(['auth'])->group(function () {
          Route::post('admin/pnp/emergency-call/{id}/complete', [PnpController::class, 'markAsCompletedForCall'])->name('pnp.emergencycall.complete');
 
          //cases
-         Route::get('pnp/all-cases', [PnpController::class, 'caseLists'])->name('pnp.cases.index');
+         Route::get('pnp/all-call-cases', [PnpController::class, 'callCaseLists'])->name('pnp.call_cases.index');
+         Route::get('pnp/all-message-cases', [PnpController::class, 'messageCaseLists'])->name('pnp.message_cases.index');
     });
 
     // Bureau of Fire Protection (BFP)
@@ -403,7 +404,8 @@ Route::middleware(['auth'])->group(function () {
          Route::post('admin/bfp/emergency-call/{id}/complete', [BfpController::class, 'markAsCompletedForCall'])->name('bfp.emergencycall.complete');
 
         //cases
-        Route::get('bfp/all-cases', [BfpController::class, 'caseLists'])->name('bfp.cases.index');
+        Route::get('bfp/all-call-cases', [BfpController::class, 'callCaseLists'])->name('bfp.call_cases.index');
+        Route::get('bfp/all-message-cases', [BfpController::class, 'messageCaseLists'])->name('bfp.message_cases.index');
     });
     
     //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
@@ -436,8 +438,9 @@ Route::middleware(['auth'])->group(function () {
          Route::post('admin/mdrrmo/emergency-call/{id}/responded', [MdrrmoController::class, 'markAsRespondedForCall'])->name('mdrrmo.emergencycall.responded');
          Route::post('admin/mdrrmo/emergency-call/{id}/complete', [MdrrmoController::class, 'markAsCompletedForCall'])->name('mdrrmo.emergencycall.complete');
 
-        //cases
-        Route::get('mdrrmo/all-cases', [MdrrmoController::class, 'caseLists'])->name('mdrrmo.cases.index');
+         //cases
+         Route::get('mdrrmo/all-call-cases', [MdrrmoController::class, 'callCaseLists'])->name('mdrrmo.call_cases.index');
+         Route::get('mdrrmo/all-message-cases', [MdrrmoController::class, 'messageCaseLists'])->name('mdrrmo.message_cases.index');
     });
     
     //Municipal Health Office (MHO)
@@ -470,7 +473,8 @@ Route::middleware(['auth'])->group(function () {
          Route::post('admin/mho/emergency-call/{id}/complete', [MhoController::class, 'markAsCompletedForCall'])->name('mho.emergencycall.complete');
 
         //cases
-        Route::get('mho/all-cases', [MhoController::class, 'caseLists'])->name('mho.cases.index');
+        Route::get('mho/all-call-cases', [MhoController::class, 'callCaseLists'])->name('mho.call_cases.index');
+        Route::get('mho/all-message-cases', [MhoController::class, 'messageCaseLists'])->name('mho.message_cases.index');
     });
 
     // Coast Guard
@@ -503,7 +507,8 @@ Route::middleware(['auth'])->group(function () {
            Route::post('admin/coast-guard/emergency-call/{id}/complete', [CoastGuardController::class, 'markAsCompletedForCall'])->name('coastguard.emergencycall.complete');
 
           //cases
-          Route::get('coastguard/all-cases', [CoastGuardController::class, 'caseLists'])->name('coastguard.cases.index');
+          Route::get('coastguard/all-call-cases', [CoastGuardController::class, 'callCaseLists'])->name('coastguard.call_cases.index');
+          Route::get('coastguard/all-message-cases', [CoastGuardController::class, 'messageCaseLists'])->name('coastguard.message_cases.index');
     });
     
     //Local Government Unit (LGU)
@@ -537,7 +542,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('admin/lgu/emergency-call/{id}/complete', [LguController::class, 'markAsCompletedForCall'])->name('lgu.emergencycall.complete');
 
          //cases
-         Route::get('lgu/all-cases', [LguController::class, 'caseLists'])->name('lgu.cases.index');
+         Route::get('lgu/all-call-cases', [LguController::class, 'callCaseLists'])->name('lgu.call_cases.index');
+         Route::get('lgu/all-message-cases', [LguController::class, 'messageCaseLists'])->name('lgu.message_cases.index');
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {
@@ -575,6 +581,7 @@ Route::middleware(['auth'])->group(function () {
           Route::post('admin/superadmin/emergency-call/{id}/complete', [SuperAdminController::class, 'markAsCompletedForCall'])->name('superadmin.emergencycall.complete');
 
             //cases
-         Route::get('superadmin/all-cases', [SuperAdminController::class, 'caseLists'])->name('superadmin.cases.index');
+         Route::get('superadmin/all-call-cases', [SuperAdminController::class, 'callCaseLists'])->name('superadmin.call_cases.index');
+         Route::get('superadmin/all-message-cases', [SuperAdminController::class, 'messageCaseLists'])->name('superadmin.message_cases.index');
     });
 });

@@ -149,7 +149,9 @@
                                                 <p><strong>Description:</strong> {{ $request->description }}</p>
                                             </div>
                                             <div class="mb-3">
-                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                                <p><strong>Time:</strong>
+                                                    {{ $request->created_at ? $request->created_at->format('F j, Y g:i A') : 'N/A' }}
+                                                </p>
                                             </div>
                                         </div>
 
@@ -262,7 +264,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -331,7 +333,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

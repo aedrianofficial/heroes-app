@@ -53,10 +53,19 @@
                             <li><a class="dropdown-item" href="{{ route('mho.reports.index') }}">All Reports</a></li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="{{ route('mho.emergencymessage.index') }}">Emergency
-                            Messages</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Emergency Messages
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('mho.emergencymessage.index') }}">Message logs</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="{{ route('mho.message_cases.index') }}">Cases</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
@@ -69,7 +78,7 @@
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="{{ route('mho.cases.index') }}">Cases</a></li>
+                            <li><a class="dropdown-item" href="{{ route('mho.call_cases.index') }}">Cases</a></li>
                         </ul>
                     </li>
                     <!--<li class="nav-item">

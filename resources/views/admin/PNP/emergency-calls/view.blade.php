@@ -143,7 +143,7 @@
                                 @csrf
                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
                                     <button type="button"
                                         onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
                                         class="btn btn-sm btn-warning action-btn"
@@ -158,7 +158,7 @@
                                 class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
                                     <button type="button"
                                         onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
                                         class="btn btn-sm btn-success action-btn"
@@ -218,7 +218,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -287,7 +287,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

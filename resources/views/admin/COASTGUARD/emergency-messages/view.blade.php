@@ -1,222 +1,184 @@
 @extends('layouts.coastguard')
 
 @section('content')
-    <div class="container">
+    <div class="container-fluid my-2">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card shadow-lg mt-4">
-
+            <div class="col-lg-12">
+                <div class="card shadow-lg border-0">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Sender Contact</h5>
-                                    <p class="text-dark">{{ $message->sender_contact }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Message Content</h5>
-                                    <p class="text-dark">{{ $message->message_content }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Date recieve</h5>
-                                    <p class="text-dark">{{ $message->created_at->format('F j, Y g:i A') }}</p>
-                                </div>
-                                {{-- <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Address</h5>
-                                    <p class="text-dark">{{ $message->location->address }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Contact Number</h5>
-                                    <p class="text-dark">{{ $message->contact_number }}</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Coordinates</h5>
-                                    <p>({{ $message->location->latitude }},
-                                        {{ $message->location->longitude }})
-                                    </p>
-                                </div> --}}
+                            <!-- Left Column: Message and Sender Information -->
+                            <div class="col-md-6 border-end">
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Message Details</h3>
 
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Sender Contact</h5>
+                                            <p class="text-dark">{{ $message->sender_contact }}</p>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Date Received</h5>
+                                            <p class="text-dark">{{ $message->created_at->format('F j, Y g:i A') }}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h5 class="text-muted">Status</h5>
+                                        <span
+                                            class="badge bg-{{ $message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
+                                            {{ $message->status->name }}
+                                        </span>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <h5 class="text-muted">Message Content</h5>
+                                        <p class="text-dark">{{ $message->message_content }}</p>
+                                    </div>
+
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Sender Profile</h3>
+                                    @if ($profile)
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p><strong>Name:</strong> {{ $profile->first_name }}
+                                                    {{ $profile->middle_name }} {{ $profile->last_name }}
+                                                    {{ $profile->suffix }}</p>
+                                                <p><strong>Sex:</strong> {{ $profile->sex }}</p>
+                                                <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                                <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
+                                            </div>
+                                            <div class="col-6">
+                                                <p><strong>Zone:</strong> {{ $profile->zone }}</p>
+                                                <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                                <p><strong>Religion:</strong> {{ $profile->religion }}</p>
+                                                <p><strong>Birth Place:</strong> {{ $profile->birth_place }}</p>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <p class="text-muted">No profile information available.</p>
+                                    @endif
+                                </div>
                             </div>
 
-                            <!-- Right Column -->
+                            <!-- Right Column: Requests and Status Log -->
                             <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Status</h5>
-                                    <span
-                                        class="badge bg-{{ $message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                        {{ $message->status->name }}
-                                    </span>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Incident Type</h5>
-                                    {{-- <p>
-                                      @foreach ($message->agencies as $agency)
-                                          <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
-                                      @endforeach
-                                  </p> --}}
-                                    <p>Test</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Agencies Involved</h5>
-                                    {{-- <p>
-                                        @foreach ($message->agencies as $agency)
-                                            <span class="badge bg-primary px-3 py-2">{{ $agency->name }}</span>
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Requests</h3>
+                                    @if ($message->requests->isNotEmpty())
+                                        @foreach ($message->requests as $index => $request)
+                                            <div class="card mb-3 shadow-sm">
+                                                <div class="card-body">
+                                                    <h5 class="card-title text-muted">Request {{ $index + 1 }}</h5>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p><strong>Name:</strong> {{ $request->name }}</p>
+                                                            <p><strong>Address:</strong> {{ $request->address }}</p>
+                                                            <p><strong>Description:</strong> {{ $request->description }}
+                                                            </p>
+                                                            <p><strong>Time:</strong>
+                                                                @if ($request->created_at)
+                                                                    {{ $request->created_at->format('F j, Y g:i A') }}
+                                                                @else
+                                                                    <em>No date available</em>
+                                                                @endif
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <h6 class="text-muted">Assigned Agencies</h6>
+                                                            @if ($request->agencies->isNotEmpty())
+                                                                <ul class="list-unstyled">
+                                                                    @foreach ($request->agencies as $agency)
+                                                                        <li>{{ $agency->name }}</li>
+                                                                    @endforeach
+                                                                </ul>
+                                                            @else
+                                                                <p class="text-muted">No assigned agencies</p>
+                                                            @endif
+
+                                                            @if ($request->incidentCase)
+                                                                <h6 class="text-muted mt-3">Incident Case</h6>
+                                                                <p><strong>Case Number:</strong>
+                                                                    {{ $request->incidentCase->case_number }}</p>
+                                                            @else
+                                                                <p class="text-muted">No Incident Case Assigned</p>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         @endforeach
-                                    </p> --}}
-                                    <p>Test</p>
-                                </div>
-                                {{-- <div class="mb-4">
-                                    <h5 class="fw-bold text-muted">Attachments</h5>
-                                    @if ($message->messageAttachments->count() > 0)
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($message->messageAttachments as $attachment)
-                                                <a href="{{ asset('storage/' . $attachment->file_path) }}" target="_blank">
-                                                    <img src="{{ asset('storage/' . $attachment->file_path) }}"
-                                                        alt="Attachment" class="rounded shadow-sm border border-primary"
-                                                        width="200" height="200" style="object-fit: cover;">
-                                                </a>
+                                    @else
+                                        <p class="text-muted">No requests found for this message.</p>
+                                    @endif
+
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Status Log</h3>
+                                    @if ($message->statusLogMessages->isNotEmpty())
+                                        <div class="list-group">
+                                            @foreach ($message->statusLogMessages as $log)
+                                                <div class="list-group-item list-group-item-action mb-2">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h5 class="mb-1">
+                                                            {{ $log->user->profile->firstname ?? 'Unknown User' }}
+                                                            {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                                        </h5>
+                                                        <small>{{ $log->created_at->format('F j, Y g:i A') }}</small>
+                                                    </div>
+                                                    <p class="mb-1">
+                                                        Marked as
+                                                        <span
+                                                            class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
+                                                            {{ $log->status->name }}
+                                                        </span>
+                                                    </p>
+                                                    <small><strong>Log Details:</strong> {{ $log->log_details }}</small>
+                                                </div>
                                             @endforeach
                                         </div>
                                     @else
-                                        <p class="text-muted">No attachments available.</p>
+                                        <p class="text-muted">No status logs available.</p>
                                     @endif
-                                </div> --}}
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <h5 class="fw-bold text-muted">Sender Profile</h5>
-                                @if ($profile)
-                                    <div class="mb-3">
-                                        <p><strong>Name:</strong> {{ $profile->first_name }} {{ $profile->middle_name }}
-                                            {{ $profile->last_name }} {{ $profile->suffix }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Date of Birth:</strong> {{ $profile->dob }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Sex:</strong> {{ $profile->sex }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
-                                    </div>
-                                @else
-                                    <p class="text-muted">No profile information available.</p>
-                                @endif
-                            </div>
-
-                            <!-- Right Column -->
-                            <div class="col-md-6">
-                                @if ($profile)
-                                    <div class="mb-3">
-                                        <p><strong>Religion:</strong> {{ $profile->religion }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Ethnicity:</strong> {{ $profile->ethnicity }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Birth Place:</strong> {{ $profile->birth_place }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Zone:</strong> {{ $profile->zone }}</p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
-                                    </div>
-                                @endif
-                            </div>
-                        </div>
-                        <hr>
-                        @if ($message->requests->isNotEmpty())
-                            @foreach ($message->requests as $index => $request)
-                                <div class="border rounded p-3 mb-4 shadow-sm">
-                                    <h5 class="fw-bold text-muted">Request {{ $index + 1 }}</h5>
-                                    <div class="row">
-                                        <!-- Left Column -->
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <p><strong>Name:</strong> {{ $request->name }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Address:</strong> {{ $request->address }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Description:</strong> {{ $request->description }}</p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Time:</strong> {{ $request->created_at->format('F j, Y g:i A') }}</p>
-                                            </div>
-                                        </div>
-
-                                        <!-- Right Column -->
-                                        <div class="col-md-6">
-                                            <h5 class="fw-bold text-muted">Assigned Agencies</h5>
-                                            @if ($request->agencies->isNotEmpty())
-                                                <div class="mb-3">
-                                                    <ul>
-                                                        @foreach ($request->agencies as $agency)
-                                                            <li>{{ $agency->name }}</li>
-                                                        @endforeach
-                                                    </ul>
-                                                </div>
-                                            @else
-                                                <p class="text-muted">No assigned agencies</p>
-                                            @endif
-                                        </div>
-                                    </div>
                                 </div>
-                            @endforeach
-                        @else
-                            <p class="text-muted">No requests found for this message.</p>
-                        @endif
-                        <hr>
-                        <div class="mb-3">
-                            <h5 class="fw-bold text-muted">Status Log</h5>
-                            @if ($message->statusLogMessages->isNotEmpty())
-                                <ul class="list-group">
-                                    @foreach ($message->statusLogMessages as $log)
-                                        <li class="list-group-item">
-                                            <strong>{{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                {{ $log->user->profile->lastname ?? 'Unknown User' }}
-
-                                            </strong> marked this message as
-                                            <span
-                                                class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                                {{ $log->status->name }}
-                                            </span>
-                                            on {{ $log->created_at->format('F j, Y g:i A') }}.
-                                            <br>
-                                            <strong>Log Details:</strong> {{ $log->log_details }}
-                                        </li>
-                                    @endforeach
-                                </ul>
-                            @else
-                                <p class="text-muted">No status logs available.</p>
-                            @endif
+                            </div>
                         </div>
                     </div>
+
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('coastguard.emergencymessage.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('bfp.emergencymessage.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $message->id }}"
-                                action="{{ route('coastguard.emergencymessage.responded', $message->id) }}" method="POST">
+                                action="{{ route('bfp.emergencymessage.responded', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
-                                <button type="button" onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
-                                    class="btn btn-sm btn-warning">Responded</button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
+                                    <button type="button"
+                                        onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
+                                        class="btn btn-sm btn-warning action-btn"
+                                        {{ $message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : '' }}>
+                                        Responded
+                                    </button>
+                                </span>
                             </form>
+
                             <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('coastguard.emergencymessage.complete', $message->id) }}" method="POST">
+                                action="{{ route('bfp.emergencymessage.complete', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
-                                    class="btn btn-sm btn-success">
-                                    Complete
-                                </button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')) }}">
+                                    <button type="button"
+                                        onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
+                                        class="btn btn-sm btn-success action-btn"
+                                        {{ $message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled') }}>
+                                        Complete
+                                    </button>
+                                </span>
                             </form>
                         </div>
                     </div>
@@ -226,6 +188,15 @@
     </div>
 @endsection
 @section('scripts')
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
@@ -259,7 +230,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -328,7 +299,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

@@ -92,7 +92,6 @@
                                 <th>Date Received</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
-                                <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,28 +112,6 @@
                                                 <a href="{{ route('superadmin.emergencymessage.view', $message->id) }}"
                                                     class="btn btn-sm btn-primary action-btn">View</a>
                                             </div>
-                                        </div>
-                                    </td>
-                                    <td class="action-btns" data-label="Actions">
-                                        <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-{{ $message->id }}"
-                                                action="{{ route('superadmin.emergencymessage.responded', $message->id) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="message_id" value="{{ $message->id }}">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-{{ $message->id }}')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
-                                            </form>
-
-                                            <form id="completeForm-{{ $message->id }}"
-                                                action="{{ route('superadmin.emergencymessage.complete', $message->id) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-{{ $message->id }}')"
-                                                    class="btn btn-sm btn-success action-btn">Complete</button>
-                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -184,7 +161,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -253,7 +230,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

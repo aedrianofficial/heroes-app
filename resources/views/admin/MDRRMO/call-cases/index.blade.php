@@ -1,4 +1,4 @@
-@extends('layouts.lgu')
+@extends('layouts.mdrrmo')
 @section('styles')
     <style>
         /* Equal-sized buttons */
@@ -119,7 +119,7 @@
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('lgu.emergencycall.view', $call->id) }}"
+                                                <a href="{{ route('mdrrmo.emergencycall.view', $call->id) }}"
                                                     class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
@@ -127,12 +127,12 @@
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <form id="respondedForm-{{ $call->id }}"
-                                                action="{{ route('lgu.emergencycall.responded', $call->id) }}"
+                                                action="{{ route('mdrrmo.emergencycall.responded', $call->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <input type="hidden" name="call_id" value="{{ $call->id }}">
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : 'Mark as responded' }}">
+                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : 'Mark as responded' }}">
                                                     <button type="button"
                                                         onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
                                                         class="btn btn-sm btn-warning action-btn"
@@ -143,11 +143,11 @@
                                             </form>
 
                                             <form id="completeForm-{{ $call->id }}"
-                                                action="{{ route('lgu.emergencycall.complete', $call->id) }}"
+                                                action="{{ route('mdrrmo.emergencycall.complete', $call->id) }}"
                                                 method="POST" class="d-inline">
                                                 @csrf
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
+                                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
                                                     <button type="button"
                                                         onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
                                                         class="btn btn-sm btn-success action-btn"
@@ -223,7 +223,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -292,7 +292,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

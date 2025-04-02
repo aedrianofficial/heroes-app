@@ -1,190 +1,190 @@
 <?php $__env->startSection('content'); ?>
-    <div class="container">
+    <div class="container-fluid my-2">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card shadow-lg mt-4">
-
+            <div class="col-lg-12">
+                <div class="card shadow-lg border-0">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Sender Contact</h5>
-                                    <p class="text-dark"><?php echo e($message->sender_contact); ?></p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Message Content</h5>
-                                    <p class="text-dark"><?php echo e($message->message_content); ?></p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Date recieve</h5>
-                                    <p class="text-dark"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></p>
-                                </div>
-                                
+                            <!-- Left Column: Message and Sender Information -->
+                            <div class="col-md-6 border-end">
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Message Details</h3>
 
-                            </div>
+                                    <div class="row mb-3">
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Sender Contact</h5>
+                                            <p class="text-dark"><?php echo e($message->sender_contact); ?></p>
+                                        </div>
+                                        <div class="col-6">
+                                            <h5 class="text-muted">Date Received</h5>
+                                            <p class="text-dark"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></p>
+                                        </div>
+                                    </div>
 
-                            <!-- Right Column -->
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Status</h5>
-                                    <span
-                                        class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
-                                        <?php echo e($message->status->name); ?>
+                                    <div class="mb-3">
+                                        <h5 class="text-muted">Status</h5>
+                                        <span
+                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                            <?php echo e($message->status->name); ?>
 
-                                    </span>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Incident Type</h5>
-                                    
-                                    <p>Test</p>
-                                </div>
-                                <div class="mb-3">
-                                    <h5 class="fw-bold text-muted">Agencies Involved</h5>
-                                    
-                                    <p>Test</p>
-                                </div>
-                                
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <!-- Left Column -->
-                            <div class="col-md-6">
-                                <h5 class="fw-bold text-muted">Sender Profile</h5>
-                                <?php if($profile): ?>
-                                    <div class="mb-3">
-                                        <p><strong>Name:</strong> <?php echo e($profile->first_name); ?> <?php echo e($profile->middle_name); ?>
+                                        </span>
+                                    </div>
 
-                                            <?php echo e($profile->last_name); ?> <?php echo e($profile->suffix); ?></p>
-                                    </div>
                                     <div class="mb-3">
-                                        <p><strong>Date of Birth:</strong> <?php echo e($profile->dob); ?></p>
+                                        <h5 class="text-muted">Message Content</h5>
+                                        <p class="text-dark"><?php echo e($message->message_content); ?></p>
                                     </div>
-                                    <div class="mb-3">
-                                        <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
-                                    </div>
-                                <?php else: ?>
-                                    <p class="text-muted">No profile information available.</p>
-                                <?php endif; ?>
-                            </div>
 
-                            <!-- Right Column -->
-                            <div class="col-md-6">
-                                <?php if($profile): ?>
-                                    <div class="mb-3">
-                                        <p><strong>Religion:</strong> <?php echo e($profile->religion); ?></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Ethnicity:</strong> <?php echo e($profile->ethnicity); ?></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Birth Place:</strong> <?php echo e($profile->birth_place); ?></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
-                                    </div>
-                                    <div class="mb-3">
-                                        <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
-                                    </div>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                        <hr>
-                        <?php if($message->requests->isNotEmpty()): ?>
-                            <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                <div class="border rounded p-3 mb-4 shadow-sm">
-                                    <h5 class="fw-bold text-muted">Request <?php echo e($index + 1); ?></h5>
-                                    <div class="row">
-                                        <!-- Left Column -->
-                                        <div class="col-md-6">
-                                            <div class="mb-3">
-                                                <p><strong>Name:</strong> <?php echo e($request->name); ?></p>
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Sender Profile</h3>
+                                    <?php if($profile): ?>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p><strong>Name:</strong> <?php echo e($profile->first_name); ?>
+
+                                                    <?php echo e($profile->middle_name); ?> <?php echo e($profile->last_name); ?>
+
+                                                    <?php echo e($profile->suffix); ?></p>
+                                                <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
+                                                <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
+                                                <p><strong>Date of Birth:</strong> <?php echo e($profile->dob); ?></p>
                                             </div>
-                                            <div class="mb-3">
-                                                <p><strong>Address:</strong> <?php echo e($request->address); ?></p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Description:</strong> <?php echo e($request->description); ?></p>
-                                            </div>
-                                            <div class="mb-3">
-                                                <p><strong>Time:</strong> <?php echo e($request->created_at->format('F j, Y g:i A')); ?></p>
+                                            <div class="col-6">
+                                                <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
+                                                <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
+                                                <p><strong>Religion:</strong> <?php echo e($profile->religion); ?></p>
+                                                <p><strong>Birth Place:</strong> <?php echo e($profile->birth_place); ?></p>
                                             </div>
                                         </div>
+                                    <?php else: ?>
+                                        <p class="text-muted">No profile information available.</p>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
 
-                                        <!-- Right Column -->
-                                        <div class="col-md-6">
-                                            <h5 class="fw-bold text-muted">Assigned Agencies</h5>
-                                            <?php if($request->agencies->isNotEmpty()): ?>
-                                                <div class="mb-3">
-                                                    <ul>
-                                                        <?php $__currentLoopData = $request->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <li><?php echo e($agency->name); ?></li>
-                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                    </ul>
+                            <!-- Right Column: Requests and Status Log -->
+                            <div class="col-md-6">
+                                <div class="px-4">
+                                    <h3 class="mb-4 text-primary">Requests</h3>
+                                    <?php if($message->requests->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <div class="card mb-3 shadow-sm">
+                                                <div class="card-body">
+                                                    <h5 class="card-title text-muted">Request <?php echo e($index + 1); ?></h5>
+                                                    <div class="row">
+                                                        <div class="col-6">
+                                                            <p><strong>Name:</strong> <?php echo e($request->name); ?></p>
+                                                            <p><strong>Address:</strong> <?php echo e($request->address); ?></p>
+                                                            <p><strong>Description:</strong> <?php echo e($request->description); ?>
+
+                                                            </p>
+                                                            <p><strong>Time:</strong>
+                                                                <?php if($request->created_at): ?>
+                                                                    <?php echo e($request->created_at->format('F j, Y g:i A')); ?>
+
+                                                                <?php else: ?>
+                                                                    <em>No date available</em>
+                                                                <?php endif; ?>
+                                                        </div>
+                                                        <div class="col-6">
+                                                            <h6 class="text-muted">Assigned Agencies</h6>
+                                                            <?php if($request->agencies->isNotEmpty()): ?>
+                                                                <ul class="list-unstyled">
+                                                                    <?php $__currentLoopData = $request->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <li><?php echo e($agency->name); ?></li>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                </ul>
+                                                            <?php else: ?>
+                                                                <p class="text-muted">No assigned agencies</p>
+                                                            <?php endif; ?>
+
+                                                            <?php if($request->incidentCase): ?>
+                                                                <h6 class="text-muted mt-3">Incident Case</h6>
+                                                                <p><strong>Case Number:</strong>
+                                                                    <?php echo e($request->incidentCase->case_number); ?></p>
+                                                            <?php else: ?>
+                                                                <p class="text-muted">No Incident Case Assigned</p>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            <?php else: ?>
-                                                <p class="text-muted">No assigned agencies</p>
-                                            <?php endif; ?>
+                                            </div>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
+                                        <p class="text-muted">No requests found for this message.</p>
+                                    <?php endif; ?>
+
+                                    <hr>
+
+                                    <h3 class="mb-4 text-primary">Status Log</h3>
+                                    <?php if($message->statusLogMessages->isNotEmpty()): ?>
+                                        <div class="list-group">
+                                            <?php $__currentLoopData = $message->statusLogMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <div class="list-group-item list-group-item-action mb-2">
+                                                    <div class="d-flex w-100 justify-content-between">
+                                                        <h5 class="mb-1">
+                                                            <?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
+
+                                                            <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+
+                                                        </h5>
+                                                        <small><?php echo e($log->created_at->format('F j, Y g:i A')); ?></small>
+                                                    </div>
+                                                    <p class="mb-1">
+                                                        Marked as
+                                                        <span
+                                                            class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                                            <?php echo e($log->status->name); ?>
+
+                                                        </span>
+                                                    </p>
+                                                    <small><strong>Log Details:</strong> <?php echo e($log->log_details); ?></small>
+                                                </div>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                    </div>
+                                    <?php else: ?>
+                                        <p class="text-muted">No status logs available.</p>
+                                    <?php endif; ?>
                                 </div>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                        <?php else: ?>
-                            <p class="text-muted">No requests found for this message.</p>
-                        <?php endif; ?>
-                        <hr>
-                        <div class="mb-3">
-                            <h5 class="fw-bold text-muted">Status Log</h5>
-                            <?php if($message->statusLogMessages->isNotEmpty()): ?>
-                                <ul class="list-group">
-                                    <?php $__currentLoopData = $message->statusLogMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                        <li class="list-group-item">
-                                            <strong><?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
-
-                                                <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
-
-
-                                            </strong> marked this message as
-                                            <span
-                                                class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
-                                                <?php echo e($log->status->name); ?>
-
-                                            </span>
-                                            on <?php echo e($log->created_at->format('F j, Y g:i A')); ?>.
-                                            <br>
-                                            <strong>Log Details:</strong> <?php echo e($log->log_details); ?>
-
-                                        </li>
-                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                </ul>
-                            <?php else: ?>
-                                <p class="text-muted">No status logs available.</p>
-                            <?php endif; ?>
+                            </div>
                         </div>
                     </div>
+
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="<?php echo e(route('pnp.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('bfp.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="ongoingForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('pnp.emergencymessage.ongoing', $message->id)); ?>" method="POST">
+                            <form id="respondedForm-<?php echo e($message->id); ?>"
+                                action="<?php echo e(route('bfp.emergencymessage.responded', $message->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
-                                <button type="button" onclick="confirmOngoing(event, 'ongoingForm-<?php echo e($message->id); ?>')"
-                                    class="btn btn-sm btn-warning">Ongoing</button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
+                                    <button type="button"
+                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
+                                        class="btn btn-sm btn-warning action-btn"
+                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ''); ?>>
+                                        Responded
+                                    </button>
+                                </span>
                             </form>
+
                             <form id="completeForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('pnp.emergencymessage.complete', $message->id)); ?>" method="POST">
+                                action="<?php echo e(route('bfp.emergencymessage.complete', $message->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
-                                <button type="button" onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
-                                    class="btn btn-sm btn-success">
-                                    Complete
-                                </button>
+                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first'))); ?>">
+                                    <button type="button"
+                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
+                                        class="btn btn-sm btn-success action-btn"
+                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled')); ?>>
+                                        Complete
+                                    </button>
+                                </span>
                             </form>
                         </div>
                     </div>
@@ -194,8 +194,17 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('scripts'); ?>
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
     <!--sweet alert-->
-    <!--Mark as Ongoing-->
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let successMessage = "<?php echo e(session('success')); ?>";
@@ -222,12 +231,12 @@
             }
         });
 
-        function confirmOngoing(event, formId) {
+        function confirmResponded(event, formId) {
             event.preventDefault();
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as ongoing?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -238,7 +247,7 @@
                 showCancelButton: true,
                 confirmButtonColor: "#ffc107",
                 cancelButtonColor: "#6c757d",
-                confirmButtonText: "Yes, mark as ongoing!",
+                confirmButtonText: "Yes, mark as responded!",
                 customClass: {
                     confirmButton: 'text-dark'
                 },
@@ -296,7 +305,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

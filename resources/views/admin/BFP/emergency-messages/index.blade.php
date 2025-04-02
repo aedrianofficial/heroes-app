@@ -184,7 +184,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -253,7 +253,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this message as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",

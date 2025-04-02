@@ -1,5 +1,4 @@
-@extends('layouts.mho')
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         /* Equal-sized buttons */
         .action-btn {
@@ -74,8 +73,8 @@
 
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <div class="container">
 
         <!--All Emergency Calls Table -->
@@ -97,61 +96,62 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse ($calls as $call)
+                            <?php $__empty_1 = true; $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
                                     <td data-label="Incident Case">
-                                        @if ($call->requests->isNotEmpty())
-                                            @foreach ($call->requests as $request)
-                                                {{ optional($request->incidentCase)->case_number ?? 'N/A' }}<br>
-                                            @endforeach
-                                        @else
+                                        <?php if($call->requests->isNotEmpty()): ?>
+                                            <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php echo e(optional($request->incidentCase)->case_number ?? 'N/A'); ?><br>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
                                             N/A
-                                        @endif
+                                        <?php endif; ?>
                                     </td>
-                                    <td data-label="Caller Contact">{{ $call->caller_contact }}</td>
-                                    <td data-label="Call Date">{{ $call->created_at }}</td>
+                                    <td data-label="Caller Contact"><?php echo e($call->caller_contact); ?></td>
+                                    <td data-label="Call Date"><?php echo e($call->created_at); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                            {{ $call->status->name }}
+                                            class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($call->status->name); ?>
+
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="{{ route('mho.emergencycall.view', $call->id) }}"
+                                                <a href="<?php echo e(route('superadmin.emergencycall.view', $call->id)); ?>"
                                                     class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-{{ $call->id }}"
-                                                action="{{ route('mho.emergencycall.responded', $call->id) }}"
+                                            <form id="respondedForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('superadmin.emergencycall.responded', $call->id)); ?>"
                                                 method="POST" class="d-inline">
-                                                @csrf
-                                                <input type="hidden" name="call_id" value="{{ $call->id }}">
+                                                <?php echo csrf_field(); ?>
+                                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : 'Mark as responded' }}">
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : 'Mark as responded'); ?>">
                                                     <button type="button"
-                                                        onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
                                                         class="btn btn-sm btn-warning action-btn"
-                                                        {{ $call->status_id == 3 ? 'disabled' : '' }}>
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ''); ?>>
                                                         Responded
                                                     </button>
                                                 </span>
                                             </form>
 
-                                            <form id="completeForm-{{ $call->id }}"
-                                                action="{{ route('mho.emergencycall.complete', $call->id) }}"
+                                            <form id="completeForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('superadmin.emergencycall.complete', $call->id)); ?>"
                                                 method="POST" class="d-inline">
-                                                @csrf
+                                                <?php echo csrf_field(); ?>
                                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                                    title="{{ $call->status_id == 3 ? 'This call is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first') }}">
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first')); ?>">
                                                     <button type="button"
-                                                        onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
                                                         class="btn btn-sm btn-success action-btn"
-                                                        {{ $call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                                        <?php echo e($call->status_id == 3 ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
                                                         Complete
                                                     </button>
                                                 </span>
@@ -161,24 +161,25 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @empty
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td colspan="6" class="text-center">No emergency calls found</td>
                                 </tr>
-                            @endforelse
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Pagination -->
                 <div class="d-flex justify-content-center mt-3">
-                    {{ $calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1]) }}
+                    <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
+
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--Initialize tooltips-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -194,8 +195,8 @@
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -223,7 +224,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as responded?",
+                text: "Do you want to mark this case as responded?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -262,8 +263,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -292,7 +293,7 @@
 
             Swal.fire({
                 title: "Are you sure?",
-                text: "Do you want to mark this call as completed?",
+                text: "Do you want to mark this case as completed?",
                 icon: "warning",
                 input: "textarea",
                 inputLabel: "Log Details",
@@ -324,4 +325,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.superadmin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/super-admin/call-cases/index.blade.php ENDPATH**/ ?>
