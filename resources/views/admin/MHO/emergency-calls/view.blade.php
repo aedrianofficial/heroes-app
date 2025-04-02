@@ -107,13 +107,48 @@
                                             @foreach ($call->statusLogCalls as $log)
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
-                                                        <h5 class="mb-1">
-                                                            {{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                            {{ $log->user->profile->lastname ?? 'Unknown User' }}
-                                                        </h5>
+                                                        <div class="d-flex align-items-center">
+                                                            @if ($log->user && $log->user->agency_id)
+                                                                @php
+                                                                    $agencyLogoPath = '';
+                                                                    switch ($log->user->agency_id) {
+                                                                        case 2:
+                                                                            $agencyLogoPath = 'pnp-logo.png';
+                                                                            break;
+                                                                        case 3:
+                                                                            $agencyLogoPath = 'bfp-logo.png';
+                                                                            break;
+                                                                        case 4:
+                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            break;
+                                                                        case 5:
+                                                                            $agencyLogoPath = 'mho-logo.jpg';
+                                                                            break;
+                                                                        case 6:
+                                                                            $agencyLogoPath = 'coastguard-logo.png';
+                                                                            break;
+                                                                        case 7:
+                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            break;
+                                                                        default:
+                                                                            $agencyLogoPath = '';
+                                                                    }
+                                                                @endphp
+
+                                                                @if ($agencyLogoPath)
+                                                                    <img src="{{ asset('asset/image/logo/' . $agencyLogoPath) }}"
+                                                                        alt="Agency Logo" class="me-2"
+                                                                        style="height: 24px; width: auto;">
+                                                                @endif
+                                                            @endif
+                                                            <h5 class="mb-0">
+                                                                {{ $log->user->profile->firstname ?? 'Unknown User' }}
+                                                                {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                                            </h5>
+                                                        </div>
                                                         <small>{{ $log->created_at->format('F j, Y g:i A') }}</small>
                                                     </div>
-                                                    <p class="mb-1">
+                                                    <p class="mb-1 mt-2">
                                                         Marked as
                                                         <span
                                                             class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
@@ -152,7 +187,7 @@
                                     </button>
                                 </span>
                             </form>
-                        
+
                             <form id="completeForm-{{ $call->id }}"
                                 action="{{ route('mho.emergencycall.complete', $call->id) }}" method="POST"
                                 class="d-inline">
