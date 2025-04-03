@@ -28,7 +28,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-danger">
         <div class="container">
-            <a class="navbar-brand" href="#">Heroes App</a>
+            <a class="navbar-brand" href="<?php echo e(route('welcome')); ?>">Heroes App</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
                 aria-label="Toggle navigation">
@@ -59,7 +59,8 @@
                             Emergency Messages
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('bfp.emergencymessage.index')); ?>">Message logs</a>
+                            <li><a class="dropdown-item" href="<?php echo e(route('bfp.emergencymessage.index')); ?>">Message
+                                    logs</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -115,7 +116,96 @@
     <div class="container">
         <?php echo $__env->yieldContent(section: 'content'); ?>
     </div>
+    <!-- Footer -->
+    <footer class="bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <!-- Logo and About -->
+                <div class="col-md-4 mb-4 mb-md-0">
+                    <h5 class="mb-3">Heroes App</h5>
+                    <p class="text-light">Emergency response platform connecting citizens with first responders and
+                        emergency services.</p>
+                    <div class="social-icons mt-3">
+                        <a href="#" class="text-light me-2"><i class="fa-brands fa-facebook"></i></a>
+                        <a href="#" class="text-light me-2"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="#" class="text-light me-2"><i class="fa-brands fa-instagram"></i></a>
 
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div class="col-md-3 mb-4 mb-md-0">
+                    <h5 class="mb-3">Quick Links</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="<?php echo e(route('welcome')); ?>"
+                                class="text-decoration-none text-text-light">Home</a></li>
+                        <li class="mb-2"><a href="<?php echo e(route('safetyguide')); ?>"
+                                class="text-decoration-none text-text-light">Safety Guide</a></li>
+                        <li class="mb-2"><a href="<?php echo e(route('aboutus')); ?>"
+                                class="text-decoration-none text-text-light">About Us</a></li>
+                        <li class="mb-2"><a href="<?php echo e(route('contact')); ?>"
+                                class="text-decoration-none text-text-light">Contact</a></li>
+                    </ul>
+                </div>
+
+                <!-- Emergency Services -->
+                <div class="col-md-5 mb-4 mb-md-0">
+                    <h5 class="mb-3">Emergency Services</h5>
+                    <ul class="list-unstyled">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <li class="mb-2"><span class="text-danger">MDRRMO-APARRI EAST (RESCUE
+                                        511):</span> <span class="text-light">09972404984</span>
+                                </li>
+                                <li class="mb-2"><span class="text-danger">MDRRMO-APARRI WEST:</span> <span
+                                        class="text-light">09655845600</span>
+                                </li>
+                                <li class="mb-2"><span class="text-danger">MUNICIPAL HEALTH OFFICE
+                                        (EAST):</span> <span class="text-light">09531908364</span></li>
+                                <li class="mb-2"><span class="text-danger">MUNICIPAL HEALTH OFFICE
+                                        (WEST):</span> <span class="text-light">09951868014</span></li>
+                            </div>
+                            <div class="col-md-6">
+
+                                <li class="mb-2"><span class="text-danger">APARRI POLICE STATION:</span> <span
+                                        class="text-light">09172032003</span></li>
+                                <li class="mb-2"><span class="text-danger">APARRI FIRE STATION(BFP):</span>
+                                    <span class="text-light">09164910946</span>
+                                </li>
+                                <li class="mb-2"><span class="text-danger">APARRI PROVINCIAL HOSPITAL:</span>
+                                    <span class="text-light">09363748430</span>
+                                </li>
+                                <li class="mb-2"><span class="text-danger">MAYOR'S OFFICE HOTLINE:</span>
+                                    <span class="text-light">09954316944</span>
+                                </li>
+                            </div>
+                        </div>
+                    </ul>
+                </div>
+
+                <!-- Newsletter -->
+                
+            </div>
+
+            <hr class="my-4">
+
+            <!-- Copyright -->
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 text-light">&copy; <?php echo e(date('Y')); ?> Heroes App. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <ul class="list-inline mb-0">
+                        <li class="list-inline-item"><a href="#"
+                                class="text-light text-decoration-none">Privacy Policy</a></li>
+                        <li class="list-inline-item">•</li>
+                        <li class="list-inline-item"><a href="#" class="text-decoration-none text-light">Terms
+                                of Use</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <!--scripts-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
