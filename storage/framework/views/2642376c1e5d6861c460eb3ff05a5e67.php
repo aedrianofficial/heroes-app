@@ -1,8 +1,6 @@
-@extends('layouts.landing')
+<?php $__env->startSection('title', 'About Us - Heroes App'); ?>
 
-@section('title', 'About Us - Heroes App')
-
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <style>
         .about-hero {
             position: relative;
@@ -170,9 +168,9 @@
             }
         }
     </style>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('content')
+<?php $__env->startSection('content'); ?>
     <!-- Hero Section -->
     <div class="container mt-5">
         <div class="row">
@@ -204,7 +202,7 @@
                             possible.</p>
                     </div>
                     <div class="col-lg-6">
-                        <img src="{{ asset('asset/image/logo.png') }}" alt="Heroes App Team" class="img-fluid rounded">
+                        <img src="<?php echo e(asset('asset/image/logo.png')); ?>" alt="Heroes App Team" class="img-fluid rounded">
                     </div>
                 </div>
             </div>
@@ -431,9 +429,11 @@
                 <h2 class="mb-4">Ready to Join Our Mission?</h2>
                 <p class="lead mb-4">Be prepared for any emergency situation.</p>
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="{{ route('register') }}" class="btn btn-outline-light btn-lg px-4">Register Now</a>
+                    <a href="<?php echo e(route('register')); ?>" class="btn btn-outline-light btn-lg px-4">Register Now</a>
                 </div>
             </div>
         </section>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.landing', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/website/about_us.blade.php ENDPATH**/ ?>

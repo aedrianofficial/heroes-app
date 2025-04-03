@@ -1,5 +1,4 @@
-@extends('layouts.landing')
-@section('styles')
+<?php $__env->startSection('styles'); ?>
     <!-- Add custom styles -->
     <style>
         .hero-section {
@@ -53,8 +52,8 @@
             border-bottom: 3px solid;
         }
     </style>
-@endsection
-@section('content')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('content'); ?>
     <!-- Header Section -->
     <div class="container mt-5">
         <div class="row">
@@ -76,7 +75,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/fire.png') }}" class="img-fluid rounded-start h-100"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/fire.png')); ?>" class="img-fluid rounded-start h-100"
                                 alt="Fire Safety" style="object-fit: cover;">
                         </div>
                         <div class="col-md-8">
@@ -97,7 +96,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/flood.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/flood.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Flood Preparedness" style="object-fit: cover;">
                         </div>
                         <div class="col-md-8">
@@ -118,7 +117,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/accident.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/accident.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Accident Prevention" style="object-fit: cover;">
                         </div>
                         <div class="col-md-8">
@@ -140,7 +139,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/volcano.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/volcano.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Volcano Eruption Safety"
                                 style="object-fit: cover;">
                         </div>
@@ -162,7 +161,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/hurricane.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/hurricane.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Hurricane Survival" style="object-fit: cover;">
                         </div>
                         <div class="col-md-8">
@@ -183,7 +182,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/virus.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/virus.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Virus Outbreak Protection"
                                 style="object-fit: cover;">
                         </div>
@@ -206,7 +205,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/conflict.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/conflict.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Conflict Safety" style="object-fit: cover;">
                         </div>
                         <div class="col-md-8">
@@ -228,7 +227,7 @@
                 <div class="card h-100 shadow-sm">
                     <div class="row g-0">
                         <div class="col-md-4">
-                            <img src="{{ asset('asset/image/safety-tips/earthquake.png') }}"
+                            <img src="<?php echo e(asset('asset/image/safety-tips/earthquake.png')); ?>"
                                 class="img-fluid rounded-start h-100" alt="Earthquake Readiness"
                                 style="object-fit: cover;">
                         </div>
@@ -1051,9 +1050,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script>
         // Additional JavaScript can be added here if needed
         document.addEventListener('DOMContentLoaded', function() {
@@ -1064,4 +1063,6 @@
             })
         });
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.landing', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/website/safetyguide.blade.php ENDPATH**/ ?>

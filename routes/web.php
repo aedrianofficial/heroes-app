@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\PnpController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AnalyticsController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\MessageAnalyticsController;
 use App\Http\Controllers\User\ReportController;
 use App\Models\CallView;
@@ -35,7 +36,7 @@ Route::get('/view-logs', function () {
 Route::get('/auth-check', function () {
     return Auth::check() ? 'User is logged in' : 'User is not logged in';
 });
-
+Route::post('/contact/submit', [ContactController::class, 'store'])->name('contact.submit');
 
 Route::get('/', function () {
     return view('website.welcome');
@@ -586,5 +587,11 @@ Route::middleware(['auth'])->group(function () {
             //cases
          Route::get('superadmin/all-call-cases', [SuperAdminController::class, 'callCaseLists'])->name('superadmin.call_cases.index');
          Route::get('superadmin/all-message-cases', [SuperAdminController::class, 'messageCaseLists'])->name('superadmin.message_cases.index');
+
+         //contact messages
+         Route::get('/contact-messages', [App\Http\Controllers\SuperAdmin\ContactMessageController::class, 'index'])
+        ->name('superadmin.contact-messages.index');
+         Route::delete('/contact-messages/{id}', [App\Http\Controllers\SuperAdmin\ContactMessageController::class, 'destroy'])
+        ->name('superadmin.contact-messages.delete');
     });
 });

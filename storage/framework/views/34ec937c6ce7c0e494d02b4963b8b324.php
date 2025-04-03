@@ -57,15 +57,33 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="<?php echo e(route('lgu.emergencymessage.index')); ?>">Emergency
-                            Messages</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Emergency Messages
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.emergencymessage.index')); ?>">Message logs</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.message_cases.index')); ?>">Cases</a></li>
+                        </ul>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page"
-                            href="<?php echo e(route('lgu.emergencycall.index')); ?>">Emergency
-                            Calls</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            Emergency Calls
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.emergencycall.index')); ?>">Call logs</a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.call_cases.index')); ?>">Cases</a></li>
+                        </ul>
                     </li>
                     <!--<li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="<?php echo e(route('lgu.reports.index')); ?>">Activity
@@ -374,7 +392,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/pnp/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/lgu/emergency-message/${data.id}/view`;
                         }
                     });
                 });
