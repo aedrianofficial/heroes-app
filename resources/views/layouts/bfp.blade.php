@@ -21,7 +21,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="{{ asset('asset/css/Control.Geocoder.css') }}" />
-
+    <link rel="icon" type="image/png" href="{{ asset('asset/image/logo.png') }}">
     @yield(section: 'styles')
 </head>
 

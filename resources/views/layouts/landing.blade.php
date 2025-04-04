@@ -23,6 +23,7 @@
         integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="{{ asset('asset/css/Control.Geocoder.css') }}" />
+    <link rel="icon" type="image/png" href="{{ asset('asset/image/logo.png') }}">
     @yield('styles')
 </head>
 
