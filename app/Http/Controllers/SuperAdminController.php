@@ -21,6 +21,31 @@ use Illuminate\Support\Facades\Hash;
 
 class SuperAdminController extends Controller
 {
+    public function markAsResponded($id)
+    {
+        try {
+            $report = Report::findOrFail($id);
+            $report->status_id = 2; // 2 = Responded
+            $report->save();
+
+            return redirect()->back()->with('success', 'Report marked as responded.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update report.');
+        }
+    }
+
+    public function markAsCompleted($id)
+    {
+        try {
+            $report = Report::findOrFail($id);
+            $report->status_id = 3; // 3 = Completed
+            $report->save();
+
+            return redirect()->back()->with('success', 'Report marked as completed.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update report.');
+        }
+    }
     public function superAdminDashboard()
     { 
         $agencies = Agency::all();
@@ -30,6 +55,12 @@ class SuperAdminController extends Controller
     {
         $users = User::with('role', 'profile')->get(); // Load users with roles & profile info
         return view('super-admin.users.all-users', compact('users'));
+    }
+    public function viewReport($id)
+    {
+        $report = Report::with(['incidentType', 'location', 'status', 'agencies', 'reportAttachments'])->findOrFail($id);
+        
+        return view('super-admin.report.view', compact('report'));
     }
     public function viewUser($id)
     {
@@ -369,14 +400,12 @@ class SuperAdminController extends Controller
         public function reportList()
         {
             $reports = Report::with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])
-                ->whereHas('user', function ($query) {
-                    $query->where('agency_id', 7); // Filtering users by agency_id = 2 (superadmin)
-                })
                 ->latest()
                 ->paginate(10);
         
             return view('super-admin.report.all-report', compact('reports'));
         }
+        
 
         public function callCaseLists()
      {

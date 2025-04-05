@@ -571,6 +571,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('superadmin/reports', [SuperAdminController::class, 'storeReport'])->name('superadmin.reports.store');
         Route::get('superadmin/all-reports', [SuperAdminController::class, 'reportList'])->name('superadmin.reports.index');
         Route::get('admin/superadmin/reports/{id}/view', [SuperAdminController::class, 'viewReport'])->name('superadmin.reports.view');
+        Route::post('admin/superadmin/reports/{id}/responded', [SuperAdminController::class, 'markAsResponded'])->name('superadmin.reports.responded');
+        Route::post('admin/superadmin/reports/{id}/complete', [SuperAdminController::class, 'markAsCompleted'])->name('superadmin.reports.complete');
 
           //emergency message
           Route::get('superadmin/all-emergency-message', [SuperAdminController::class, 'emergencyMessageList'])->name('superadmin.emergencymessage.index');
