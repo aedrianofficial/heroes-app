@@ -324,13 +324,21 @@ Route::get('/api/calls/{call}/can-complete', 'EmergencyCallController@canComplet
 
 // Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {
+    Route::get('/email/verify', [UserController::class, 'verifyNotice'])->name('verification.notice');
+    Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verifyEmail'])
+        ->middleware('signed')
+        ->name('verification.verify');
+    Route::post('/email/verification-notification', [UserController::class, 'verifyHandler'])
+        ->middleware('throttle:6,1')
+        ->name('verification.send');
     // User Dashboard (Only Users in DEFAULT)
     Route::middleware(['role:user,DEFAULT'])->group(function () {
         Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
+        // Route::get('user/reports/create', [ReportController::class, 'create'])->name('user.reports.create');
+        // Route::post('user/reports', [ReportController::class, 'store'])->name('user.reports.store');
+        // Route::get('user/reports', [ReportController::class, 'index'])->name('user.reports.index');
 
-        Route::get('user/reports/create', [ReportController::class, 'create'])->name('user.reports.create');
-        Route::post('user/reports', [ReportController::class, 'store'])->name('user.reports.store');
-        Route::get('user/reports', [ReportController::class, 'index'])->name('user.reports.index');
+       
     });
     
     // Philippine National Police (PNP)

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\UserContact;
 use App\Models\UserProfile;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -21,7 +22,6 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        // Validate user input
         $request->validate([
             'username' => 'required|string|max:255|unique:users,username',
             'email' => 'required|string|email|max:255|unique:users,email',
@@ -33,37 +33,33 @@ class RegisterController extends Controller
             'bday' => 'required|date',
             'contact_number' => 'required|string|max:11',
         ]);
-
-        // Create User with default role_id = 1 and agency_id = 1
+    
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role_id' => 1, // Default User Role
-            'agency_id' => 1, // Default Agency
+            'role_id' => 1,
+            'agency_id' => 1,
         ]);
-
-        // Create User Profile
+    
         UserProfile::create([
             'user_id' => $user->id,
             'firstname' => $request->firstname,
             'middlename' => $request->middlename,
             'lastname' => $request->lastname,
             'extname' => $request->extname,
-            'bday' => $request->bday, // Store the birthdate
+            'bday' => $request->bday,
         ]);
-
-        // Store contact number in user_contacts table
+    
         UserContact::create([
             'user_id' => $user->id,
-            'contact_number' => $request->contact_number, // Store contact number
+            'contact_number' => $request->contact_number,
         ]);
-
-        // Log the user in
+    
+        // Log in and send verification email
         Auth::login($user);
-
-        // Redirect to the dashboard after registration
-        return redirect()->route('welcome')->with('success', 'Registration successful! Welcome to your dashboard.');
+        event(new Registered($user));
+    
+        return redirect()->route('verification.notice')->with('status', 'verification-link-sent');
     }
-
 }
