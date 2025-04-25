@@ -73,4 +73,9 @@ class User extends Authenticatable implements MustVerifyEmail
     public function seenRequests() {
         return $this->hasMany(RequestCallView::class);
     }
+    public function vehicleRequests()
+    {
+        return $this->hasMany(VehicleRequest::class, 'requested_by');
+    }
+
 }

@@ -70,6 +70,7 @@
             .table-responsive .table td.action-btns .action-btn {
                 width: 100px;
             }
+
         }
     </style>
 <?php $__env->stopSection(); ?>
@@ -79,27 +80,37 @@
         <!--All Emergency Messages Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Messages</h5>
+                <h5>Cases</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
+                                <th>Incident Case</th>
                                 <th>Sender Contact</th>
                                 <th>Message Content</th>
-                                <th>Date Received</th>
+                                <th>Message Date</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__empty_1 = true; $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td data-label="Contact"><?php echo e($message->sender_contact); ?></td>
+                                    <td data-label="Incident Case">
+                                        <?php if($message->requests->isNotEmpty()): ?>
+                                            <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php echo e(optional($request->incidentCase)->case_number ?? 'N/A'); ?><br>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Sender Contact"><?php echo e($message->sender_contact); ?></td>
                                     <td data-label="Message"><?php echo e(Str::limit($message->message_content, 50)); ?></td>
-                                    <td data-label="Date"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></td>
+                                    <td data-label="Message Date"><?php echo e($message->created_at); ?></td>
                                     <td data-label="Status">
                                         <span
                                             class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
@@ -111,7 +122,7 @@
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
                                                 <a href="<?php echo e(route('mdrrmo.emergencymessage.view', $message->id)); ?>"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
@@ -122,28 +133,47 @@
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
                                                 <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
+                                                        class="btn btn-sm btn-warning action-btn"
+                                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ''); ?>>
+                                                        Responded
+                                                    </button>
+                                                </span>
                                             </form>
 
                                             <form id="completeForm-<?php echo e($message->id); ?>"
                                                 action="<?php echo e(route('mdrrmo.emergencymessage.complete', $message->id)); ?>"
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
-                                                    class="btn btn-sm btn-success action-btn">Complete</button>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : '')))); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
+                                                        class="btn btn-sm btn-success action-btn"
+                                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled')); ?>>
+                                                        Complete
+                                                    </button>
+                                                </span>
                                             </form>
+
+
                                         </div>
                                     </td>
                                 </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">No emergency messages found</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-                 <!-- Pagination -->
-                 <div class="d-flex justify-content-center mt-3">
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
                     <?php echo e($messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1])); ?>
 
                 </div>
@@ -152,6 +182,17 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('scripts'); ?>
+    <!--Initialize tooltips-->
+    <script>
+      document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
@@ -288,4 +329,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-messages/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/message-cases/index.blade.php ENDPATH**/ ?>

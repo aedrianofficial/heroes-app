@@ -11,6 +11,7 @@ use App\Models\Report;
 use App\Models\ReportAttachment;
 use App\Models\StatusLogCall;
 use App\Models\StatusLogMessage;
+use App\Models\VehicleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -27,14 +28,19 @@ class MdrrmoController extends Controller
         })->with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])
           ->latest()
           ->get();
-    
+          
+        // Fetch all vehicle requests
+        $vehicleRequests = VehicleRequest::with('requester')
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
+
         // Count reports by status
         $totalReports = $reports->count();
         $pendingReports = $reports->where('status_id', 1)->count();
         $respondedReports = $reports->where('status_id', 2)->count();
         $completedReports = $reports->where('status_id', 3)->count();
         $agencies = Agency::all();
-        return view('admin.mdrrmo.dashboard', compact('totalReports', 'pendingReports', 'completedReports','respondedReports', 'reports','agencies'));
+        return view('admin.mdrrmo.dashboard', compact('totalReports', 'pendingReports', 'completedReports','respondedReports', 'reports','agencies','vehicleRequests'));
     }
     public function allReports()
     {
@@ -141,7 +147,7 @@ class MdrrmoController extends Controller
             }
         }
     
-        return redirect()->route('mdrrmo.reports.index')->with('success', 'Report marked as responded.');
+        return redirect()->route('mdrrmo.incident_reports.index')->with('success', 'Report marked as responded.');
     }
 
     public function reportList()
@@ -512,4 +518,5 @@ class MdrrmoController extends Controller
          
          return $canComplete;
      }
+
 }

@@ -1,247 +1,9 @@
-@extends('layouts.mdrrmo')
-
-@section('content')
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid">
 
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
-            <h1 class="h3 mb-0 text-gray-800">MDRRMO Agency</h1>
-        </div>
-
-        <!-- Table -->
-        <div class="card my-4">
-            <div class="card-header d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Vehicle Requests</h5>
-                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#vehicleRequestModal">
-                    <i class="bi bi-plus-circle me-1"></i> New Request
-                </button>
-            </div>
-            <div class="card-body">
-                <!-- Vehicle Requests Table -->
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover align-middle">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Requestor</th>
-                                <th>Vehicle Type</th>
-                                <th>Priority</th>
-                                <th>Status</th>
-                                <th>Requested On</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($vehicleRequests as $request)
-                                <tr>
-                                    <td>{{ $request->full_name }}</td>
-                                    <td>{{ $request->vehicle_type }}</td>
-                                    <td>
-                                        @if ($request->priority == 'Low')
-                                            <span class="badge bg-success">Low</span>
-                                        @elseif($request->priority == 'Medium')
-                                            <span class="badge bg-warning text-dark">Medium</span>
-                                        @else
-                                            <span class="badge bg-danger">High</span>
-                                        @endif
-                                    </td>
-                                    <td>
-                                        @if ($request->status == 'Pending')
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        @elseif($request->status == 'Approved')
-                                            <span class="badge bg-success">Approved</span>
-                                        @elseif($request->status == 'Rejected')
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @else
-                                            <span class="badge bg-info">Completed</span>
-                                        @endif
-                                    </td>
-                                    <td>{{ $request->created_at->format('M d, Y h:i A') }}</td>
-                                    <td>
-                                        <button type="button" class="btn btn-sm btn-primary text-white view-request-btn"
-                                            data-bs-toggle="modal" data-bs-target="#viewRequestModal"
-                                            data-id="{{ $request->id }}" data-name="{{ $request->full_name }}"
-                                            data-vehicle="{{ $request->vehicle_type }}"
-                                            data-location="{{ $request->location }}"
-                                            data-quantity="{{ $request->quantity }}" data-reason="{{ $request->reason }}"
-                                            data-priority="{{ $request->priority }}" data-status="{{ $request->status }}"
-                                            data-created="{{ $request->created_at->format('M d, Y h:i A') }}">
-                                            <i class="bi bi-eye-fill"></i> View
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">No vehicle requests found</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-4">
-                    {{ $vehicleRequests->links() }}
-                </div>
-            </div>
-        </div>
-
-        <!-- View Request Modal -->
-        <div class="modal fade" id="viewRequestModal" tabindex="-1" aria-labelledby="viewRequestModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="viewRequestModalLabel">Vehicle Request Details</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Request Information</h6>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Requestor Name:</label>
-                                    <p id="modal-name"></p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Vehicle Type:</label>
-                                    <p id="modal-vehicle"></p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Number of vehicles:</label>
-                                    <p id="modal-quantity"></p>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-2">Additional Details</h6>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Location:</label>
-                                    <p id="modal-location"></p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Priority:</label>
-                                    <p id="modal-priority"></p>
-                                </div>
-                                <div class="mb-3">
-                                    <label class="form-label fw-bold">Requested On:</label>
-                                    <p id="modal-created"></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Purpose/Reason:</label>
-                            <p id="modal-reason"></p>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Current Status:</label>
-                            <p id="modal-status"></p>
-                        </div>
-
-                        <div class="mt-4 border-top pt-4">
-                            <h6 class="mb-3">Update Request Status</h6>
-                            <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-success status-action-modal-btn"
-                                    data-status="Approved">
-                                    <i class="bi bi-check-circle me-1"></i> Approve
-                                </button>
-                                <button type="button" class="btn btn-danger status-action-modal-btn"
-                                    data-status="Rejected">
-                                    <i class="bi bi-x-circle me-1"></i> Reject
-                                </button>
-                                <button type="button" class="btn btn-primary status-action-modal-btn"
-                                    data-status="Completed">
-                                    <i class="bi bi-flag-fill me-1"></i> Completed
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Hidden forms for submitting actions -->
-        <form id="status-form-Approved" action="" method="POST" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <input type="hidden" name="status" value="Approved">
-        </form>
-        <form id="status-form-Rejected" action="" method="POST" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <input type="hidden" name="status" value="Rejected">
-        </form>
-        <form id="status-form-Completed" action="" method="POST" style="display: none;">
-            @csrf
-            @method('PATCH')
-            <input type="hidden" name="status" value="Completed">
-        </form>
-
-
-
-        <!-- Vehicle Request Modal -->
-        <div class="modal fade" id="vehicleRequestModal" tabindex="-1" aria-labelledby="vehicleRequestModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header bg-primary text-white">
-                        <h5 class="modal-title" id="vehicleRequestModalLabel">Request Vehicle</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <form id="vehicleRequestForm" action="{{ route('mdrrmo.request_vehicle.store') }}" method="POST">
-                        @csrf
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="full_name" class="form-label">Full Name</label>
-                                <input type="text" class="form-control" id="full_name" name="full_name" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="vehicle_type" class="form-label">Vehicle Type</label>
-                                <select class="form-select" id="vehicle_type" name="vehicle_type" required>
-                                    <option value="">Select Vehicle Type</option>
-                                    <option value="Ambulance">Ambulance</option>
-                                    <option value="Fire Truck">Fire Truck</option>
-                                    <option value="Rescue Vehicle">Rescue Vehicle</option>
-                                    <option value="Transportation Vehicle">Transportation Vehicle</option>
-                                    <option value="Other">Other</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="location" class="form-label">Location</label>
-                                <input type="text" class="form-control" id="location" name="location" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="quantity" class="form-label">Number of Vehicles</label>
-                                <input type="number" class="form-control" id="quantity" name="quantity"
-                                    min="1" value="1" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="reason" class="form-label">Reason/Purpose</label>
-                                <textarea class="form-control" id="reason" name="reason" rows="3" required></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="priority" class="form-label">Priority</label>
-                                <select class="form-select" id="priority" name="priority" required>
-                                    <option value="Low">Low</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="High">High</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="button" id="confirmRequest" class="btn btn-primary">Submit Request</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <h1 class="h3 mb-0 text-gray-800">COASTGUARD Agency</h1>
         </div>
 
         <!-- Date Range Selector -->
@@ -252,24 +14,25 @@
                     <div class="dropdown mb-3">
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dashboardTypeDropdown"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                            {{ request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics' }}
+                            <?php echo e(request()->is('*/message-analytics') ? 'Message Analytics' : 'Call Analytics'); ?>
+
                         </button>
                         <ul class="dropdown-menu" aria-labelledby="dashboardTypeDropdown">
-                            <li><a class="dropdown-item {{ !request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}">Call Analytics</a></li>
-                            <li><a class="dropdown-item {{ request()->is('*/message-analytics') ? 'active' : '' }}"
-                                    href="{{ route('admin.mdrrmo') }}/message-analytics">Message Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(!request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.coastguard')); ?>">Call Analytics</a></li>
+                            <li><a class="dropdown-item <?php echo e(request()->is('*/message-analytics') ? 'active' : ''); ?>"
+                                    href="<?php echo e(route('admin.coastguard')); ?>/message-analytics">Message Analytics</a></li>
                         </ul>
                     </div>
                     <div class="col-md-6">
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date"
-                            value="{{ \Carbon\Carbon::now()->subMonth()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->subMonth()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-md-6">
                         <label for="end_date" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="end_date" name="end_date"
-                            value="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+                            value="<?php echo e(\Carbon\Carbon::now()->format('Y-m-d')); ?>">
                     </div>
                     <div class="col-12">
                         <button type="submit" class="btn btn-primary">Apply Filters</button>
@@ -441,9 +204,9 @@
             </div>
         </div>
     </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@section('scripts')
+<?php $__env->startSection('scripts'); ?>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -495,8 +258,8 @@
             let viewActivityChart = null;
             let callViewActivityChart = null;
 
-            // Set the agency ID as a constant (MDRRMO agency_id=2)
-            const AGENCY_ID = 4;
+            // Set the agency ID as a constant (COASTGUARD agency_id=2)
+            const AGENCY_ID = 6;
 
             // Load initial data
             loadAllData();
@@ -520,7 +283,7 @@
             function loadAgencyPerformance(startDate, endDate) {
                 fetch(
                         `/analytics/agency-performance?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                    )
+                        )
                     .then(response => response.json())
                     .then(data => {
                         // Find the agency data (should be only one since we're filtering by agency_id)
@@ -610,7 +373,7 @@
             function loadDailyCallVolume(startDate, endDate) {
                 fetch(
                         `/api/analytics/daily-call-volume?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                    )
+                        )
                     .then(response => response.json())
                     .then(data => {
                         const dates = data.daily_calls.map(item => item.date);
@@ -673,7 +436,7 @@
             function loadCallsStatusDistribution(startDate, endDate) {
                 fetch(
                         `/api/analytics/calls-status-distribution?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                    )
+                        )
                     .then(response => response.json())
                     .then(data => {
                         if (statusDistributionChart) {
@@ -723,7 +486,7 @@
             function loadActivityCharts(startDate, endDate) {
                 fetch(
                         `/api/analytics/top-agencies?start_date=${startDate}&end_date=${endDate}&agency_id=${AGENCY_ID}`
-                    )
+                        )
                     .then(response => response.json())
                     .then(data => {
                         // Since we're filtering by agency_id, we need to adjust the data structure
@@ -852,204 +615,6 @@
             }
         });
     </script>
-    <!-- Combined JavaScript for the View Modal and SweetAlert -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Handle existing messages
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+<?php $__env->stopSection(); ?>
 
-            if (successMessage) {
-                Swal.fire({
-                    title: "Success!",
-                    text: successMessage,
-                    icon: "success",
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }
-
-            if (errorMessage) {
-                Swal.fire({
-                    title: "Error!",
-                    text: errorMessage,
-                    icon: "error",
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }
-
-            // Current request data being viewed
-            let currentRequestData = {
-                id: null,
-                vehicle: null,
-                quantity: null
-            };
-
-            // Setup view button click handlers
-            const viewButtons = document.querySelectorAll('.view-request-btn');
-            viewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    // Get data attributes
-                    const id = this.getAttribute('data-id');
-                    const name = this.getAttribute('data-name');
-                    const vehicle = this.getAttribute('data-vehicle');
-                    const location = this.getAttribute('data-location');
-                    const quantity = this.getAttribute('data-quantity');
-                    const reason = this.getAttribute('data-reason');
-                    const priority = this.getAttribute('data-priority');
-                    const status = this.getAttribute('data-status');
-                    const created = this.getAttribute('data-created');
-
-                    // Store current request data
-                    currentRequestData = {
-                        id: id,
-                        vehicle: vehicle,
-                        quantity: quantity
-                    };
-
-                    // Set modal content
-                    document.getElementById('modal-name').textContent = name;
-                    document.getElementById('modal-vehicle').textContent = vehicle;
-                    document.getElementById('modal-location').textContent = location;
-                    document.getElementById('modal-quantity').textContent = quantity;
-                    document.getElementById('modal-reason').textContent = reason;
-
-                    // Set priority with badge
-                    let priorityHtml = '';
-                    if (priority === 'Low') {
-                        priorityHtml = '<span class="badge bg-success">Low</span>';
-                    } else if (priority === 'Medium') {
-                        priorityHtml = '<span class="badge bg-warning text-dark">Medium</span>';
-                    } else {
-                        priorityHtml = '<span class="badge bg-danger">High</span>';
-                    }
-                    document.getElementById('modal-priority').innerHTML = priorityHtml;
-
-                    // Set status with badge
-                    let statusHtml = '';
-                    if (status === 'Pending') {
-                        statusHtml = '<span class="badge bg-warning text-dark">Pending</span>';
-                    } else if (status === 'Approved') {
-                        statusHtml = '<span class="badge bg-success">Approved</span>';
-                    } else if (status === 'Rejected') {
-                        statusHtml = '<span class="badge bg-danger">Rejected</span>';
-                    } else {
-                        statusHtml = '<span class="badge bg-info">Completed</span>';
-                    }
-                    document.getElementById('modal-status').innerHTML = statusHtml;
-
-                    document.getElementById('modal-created').textContent = created;
-
-                    // Update button visibility based on status
-                    updateButtonVisibility(status);
-                });
-            });
-
-            // Function to update button visibility based on status
-            function updateButtonVisibility(status) {
-                const approveBtn = document.querySelector('.status-action-modal-btn[data-status="Approved"]');
-                const rejectBtn = document.querySelector('.status-action-modal-btn[data-status="Rejected"]');
-                const completeBtn = document.querySelector('.status-action-modal-btn[data-status="Completed"]');
-
-                // Show/hide buttons based on current status
-                if (status === 'Pending') {
-                    approveBtn.style.display = 'inline-block';
-                    rejectBtn.style.display = 'inline-block';
-                    completeBtn.style.display = 'none';
-                } else if (status === 'Approved') {
-                    approveBtn.style.display = 'none';
-                    rejectBtn.style.display = 'inline-block';
-                    completeBtn.style.display = 'inline-block';
-                } else if (status === 'Rejected') {
-                    approveBtn.style.display = 'inline-block';
-                    rejectBtn.style.display = 'none';
-                    completeBtn.style.display = 'none';
-                } else if (status === 'Completed') {
-                    approveBtn.style.display = 'none';
-                    rejectBtn.style.display = 'none';
-                    completeBtn.style.display = 'none';
-                }
-            }
-
-            // Setup action buttons in modal with SweetAlert confirmation
-            const actionButtons = document.querySelectorAll('.status-action-modal-btn');
-            actionButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    if (!currentRequestData.id) return;
-
-                    const status = this.getAttribute('data-status');
-                    const form = document.getElementById(`status-form-${status}`);
-
-                    // Set the form action dynamically
-                    form.action = `/vehicle-requests/${currentRequestData.id}/status`;
-
-                    // Configure SweetAlert based on status
-                    let title, confirmText, buttonColor;
-
-                    if (status === 'Approved') {
-                        title = 'Approve Request';
-                        confirmText = 'Yes, approve it';
-                        buttonColor = '#28a745'; // green
-                    } else if (status === 'Rejected') {
-                        title = 'Reject Request';
-                        confirmText = 'Yes, reject it';
-                        buttonColor = '#dc3545'; // red
-                    } else {
-                        title = 'Mark as Completed';
-                        confirmText = 'Yes, mark as completed';
-                        buttonColor = '#007bff'; // blue
-                    }
-
-                    // Show SweetAlert confirmation
-                    Swal.fire({
-                        title: title,
-                        html: `Are you sure you want to <b>${status.toLowerCase()}</b> the request for <b>${currentRequestData.quantity} ${currentRequestData.vehicle}</b>?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: buttonColor,
-                        cancelButtonColor: '#6c757d',
-                        confirmButtonText: confirmText,
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Hide modal before submitting
-                            const modal = bootstrap.Modal.getInstance(document
-                                .getElementById('viewRequestModal'));
-                            modal.hide();
-
-                            // Submit the form
-                            form.submit();
-                        }
-                    });
-                });
-            });
-
-            // Add confirmation for vehicle request form submission (if exists)
-            if (document.getElementById("confirmRequest")) {
-                document.getElementById("confirmRequest").addEventListener("click", function() {
-                    // Get form values for confirmation message
-                    const vehicleType = document.getElementById("vehicle_type").value;
-                    const quantity = document.getElementById("quantity").value;
-                    const priority = document.getElementById("priority").value;
-
-                    Swal.fire({
-                        title: 'Confirm Vehicle Request',
-                        html: `Are you sure you want to request <b>${quantity} ${vehicleType}</b> with <b>${priority}</b> priority?`,
-                        icon: 'question',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Yes, submit request',
-                        cancelButtonText: 'Cancel'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Submit the form if confirmed
-                            document.getElementById("vehicleRequestForm").submit();
-                        }
-                    });
-                });
-            }
-        });
-    </script>
-@endsection
+<?php echo $__env->make('layouts.coastguard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/coastguard/dashboard.blade.php ENDPATH**/ ?>

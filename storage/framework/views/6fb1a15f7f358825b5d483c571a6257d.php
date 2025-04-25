@@ -70,81 +70,107 @@
             .table-responsive .table td.action-btns .action-btn {
                 width: 100px;
             }
+
         }
     </style>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('content'); ?>
     <div class="container">
 
-        <!--All Emergency Messages Table -->
+        <!--All Emergency Calls Table -->
         <div class="card mt-4">
             <div class="card-header">
-                <h5>Emergency Messages</h5>
+                <h5>Cases</h5>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Sender Contact</th>
-                                <th>Message Content</th>
-                                <th>Date Received</th>
+                                <th>Incident Case</th>
+                                <th>Caller Contact</th>
+                                <th>Call Date</th>
                                 <th>Status</th>
                                 <th class="text-center">View</th>
                                 <th class="text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $__currentLoopData = $messages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $message): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <?php $__empty_1 = true; $__currentLoopData = $calls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $call): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                    <td data-label="Contact"><?php echo e($message->sender_contact); ?></td>
-                                    <td data-label="Message"><?php echo e(Str::limit($message->message_content, 50)); ?></td>
-                                    <td data-label="Date"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></td>
+                                    <td data-label="Incident Case">
+                                        <?php if($call->requests->isNotEmpty()): ?>
+                                            <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <?php echo e(optional($request->incidentCase)->case_number ?? 'N/A'); ?><br>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        <?php else: ?>
+                                            N/A
+                                        <?php endif; ?>
+                                    </td>
+                                    <td data-label="Caller Contact"><?php echo e($call->caller_contact); ?></td>
+                                    <td data-label="Call Date"><?php echo e($call->created_at); ?></td>
                                     <td data-label="Status">
                                         <span
-                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
-                                            <?php echo e($message->status->name); ?>
+                                            class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                            <?php echo e($call->status->name); ?>
 
                                         </span>
                                     </td>
                                     <td class="action-btns" data-label="View">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
                                             <div class="d-inline">
-                                                <a href="<?php echo e(route('mdrrmo.emergencymessage.view', $message->id)); ?>"
-                                                    class="btn btn-sm btn-primary action-btn">View</a>
+                                                <a href="<?php echo e(route('mdrrmo.emergencycall.view', $call->id)); ?>"
+                                                    class="btn btn-sm btn-danger action-btn">View</a>
                                             </div>
                                         </div>
                                     </td>
                                     <td class="action-btns" data-label="Actions">
                                         <div class="d-flex flex-column flex-sm-row gap-2 justify-content-center">
-                                            <form id="respondedForm-<?php echo e($message->id); ?>"
-                                                action="<?php echo e(route('mdrrmo.emergencymessage.responded', $message->id)); ?>"
+                                            <form id="respondedForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('mdrrmo.emergencycall.responded', $call->id)); ?>"
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
-                                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
-                                                <button type="button"
-                                                    onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
-                                                    class="btn btn-sm btn-warning action-btn">Responded</button>
+                                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-warning action-btn"
+                                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ''); ?>>
+                                                        Responded
+                                                    </button>
+                                                </span>
                                             </form>
 
-                                            <form id="completeForm-<?php echo e($message->id); ?>"
-                                                action="<?php echo e(route('mdrrmo.emergencymessage.complete', $message->id)); ?>"
+                                            <form id="completeForm-<?php echo e($call->id); ?>"
+                                                action="<?php echo e(route('mdrrmo.emergencycall.complete', $call->id)); ?>"
                                                 method="POST" class="d-inline">
                                                 <?php echo csrf_field(); ?>
-                                                <button type="button"
-                                                    onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
-                                                    class="btn btn-sm btn-success action-btn">Complete</button>
+                                                <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
+                                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
+                                                    <button type="button"
+                                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
+                                                        class="btn btn-sm btn-success action-btn"
+                                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
+                                                        Complete
+                                                    </button>
+                                                </span>
                                             </form>
                                         </div>
                                     </td>
                                 </tr>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                <tr>
+                                    <td colspan="6" class="text-center">No emergency calls found</td>
+                                </tr>
+                            <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-                 <!-- Pagination -->
-                 <div class="d-flex justify-content-center mt-3">
-                    <?php echo e($messages->links('pagination::bootstrap-5', ['paginator' => $messages, 'elements' => [1 => $messages->getUrlRange(1, $messages->lastPage())], 'onEachSide' => 1])); ?>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-center mt-3">
+                    <?php echo e($calls->links('pagination::bootstrap-5', ['paginator' => $calls, 'elements' => [1 => $calls->getUrlRange(1, $calls->lastPage())], 'onEachSide' => 1])); ?>
 
                 </div>
             </div>
@@ -152,27 +178,38 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startSection('scripts'); ?>
+    <!--Initialize tooltips-->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+    </script>
+    
+
     <!--sweet alert-->
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "<?php echo e(session('success')); ?>";
-            let errorMessage = "<?php echo e(session('error')); ?>";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -202,7 +239,7 @@
                 },
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationMessage("Log details are required!");
+                        Swal.showValidationCall("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -224,23 +261,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "<?php echo e(session('success')); ?>";
-            let errorMessage = "<?php echo e(session('error')); ?>";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -268,7 +305,7 @@
                 confirmButtonText: "Yes, mark as completed!",
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationMessage("Log details are required!");
+                        Swal.showValidationCall("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -288,4 +325,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-messages/index.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/call-cases/index.blade.php ENDPATH**/ ?>

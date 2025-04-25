@@ -18,8 +18,11 @@ use App\Models\RequestMessageView;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CallController;
+use App\Http\Controllers\IncidentReportController;
+use App\Http\Controllers\Mdrrmo\IncidentReportController as MdrrmoIncidentReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\VehicleRequestController;
 use App\Http\Controllers\WebsiteController;
 use App\Models\Agency;
 use App\Models\Call;
@@ -320,9 +323,6 @@ Route::get('/api/calls/{call}/can-complete', 'EmergencyCallController@canComplet
 
 // Then add this method to your EmergencyCallController
 
-
-
-// Protected Route (Dashboard)
 Route::middleware(['auth'])->group(function () {
     Route::get('/email/verify', [UserController::class, 'verifyNotice'])->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', [UserController::class, 'verifyEmail'])
@@ -331,6 +331,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/email/verification-notification', [UserController::class, 'verifyHandler'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
+});
+
+// Protected Route (Dashboard)
+Route::middleware(['auth'])->group(function () {
     // User Dashboard (Only Users in DEFAULT)
     Route::middleware(['role:user,DEFAULT'])->group(function () {
         Route::get('/user/dashboard', [UserController::class, 'index'])->name('user.dashboard');
@@ -343,6 +347,7 @@ Route::middleware(['auth'])->group(function () {
     
     // Philippine National Police (PNP)
     Route::middleware(['role:admin,PNP'])->group(function () {
+        
         Route::get('/admin/pnp-dashboard/call-analytics', function () {
             $agencies = Agency::all();
             return view('admin.pnp.partials.call-analytics',compact('agencies'));
@@ -352,6 +357,7 @@ Route::middleware(['auth'])->group(function () {
             $agencies = Agency::all();
             return view('admin.pnp.partials.message-analytics',compact('agencies'));
         })->name('admin.pnp.message-analytics');
+
         //dashboard
         Route::get('/admin/pnp-dashboard', [PnpController::class, 'pnpDashboard'])->name('admin.pnp');
         Route::post('admin/pnp/reports/{id}/responded', [PnpController::class, 'markAsResponded'])->name('pnp.reports.responded');
@@ -453,7 +459,23 @@ Route::middleware(['auth'])->group(function () {
          //cases
          Route::get('mdrrmo/all-call-cases', [MdrrmoController::class, 'callCaseLists'])->name('mdrrmo.call_cases.index');
          Route::get('mdrrmo/all-message-cases', [MdrrmoController::class, 'messageCaseLists'])->name('mdrrmo.message_cases.index');
-    });
+
+         //vehicle request
+         Route::post('mdrrmo/vehicle-requests', [VehicleRequestController::class, 'store'])->name('mdrrmo.request_vehicle.store');
+         Route::patch('mdrrmo/vehicle-requests/{id}/status', [VehicleRequestController::class, 'updateStatus'])->name('mdrrmo.request_vehicle.status');
+
+         //incidentReport
+        Route::get('mdrrmo/incident_reports/generate/{id}', [MdrrmoIncidentReportController::class, 'generateReport'])->name('mdrrmo.incident_reports.generate');
+        Route::get('mdrrmo/incident_reports/view/{reportId}', [MdrrmoIncidentReportController::class, 'viewReport'])->name('mdrrmo.incident_reports.view');
+        Route::get('mdrrmo/incident_reports/download/{reportId}', [MdrrmoIncidentReportController::class, 'downloadReport'])->name('mdrrmo.incident_reports.download');
+        Route::get('mdrrmo/incident_reports/', [MdrrmoIncidentReportController::class, 'list'])->name('mdrrmo.incident_reports.index');
+    
+          // Additional route for specifying source type (call or message)
+        Route::get('mdrrmo/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+        $request->merge(['source_type' => $source_type]);
+        return app(MdrrmoIncidentReportController::class)->generateReport($request, $id);
+        })->name('mdrrmo.incident_reports.generate.with_source');
+});
     
     //Municipal Health Office (MHO)
     Route::middleware( ['role:admin,MHO'])->group(function () {

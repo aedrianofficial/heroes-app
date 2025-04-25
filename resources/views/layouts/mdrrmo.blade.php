@@ -39,7 +39,10 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('admin.mdrrmo') }}">Dashboard</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="{{ route('mdrrmo.incident_reports.index') }}">Reports</a>
+                    </li>
+                    {{-- <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
                             Reports
@@ -52,7 +55,7 @@
                             </li>
                             <li><a class="dropdown-item" href="{{ route('mdrrmo.reports.index') }}">All Reports</a></li>
                         </ul>
-                    </li>
+                    </li> --}}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">

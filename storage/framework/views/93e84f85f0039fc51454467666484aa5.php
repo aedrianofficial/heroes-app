@@ -10,7 +10,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="">
-    <link rel="icon" type="image/png" href="<?php echo e(asset('asset/image/logo.png')); ?>">
+
     <!--bootstrap-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -21,9 +21,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <link rel="stylesheet" href="<?php echo e(asset('asset/css/Control.Geocoder.css')); ?>" />
-
-
-
+    <link rel="icon" type="image/png" href="<?php echo e(asset('asset/image/logo.png')); ?>">
     <?php echo $__env->yieldContent(section: 'styles'); ?>
 </head>
 
@@ -39,7 +37,8 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mx-auto mb-2 mb-lg-0">
                     <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('admin.lgu')); ?>">Dashboard</a>
+                        <a class="nav-link active" aria-current="page"
+                            href="<?php echo e(route('admin.coastguard')); ?>">Dashboard</a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
@@ -47,13 +46,13 @@
                             Reports
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.reports.create')); ?>">Create a
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.reports.create')); ?>">Create a
                                     Report</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.reports.index')); ?>">All Reports</a>
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.reports.index')); ?>">All Reports</a>
                             </li>
                         </ul>
                     </li>
@@ -63,13 +62,14 @@
                             Emergency Messages
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.emergencymessage.index')); ?>">Message
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.emergencymessage.index')); ?>">Message
                                     logs</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.message_cases.index')); ?>">Cases</a></li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.message_cases.index')); ?>">Cases</a>
+                            </li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
@@ -78,16 +78,19 @@
                             Emergency Calls
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.emergencycall.index')); ?>">Call logs</a>
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.emergencycall.index')); ?>">Call
+                                    logs</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('lgu.call_cases.index')); ?>">Cases</a></li>
+                            <li><a class="dropdown-item" href="<?php echo e(route('coastguard.call_cases.index')); ?>">Cases</a>
+                            </li>
                         </ul>
                     </li>
                     <!--<li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('lgu.reports.index')); ?>">Activity
+                        <a class="nav-link active" aria-current="page"
+                            href="<?php echo e(route('coastguard.reports.index')); ?>">Activity
                             Logs</a>
                     </li>-->
                 </ul>
@@ -236,6 +239,7 @@
         // Check if we already have an active SSE connection
         if (typeof window.callEventSource === 'undefined') {
 
+            // Function to mark a call as seen by this user
             function markCallAsSeen(callId) {
                 fetch('/mark-call-as-seen', {
                     method: 'POST',
@@ -248,8 +252,6 @@
                     })
                 });
             }
-
-
 
             function connectCallSSE() {
                 // Store the EventSource in a global variable so it persists
@@ -265,11 +267,11 @@
                     Swal.fire({
                         title: "📞 Incoming Call Alert",
                         html: `<b>Caller:</b> ${data.caller_name} (${data.caller_contact}) <br> 
-                         <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+                                <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
         month: 'long', day: 'numeric', year: 'numeric', 
         hour: 'numeric', minute: 'numeric', hour12: true 
     })} <br>
-                        <b>Address:</b> ${data.address}`,
+                               <b>Address:</b> ${data.address}`,
                         icon: "info",
                         showCancelButton: true,
                         cancelButtonText: "Close",
@@ -278,7 +280,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/lgu/emergency-call/${data.id}/view`;
+                            window.location.href = `/admin/coastguard/emergency-call/${data.id}/view`;
                         }
                     });
                 });
@@ -305,7 +307,6 @@
         }
     </script>
 
-    <!--message-->
     <script>
         // Check if we already have an active Message SSE connection
         if (typeof window.messageEventSource === 'undefined') {
@@ -337,9 +338,9 @@
                     Swal.fire({
                         title: "📩 New Message Alert",
                         html: `<b>From:</b> ${data.sender_name} (${data.sender_contact}) <br> 
-                               <b>Message:</b> ${data.message_content} <br>
-                               <b>Address:</b> ${data.address} <br>
-                                <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
+                           <b>Message:</b> ${data.message_content} <br>
+                           <b>Address:</b> ${data.address} <br>
+                            <b>Time:</b> ${new Date(data.created_at).toLocaleString('en-US', { 
         month: 'long', day: 'numeric', year: 'numeric', 
         hour: 'numeric', minute: 'numeric', hour12: true 
     })}`,
@@ -351,7 +352,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/lgu/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/coastguard/emergency-message/${data.id}/view`;
                         }
                     });
                 });
@@ -419,7 +420,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/lgu/emergency-call/${data.id}/view`;
+                            window.location.href = `/admin/coast-guard/emergency-call/${data.id}/view`;
                         }
                     });
                 });
@@ -482,7 +483,7 @@
                         cancelButtonColor: "#d33",
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = `/admin/lgu/emergency-message/${data.id}/view`;
+                            window.location.href = `/admin/coastguard/emergency-message/${data.id}/view`;
                         }
                     });
                 });
@@ -504,9 +505,8 @@
             });
         }
     </script>
-
     <?php echo $__env->yieldContent('scripts'); ?>
 </body>
 
 </html>
-<?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/layouts/lgu.blade.php ENDPATH**/ ?>
+<?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/layouts/coastguard.blade.php ENDPATH**/ ?>

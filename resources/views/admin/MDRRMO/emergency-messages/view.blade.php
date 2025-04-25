@@ -1,3 +1,4 @@
+<!--message-->
 @extends('layouts.mdrrmo')
 
 @section('content')
@@ -83,6 +84,7 @@
                                                                 @else
                                                                     <em>No date available</em>
                                                                 @endif
+                                                            </p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
@@ -181,13 +183,13 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('bfp.emergencymessage.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('mdrrmo.emergencymessage.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $message->id }}"
-                                action="{{ route('mdrrmo.emergencymessage.responded', $message->id) }}"
-                                method="POST" class="d-inline">
+                                action="{{ route('mdrrmo.emergencymessage.responded', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -202,8 +204,8 @@
                             </form>
 
                             <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('mdrrmo.emergencymessage.complete', $message->id) }}"
-                                method="POST" class="d-inline">
+                                action="{{ route('mdrrmo.emergencymessage.complete', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
                                     title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : ''))) }}">
@@ -215,6 +217,134 @@
                                     </button>
                                 </span>
                             </form>
+                            @if ($message->status_id == 3)
+                                @php
+                                    $allCasesHaveReports = true;
+                                    $caseIds = [];
+
+                                    // Collect all incident case IDs for this message
+                                    foreach ($message->requests as $request) {
+                                        if ($request->incidentCase) {
+                                            $caseIds[] = $request->incidentCase->id;
+                                        }
+                                    }
+
+                                    // Check if each case already has a report
+                                    if (!empty($caseIds)) {
+                                        foreach ($caseIds as $caseId) {
+                                            $reportExists = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $caseId,
+                                            )->exists();
+                                            if (!$reportExists) {
+                                                $allCasesHaveReports = false;
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // No cases, so can't generate report
+                                        $allCasesHaveReports = true;
+                                    }
+                                @endphp
+
+                                <span class="d-inline-block">
+                                    @if (!$allCasesHaveReports)
+                                        <button type="button" class="btn btn-sm btn-primary action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                                            Generate Report
+                                        </button>
+                                    @else
+                                        <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                            title="Reports already generated for all cases">
+                                            Reports Generated
+                                        </button>
+                                    @endif
+                                </span>
+
+                                <!-- Generate Report Modal -->
+                                @if (!$allCasesHaveReports)
+                                    <div class="modal fade" id="generateReportModal" tabindex="-1"
+                                        aria-labelledby="generateReportModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <form
+                                                    action="{{ route('mdrrmo.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message']) }}"
+                                                    method="GET">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="generateReportModalLabel">Generate
+                                                            Incident Report</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-4">
+                                                            <h6 class="text-muted mb-3">Message Information</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <p><strong>Sender Contact:</strong>
+                                                                        {{ $message->sender_contact }}</p>
+                                                                    <p><strong>Date Received:</strong>
+                                                                        {{ $message->created_at->format('F j, Y g:i A') }}
+                                                                    </p>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <p><strong>Message Type:</strong>
+                                                                        {{ $message->sender_type }}</p>
+                                                                    <p><strong>Case Number(s):</strong>
+                                                                        @foreach ($message->requests as $request)
+                                                                            @if ($request->incidentCase)
+                                                                                @php
+                                                                                    $hasReport = \App\Models\IncidentReport::where(
+                                                                                        'incident_case_id',
+                                                                                        $request->incidentCase->id,
+                                                                                    )->exists();
+                                                                                @endphp
+                                                                                <span
+                                                                                    class="badge {{ $hasReport ? 'bg-success' : 'bg-info' }}">
+                                                                                    {{ $request->incidentCase->case_number }}
+                                                                                    {{ $hasReport ? '✓' : '' }}
+                                                                                </span>
+                                                                            @endif
+                                                                        @endforeach
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            @if (count($caseIds) > 0)
+                                                                <div class="alert alert-info mt-2">
+                                                                    <small>
+                                                                        <i class="fas fa-info-circle"></i>
+                                                                        Reports will only be generated for cases that don't
+                                                                        already have one.
+                                                                        Cases with existing reports are marked with ✓.
+                                                                    </small>
+                                                                </div>
+                                                            @endif
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="resolution_details" class="form-label">Resolution
+                                                                Details <span class="text-danger">*</span></label>
+                                                            <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required
+                                                                placeholder="Provide detailed information about how this incident was resolved..."></textarea>
+                                                            <small class="form-text text-muted">
+                                                                Include actions taken, resources deployed, outcomes, and any
+                                                                follow-up requirements.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Generate
+                                                            Report</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -226,13 +356,13 @@
     <!--Initialize tooltips-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var tooltipTriggerList = [].slice.message(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>
-    <!--sweet alert-->
+
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -304,23 +434,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successCall = "{{ session('success') }}";
+            let errorCall = "{{ session('error') }}";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false

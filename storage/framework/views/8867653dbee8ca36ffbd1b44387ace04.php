@@ -1,63 +1,68 @@
-<!--call-->
-@extends('layouts.mdrrmo')
-@section('content')
+<!--message-->
+
+
+<?php $__env->startSection('content'); ?>
     <div class="container-fluid my-2">
         <div class="row justify-content-center">
             <div class="col-lg-12">
                 <div class="card shadow-lg border-0">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Left Column: Call and Caller Information -->
+                            <!-- Left Column: Message and Sender Information -->
                             <div class="col-md-6 border-end">
                                 <div class="px-4">
-                                    <h3 class="mb-4 text-primary">Call Details</h3>
+                                    <h3 class="mb-4 text-primary">Message Details</h3>
 
                                     <div class="row mb-3">
                                         <div class="col-6">
-                                            <h5 class="text-muted">Caller Contact</h5>
-                                            <p class="text-dark">{{ $call->caller_contact }}</p>
+                                            <h5 class="text-muted">Sender Contact</h5>
+                                            <p class="text-dark"><?php echo e($message->sender_contact); ?></p>
                                         </div>
                                         <div class="col-6">
                                             <h5 class="text-muted">Date Received</h5>
-                                            <p class="text-dark">{{ $call->created_at->format('F j, Y g:i A') }}</p>
+                                            <p class="text-dark"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></p>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <h5 class="text-muted">Status</h5>
                                         <span
-                                            class="badge bg-{{ $call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success') }} px-3 py-2">
-                                            {{ $call->status->name }}
+                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                            <?php echo e($message->status->name); ?>
+
                                         </span>
                                     </div>
 
-                                    @if ($call->caller_description)
-                                        <div class="mb-3">
-                                            <h5 class="text-muted">Caller Description</h5>
-                                            <p class="text-dark">{{ $call->caller_description }}</p>
-                                        </div>
-                                    @endif
+                                    <div class="mb-3">
+                                        <h5 class="text-muted">Message Content</h5>
+                                        <p class="text-dark"><?php echo e($message->message_content); ?></p>
+                                    </div>
 
                                     <hr>
 
-                                    <h3 class="mb-4 text-primary">Caller Profile</h3>
-                                    @if ($profile)
+                                    <h3 class="mb-4 text-primary">Sender Profile</h3>
+                                    <?php if($profile): ?>
                                         <div class="row">
                                             <div class="col-6">
-                                                <p><strong>Name:</strong> {{ $profile->first_name }}
-                                                    {{ $profile->middle_name }} {{ $profile->last_name }}
-                                                    {{ $profile->suffix }}</p>
-                                                <p><strong>Sex:</strong> {{ $profile->sex }}</p>
-                                                <p><strong>Marital Status:</strong> {{ $profile->marital_status }}</p>
+                                                <p><strong>Name:</strong> <?php echo e($profile->first_name); ?>
+
+                                                    <?php echo e($profile->middle_name); ?> <?php echo e($profile->last_name); ?>
+
+                                                    <?php echo e($profile->suffix); ?></p>
+                                                <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
+                                                <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
+                                                <p><strong>Date of Birth:</strong> <?php echo e($profile->dob); ?></p>
                                             </div>
                                             <div class="col-6">
-                                                <p><strong>Zone:</strong> {{ $profile->zone }}</p>
-                                                <p><strong>Barangay:</strong> {{ $profile->nameofbarangay }}</p>
+                                                <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
+                                                <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
+                                                <p><strong>Religion:</strong> <?php echo e($profile->religion); ?></p>
+                                                <p><strong>Birth Place:</strong> <?php echo e($profile->birth_place); ?></p>
                                             </div>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <p class="text-muted">No profile information available.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
 
@@ -65,59 +70,66 @@
                             <div class="col-md-6">
                                 <div class="px-4">
                                     <h3 class="mb-4 text-primary">Requests</h3>
-                                    @if ($call->requests->isNotEmpty())
-                                        @foreach ($call->requests as $index => $request)
+                                    <?php if($message->requests->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="card mb-3 shadow-sm">
                                                 <div class="card-body">
-                                                    <h5 class="card-title text-muted">Request {{ $index + 1 }}</h5>
+                                                    <h5 class="card-title text-muted">Request <?php echo e($index + 1); ?></h5>
                                                     <div class="row">
                                                         <div class="col-6">
-                                                            <p><strong>Name:</strong> {{ $request->name }}</p>
-                                                            <p><strong>Address:</strong> {{ $request->address }}</p>
-                                                            <p><strong>Description:</strong> {{ $request->description }}
+                                                            <p><strong>Name:</strong> <?php echo e($request->name); ?></p>
+                                                            <p><strong>Address:</strong> <?php echo e($request->address); ?></p>
+                                                            <p><strong>Description:</strong> <?php echo e($request->description); ?>
+
                                                             </p>
                                                             <p><strong>Time:</strong>
-                                                                {{ $request->created_at->format('F j, Y g:i A') }}</p>
+                                                                <?php if($request->created_at): ?>
+                                                                    <?php echo e($request->created_at->format('F j, Y g:i A')); ?>
+
+                                                                <?php else: ?>
+                                                                    <em>No date available</em>
+                                                                <?php endif; ?>
+                                                            </p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
-                                                            @if ($request->agencies->isNotEmpty())
+                                                            <?php if($request->agencies->isNotEmpty()): ?>
                                                                 <ul class="list-unstyled">
-                                                                    @foreach ($request->agencies as $agency)
-                                                                        <li>{{ $agency->name }}</li>
-                                                                    @endforeach
+                                                                    <?php $__currentLoopData = $request->agencies; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $agency): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <li><?php echo e($agency->name); ?></li>
+                                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                 </ul>
-                                                            @else
+                                                            <?php else: ?>
                                                                 <p class="text-muted">No assigned agencies</p>
-                                                            @endif
+                                                            <?php endif; ?>
 
-                                                            @if ($request->incidentCase)
+                                                            <?php if($request->incidentCase): ?>
                                                                 <h6 class="text-muted mt-3">Incident Case</h6>
                                                                 <p><strong>Case Number:</strong>
-                                                                    {{ $request->incidentCase->case_number }}</p>
-                                                            @else
+                                                                    <?php echo e($request->incidentCase->case_number); ?></p>
+                                                            <?php else: ?>
                                                                 <p class="text-muted">No Incident Case Assigned</p>
-                                                            @endif
+                                                            <?php endif; ?>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    @else
-                                        <p class="text-muted">No requests found for this call.</p>
-                                    @endif
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                    <?php else: ?>
+                                        <p class="text-muted">No requests found for this message.</p>
+                                    <?php endif; ?>
 
                                     <hr>
 
                                     <h3 class="mb-4 text-primary">Status Log</h3>
-                                    @if ($call->statusLogCalls->isNotEmpty())
+                                    <?php if($message->statusLogMessages->isNotEmpty()): ?>
                                         <div class="list-group">
-                                            @foreach ($call->statusLogCalls as $log)
+                                            <?php $__currentLoopData = $message->statusLogMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <div class="d-flex align-items-center">
-                                                            @if ($log->user && $log->user->agency_id)
-                                                                @php
+                                                            <?php if($log->user && $log->user->agency_id): ?>
+                                                                <?php
                                                                     $agencyLogoPath = '';
                                                                     switch ($log->user->agency_id) {
                                                                         case 2:
@@ -141,82 +153,85 @@
                                                                         default:
                                                                             $agencyLogoPath = '';
                                                                     }
-                                                                @endphp
+                                                                ?>
 
-                                                                @if ($agencyLogoPath)
-                                                                    <img src="{{ asset('asset/image/logo/' . $agencyLogoPath) }}"
+                                                                <?php if($agencyLogoPath): ?>
+                                                                    <img src="<?php echo e(asset('asset/image/logo/' . $agencyLogoPath)); ?>"
                                                                         alt="Agency Logo" class="me-2"
                                                                         style="height: 24px; width: auto;">
-                                                                @endif
-                                                            @endif
+                                                                <?php endif; ?>
+                                                            <?php endif; ?>
                                                             <h5 class="mb-0">
-                                                                {{ $log->user->profile->firstname ?? 'Unknown User' }}
-                                                                {{ $log->user->profile->lastname ?? 'Unknown User' }}
+                                                                <?php echo e($log->user->profile->firstname ?? 'Unknown User'); ?>
+
+                                                                <?php echo e($log->user->profile->lastname ?? 'Unknown User'); ?>
+
                                                             </h5>
                                                         </div>
-                                                        <small>{{ $log->created_at->format('F j, Y g:i A') }}</small>
+                                                        <small><?php echo e($log->created_at->format('F j, Y g:i A')); ?></small>
                                                     </div>
                                                     <p class="mb-1 mt-2">
                                                         Marked as
                                                         <span
-                                                            class="badge bg-{{ $log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success') }}">
-                                                            {{ $log->status->name }}
+                                                            class="badge bg-<?php echo e($log->status_id == 1 ? 'danger' : ($log->status_id == 2 ? 'warning text-dark' : 'success')); ?>">
+                                                            <?php echo e($log->status->name); ?>
+
                                                         </span>
                                                     </p>
-                                                    <small><strong>Log Details:</strong> {{ $log->log_details }}</small>
+                                                    <small><strong>Log Details:</strong> <?php echo e($log->log_details); ?></small>
                                                 </div>
-                                            @endforeach
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                         </div>
-                                    @else
+                                    <?php else: ?>
                                         <p class="text-muted">No status logs available.</p>
-                                    @endif
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('mdrrmo.emergencycall.index') }}" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('mdrrmo.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="respondedForm-{{ $call->id }}"
-                                action="{{ route('mdrrmo.emergencycall.responded', $call->id) }}" method="POST"
+                            <form id="respondedForm-<?php echo e($message->id); ?>"
+                                action="<?php echo e(route('mdrrmo.emergencymessage.responded', $message->id)); ?>" method="POST"
                                 class="d-inline">
-                                @csrf
-                                <input type="hidden" name="call_id" value="{{ $call->id }}">
+                                <?php echo csrf_field(); ?>
+                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to') }}">
+                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
                                     <button type="button"
-                                        onclick="confirmResponded(event, 'respondedForm-{{ $call->id }}')"
+                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
                                         class="btn btn-sm btn-warning action-btn"
-                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : '' }}>
+                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ''); ?>>
                                         Responded
                                     </button>
                                 </span>
                             </form>
 
-                            <form id="completeForm-{{ $call->id }}"
-                                action="{{ route('mdrrmo.emergencycall.complete', $call->id) }}" method="POST"
+                            <form id="completeForm-<?php echo e($message->id); ?>"
+                                action="<?php echo e(route('mdrrmo.emergencymessage.complete', $message->id)); ?>" method="POST"
                                 class="d-inline">
-                                @csrf
+                                <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="{{ $call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : ''))) }}">
+                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : '')))); ?>">
                                     <button type="button"
-                                        onclick="confirmComplete(event, 'completeForm-{{ $call->id }}')"
+                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
                                         class="btn btn-sm btn-success action-btn"
-                                        {{ $call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled') }}>
+                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled')); ?>>
                                         Complete
                                     </button>
                                 </span>
                             </form>
-                            @if ($call->status_id == 3)
-                                @php
+                            <?php if($message->status_id == 3): ?>
+                                <?php
                                     $allCasesHaveReports = true;
                                     $caseIds = [];
 
-                                    // Collect all incident case IDs for this call
-                                    foreach ($call->requests as $request) {
+                                    // Collect all incident case IDs for this message
+                                    foreach ($message->requests as $request) {
                                         if ($request->incidentCase) {
                                             $caseIds[] = $request->incidentCase->id;
                                         }
@@ -238,30 +253,30 @@
                                         // No cases, so can't generate report
                                         $allCasesHaveReports = true;
                                     }
-                                @endphp
+                                ?>
 
                                 <span class="d-inline-block">
-                                    @if (!$allCasesHaveReports)
+                                    <?php if(!$allCasesHaveReports): ?>
                                         <button type="button" class="btn btn-sm btn-primary action-btn"
                                             data-bs-toggle="modal" data-bs-target="#generateReportModal">
                                             Generate Report
                                         </button>
-                                    @else
+                                    <?php else: ?>
                                         <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
                                             title="Reports already generated for all cases">
                                             Reports Generated
                                         </button>
-                                    @endif
+                                    <?php endif; ?>
                                 </span>
 
                                 <!-- Generate Report Modal -->
-                                @if (!$allCasesHaveReports)
+                                <?php if(!$allCasesHaveReports): ?>
                                     <div class="modal fade" id="generateReportModal" tabindex="-1"
                                         aria-labelledby="generateReportModalLabel" aria-hidden="true">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <form
-                                                    action="{{ route('mdrrmo.incident_reports.generate.with_source', ['id' => $call->id, 'source_type' => 'call']) }}"
+                                                    action="<?php echo e(route('mdrrmo.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message'])); ?>"
                                                     method="GET">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="generateReportModalLabel">Generate
@@ -271,35 +286,41 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="mb-4">
-                                                            <h6 class="text-muted mb-3">Call Information</h6>
+                                                            <h6 class="text-muted mb-3">Message Information</h6>
                                                             <div class="row">
                                                                 <div class="col-md-6">
-                                                                    <p><strong>Caller Contact:</strong>
-                                                                        {{ $call->caller_contact }}</p>
+                                                                    <p><strong>Sender Contact:</strong>
+                                                                        <?php echo e($message->sender_contact); ?></p>
                                                                     <p><strong>Date Received:</strong>
-                                                                        {{ $call->created_at->format('F j, Y g:i A') }}</p>
+                                                                        <?php echo e($message->created_at->format('F j, Y g:i A')); ?>
+
+                                                                    </p>
                                                                 </div>
                                                                 <div class="col-md-6">
+                                                                    <p><strong>Message Type:</strong>
+                                                                        <?php echo e($message->sender_type); ?></p>
                                                                     <p><strong>Case Number(s):</strong>
-                                                                        @foreach ($call->requests as $request)
-                                                                            @if ($request->incidentCase)
-                                                                                @php
+                                                                        <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <?php if($request->incidentCase): ?>
+                                                                                <?php
                                                                                     $hasReport = \App\Models\IncidentReport::where(
                                                                                         'incident_case_id',
                                                                                         $request->incidentCase->id,
                                                                                     )->exists();
-                                                                                @endphp
+                                                                                ?>
                                                                                 <span
-                                                                                    class="badge {{ $hasReport ? 'bg-success' : 'bg-info' }}">
-                                                                                    {{ $request->incidentCase->case_number }}
-                                                                                    {{ $hasReport ? '✓' : '' }}
+                                                                                    class="badge <?php echo e($hasReport ? 'bg-success' : 'bg-info'); ?>">
+                                                                                    <?php echo e($request->incidentCase->case_number); ?>
+
+                                                                                    <?php echo e($hasReport ? '✓' : ''); ?>
+
                                                                                 </span>
-                                                                            @endif
-                                                                        @endforeach
+                                                                            <?php endif; ?>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                                     </p>
                                                                 </div>
                                                             </div>
-                                                            @if (count($caseIds) > 0)
+                                                            <?php if(count($caseIds) > 0): ?>
                                                                 <div class="alert alert-info mt-2">
                                                                     <small>
                                                                         <i class="fas fa-info-circle"></i>
@@ -308,7 +329,7 @@
                                                                         Cases with existing reports are marked with ✓.
                                                                     </small>
                                                                 </div>
-                                                            @endif
+                                                            <?php endif; ?>
                                                         </div>
 
                                                         <div class="mb-3">
@@ -332,17 +353,17 @@
                                             </div>
                                         </div>
                                     </div>
-                                @endif
-                            @endif
+                                <?php endif; ?>
+                            <?php endif; ?>
+
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </div>
-@endsection
-@section('scripts')
+<?php $__env->stopSection(); ?>
+<?php $__env->startSection('scripts'); ?>
     <!--Initialize tooltips-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -352,28 +373,27 @@
             });
         });
     </script>
-    <!--sweet alert-->
-    <!--Mark as Responded-->
 
+    <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successMessage = "<?php echo e(session('success')); ?>";
+            let errorMessage = "<?php echo e(session('error')); ?>";
 
-            if (successCall) {
+            if (successMessage) {
                 Swal.fire({
                     title: "Success!",
-                    text: successCall,
+                    text: successMessage,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorCall) {
+            if (errorMessage) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorCall,
+                    text: errorMessage,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -425,8 +445,8 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successCall = "{{ session('success') }}";
-            let errorCall = "{{ session('error') }}";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
             if (successCall) {
                 Swal.fire({
@@ -487,4 +507,6 @@
             });
         }
     </script>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-messages/view.blade.php ENDPATH**/ ?>

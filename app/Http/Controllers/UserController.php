@@ -9,6 +9,7 @@ use App\Models\UserContact;
 use App\Models\UserProfile;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -34,9 +35,41 @@ class UserController extends Controller
         return back()->with('message', 'Verification link sent!');
     }
     
-    public function verifyEmail(EmailVerificationRequest $request) {
-        $request->fulfill();
-     
+    
+    public function verifyEmail(EmailVerificationRequest $request)
+    {
+    $request->fulfill();
+
+    // Manually log the user in
+    Auth::login($request->user());
+
+    $user = Auth::user();
+    $role = $user->role->name ?? null;
+    $agency = $user->agency->name ?? null;
+
+    if ($role === 'admin') {
+        switch ($agency) {
+            case 'PNP':
+                return redirect()->route('admin.pnp')->with('verified', 'Email verified successfully.');
+            case 'BFP':
+                return redirect()->route('admin.bfp')->with('verified', 'Email verified successfully.');
+            case 'MDRRMO':
+                return redirect()->route('admin.mdrrmo')->with('verified', 'Email verified successfully.');
+            case 'MHO':
+                return redirect()->route('admin.mho')->with('verified', 'Email verified successfully.');
+            case 'COAST GUARD':
+                return redirect()->route('admin.coastguard')->with('verified', 'Email verified successfully.');
+            case 'LGU':
+                return redirect()->route('admin.lgu')->with('verified', 'Email verified successfully.');
+            default:
+                return redirect()->route('welcome')->with('verified', 'Email verified successfully.');
+        }
+    } elseif ($role === 'super admin') {
+        return redirect()->route('superadmin.dashboard')->with('verified', 'Email verified successfully.');
+    } elseif ($role === 'user') {
         return redirect()->route('welcome')->with('verified', 'Email verified successfully.');
+    }
+
+    return redirect()->route('welcome')->with('verified', 'Email verified successfully.');
     }
 }
