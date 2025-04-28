@@ -1,5 +1,4 @@
-<!--message-->
-
+<!--call-->
 
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid my-2">
@@ -8,39 +7,41 @@
                 <div class="card shadow-lg border-0">
                     <div class="card-body">
                         <div class="row">
-                            <!-- Left Column: Message and Sender Information -->
+                            <!-- Left Column: Call and Caller Information -->
                             <div class="col-md-6 border-end">
                                 <div class="px-4">
-                                    <h3 class="mb-4 text-primary">Message Details</h3>
+                                    <h3 class="mb-4 text-primary">Call Details</h3>
 
                                     <div class="row mb-3">
                                         <div class="col-6">
-                                            <h5 class="text-muted">Sender Contact</h5>
-                                            <p class="text-dark"><?php echo e($message->sender_contact); ?></p>
+                                            <h5 class="text-muted">Caller Contact</h5>
+                                            <p class="text-dark"><?php echo e($call->caller_contact); ?></p>
                                         </div>
                                         <div class="col-6">
                                             <h5 class="text-muted">Date Received</h5>
-                                            <p class="text-dark"><?php echo e($message->created_at->format('F j, Y g:i A')); ?></p>
+                                            <p class="text-dark"><?php echo e($call->created_at->format('F j, Y g:i A')); ?></p>
                                         </div>
                                     </div>
 
                                     <div class="mb-3">
                                         <h5 class="text-muted">Status</h5>
                                         <span
-                                            class="badge bg-<?php echo e($message->status_id == 1 ? 'danger' : ($message->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
-                                            <?php echo e($message->status->name); ?>
+                                            class="badge bg-<?php echo e($call->status_id == 1 ? 'danger' : ($call->status_id == 2 ? 'warning text-dark' : 'success')); ?> px-3 py-2">
+                                            <?php echo e($call->status->name); ?>
 
                                         </span>
                                     </div>
 
-                                    <div class="mb-3">
-                                        <h5 class="text-muted">Message Content</h5>
-                                        <p class="text-dark"><?php echo e($message->message_content); ?></p>
-                                    </div>
+                                    <?php if($call->caller_description): ?>
+                                        <div class="mb-3">
+                                            <h5 class="text-muted">Caller Description</h5>
+                                            <p class="text-dark"><?php echo e($call->caller_description); ?></p>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <hr>
 
-                                    <h3 class="mb-4 text-primary">Sender Profile</h3>
+                                    <h3 class="mb-4 text-primary">Caller Profile</h3>
                                     <?php if($profile): ?>
                                         <div class="row">
                                             <div class="col-6">
@@ -51,13 +52,10 @@
                                                     <?php echo e($profile->suffix); ?></p>
                                                 <p><strong>Sex:</strong> <?php echo e($profile->sex); ?></p>
                                                 <p><strong>Marital Status:</strong> <?php echo e($profile->marital_status); ?></p>
-                                                <p><strong>Date of Birth:</strong> <?php echo e($profile->dob); ?></p>
                                             </div>
                                             <div class="col-6">
                                                 <p><strong>Zone:</strong> <?php echo e($profile->zone); ?></p>
                                                 <p><strong>Barangay:</strong> <?php echo e($profile->nameofbarangay); ?></p>
-                                                <p><strong>Religion:</strong> <?php echo e($profile->religion); ?></p>
-                                                <p><strong>Birth Place:</strong> <?php echo e($profile->birth_place); ?></p>
                                             </div>
                                         </div>
                                     <?php else: ?>
@@ -70,8 +68,8 @@
                             <div class="col-md-6">
                                 <div class="px-4">
                                     <h3 class="mb-4 text-primary">Requests</h3>
-                                    <?php if($message->requests->isNotEmpty()): ?>
-                                        <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <?php if($call->requests->isNotEmpty()): ?>
+                                        <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $index => $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <div class="card mb-3 shadow-sm">
                                                 <div class="card-body">
                                                     <h5 class="card-title text-muted">Request <?php echo e($index + 1); ?></h5>
@@ -83,13 +81,7 @@
 
                                                             </p>
                                                             <p><strong>Time:</strong>
-                                                                <?php if($request->created_at): ?>
-                                                                    <?php echo e($request->created_at->format('F j, Y g:i A')); ?>
-
-                                                                <?php else: ?>
-                                                                    <em>No date available</em>
-                                                                <?php endif; ?>
-                                                            </p>
+                                                                <?php echo e($request->created_at->format('F j, Y g:i A')); ?></p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
@@ -116,15 +108,15 @@
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                     <?php else: ?>
-                                        <p class="text-muted">No requests found for this message.</p>
+                                        <p class="text-muted">No requests found for this call.</p>
                                     <?php endif; ?>
 
                                     <hr>
 
                                     <h3 class="mb-4 text-primary">Status Log</h3>
-                                    <?php if($message->statusLogMessages->isNotEmpty()): ?>
+                                    <?php if($call->statusLogCalls->isNotEmpty()): ?>
                                         <div class="list-group">
-                                            <?php $__currentLoopData = $message->statusLogMessages; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                            <?php $__currentLoopData = $call->statusLogCalls; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $log): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                 <div class="list-group-item list-group-item-action mb-2">
                                                     <div class="d-flex w-100 justify-content-between">
                                                         <div class="d-flex align-items-center">
@@ -136,10 +128,10 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'lgu-logo.png';
+                                                                            $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            $agencyLogoPath = 'coastguard-logo.jpg';
                                                                             break;
                                                                         case 5:
                                                                             $agencyLogoPath = 'mho-logo.jpg';
@@ -191,47 +183,47 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="<?php echo e(route('lgu.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('coastguard.emergencycall.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
-                            <form id="respondedForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('lgu.emergencymessage.responded', $message->id)); ?>" method="POST"
+                            <form id="respondedForm-<?php echo e($call->id); ?>"
+                                action="<?php echo e(route('coastguard.emergencycall.responded', $call->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
-                                <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
+                                <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
+                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isNotEmpty() ? 'Mark as responded' : 'No requests to respond to')); ?>">
                                     <button type="button"
-                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($message->id); ?>')"
+                                        onclick="confirmResponded(event, 'respondedForm-<?php echo e($call->id); ?>')"
                                         class="btn btn-sm btn-warning action-btn"
-                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ''); ?>>
+                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ''); ?>>
                                         Responded
                                     </button>
                                 </span>
                             </form>
 
-                            <form id="completeForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('lgu.emergencymessage.complete', $message->id)); ?>" method="POST"
+                            <form id="completeForm-<?php echo e($call->id); ?>"
+                                action="<?php echo e(route('coastguard.emergencycall.complete', $call->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
-                                    title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : '')))); ?>">
+                                    title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
                                     <button type="button"
-                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($message->id); ?>')"
+                                        onclick="confirmComplete(event, 'completeForm-<?php echo e($call->id); ?>')"
                                         class="btn btn-sm btn-success action-btn"
-                                        <?php echo e($message->status_id == 3 || $message->requests->isEmpty() ? 'disabled' : ($message->can_complete ? '' : 'disabled')); ?>>
+                                        <?php echo e($call->status_id == 3 || $call->requests->isEmpty() ? 'disabled' : ($call->can_complete ? '' : 'disabled')); ?>>
                                         Complete
                                     </button>
                                 </span>
                             </form>
-                            <?php if($message->status_id == 3): ?>
+                            <?php if($call->status_id == 3): ?>
                                 <?php
                                     $allCasesHaveReports = true;
                                     $caseIds = [];
 
-                                    // Collect all incident case IDs for this message
-                                    foreach ($message->requests as $request) {
+                                    // Collect all incident case IDs for this call
+                                    foreach ($call->requests as $request) {
                                         if ($request->incidentCase) {
                                             $caseIds[] = $request->incidentCase->id;
                                         }
@@ -276,7 +268,7 @@
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <form
-                                                    action="<?php echo e(route('lgu.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message'])); ?>"
+                                                    action="<?php echo e(route('coastguard.incident_reports.generate.with_source', ['id' => $call->id, 'source_type' => 'call'])); ?>"
                                                     method="GET">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="generateReportModalLabel">Generate
@@ -286,21 +278,17 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="mb-4">
-                                                            <h6 class="text-muted mb-3">Message Information</h6>
+                                                            <h6 class="text-muted mb-3">Call Information</h6>
                                                             <div class="row">
                                                                 <div class="col-md-6">
-                                                                    <p><strong>Sender Contact:</strong>
-                                                                        <?php echo e($message->sender_contact); ?></p>
+                                                                    <p><strong>Caller Contact:</strong>
+                                                                        <?php echo e($call->caller_contact); ?></p>
                                                                     <p><strong>Date Received:</strong>
-                                                                        <?php echo e($message->created_at->format('F j, Y g:i A')); ?>
-
-                                                                    </p>
+                                                                        <?php echo e($call->created_at->format('F j, Y g:i A')); ?></p>
                                                                 </div>
                                                                 <div class="col-md-6">
-                                                                    <p><strong>Message Type:</strong>
-                                                                        <?php echo e($message->sender_type); ?></p>
                                                                     <p><strong>Case Number(s):</strong>
-                                                                        <?php $__currentLoopData = $message->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                        <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                                                             <?php if($request->incidentCase): ?>
                                                                                 <?php
                                                                                     $hasReport = \App\Models\IncidentReport::where(
@@ -355,11 +343,11 @@
                                     </div>
                                 <?php endif; ?>
                             <?php endif; ?>
-
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 <?php $__env->stopSection(); ?>
@@ -373,27 +361,28 @@
             });
         });
     </script>
-
+    <!--sweet alert-->
     <!--Mark as Responded-->
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "<?php echo e(session('success')); ?>";
-            let errorMessage = "<?php echo e(session('error')); ?>";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false
@@ -509,4 +498,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/emergency-messages/view.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.coastguard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/coastguard/emergency-calls/view.blade.php ENDPATH**/ ?>

@@ -1,3 +1,4 @@
+<!--call-->
 @extends('layouts.pnp')
 @section('content')
     <div class="container-fluid my-2">
@@ -29,6 +30,13 @@
                                             {{ $call->status->name }}
                                         </span>
                                     </div>
+
+                                    @if ($call->caller_description)
+                                        <div class="mb-3">
+                                            <h5 class="text-muted">Caller Description</h5>
+                                            <p class="text-dark">{{ $call->caller_description }}</p>
+                                        </div>
+                                    @endif
 
                                     <hr>
 
@@ -116,19 +124,19 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'bfp-logo.png';
+                                                                            $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         case 5:
-                                                                            $agencyLogoPath = 'mho-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         case 6:
                                                                             $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 7:
-                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         default:
                                                                             $agencyLogoPath = '';
@@ -202,10 +210,104 @@
                                     </button>
                                 </span>
                             </form>
+                            @if ($call->status_id == 3)
+                                @php
+                                    $allCasesHaveReports = true;
+                                    $caseIds = [];
+                                    $reportsInfo = [];
+
+                                    // Collect all incident case IDs for this call
+                                    foreach ($call->requests as $request) {
+                                        if ($request->incidentCase) {
+                                            $caseIds[] = $request->incidentCase->id;
+
+                                            // Check if this case has a report and store report info
+                                            $report = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $request->incidentCase->id,
+                                            )->first();
+                                            if ($report) {
+                                                $reportsInfo[] = [
+                                                    'id' => $report->id,
+                                                    'case_number' => $request->incidentCase->case_number,
+                                                ];
+                                            }
+                                        }
+                                    }
+
+                                    // Check if each case already has a report
+                                    if (!empty($caseIds)) {
+                                        foreach ($caseIds as $caseId) {
+                                            $reportExists = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $caseId,
+                                            )->exists();
+                                            if (!$reportExists) {
+                                                $allCasesHaveReports = false;
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // No cases, so can't generate report
+                                        $allCasesHaveReports = true;
+                                    }
+                                @endphp
+
+                                <span class="d-inline-block">
+                                    @if (!$allCasesHaveReports)
+                                        <button type="button" class="btn btn-sm btn-primary action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                                            Generate Report
+                                        </button>
+                                    @else
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                                title="Reports already generated for all cases">
+                                                Reports Generated
+                                            </button>
+
+                                            @if (!empty($reportsInfo))
+                                                <button type="button"
+                                                    class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    @foreach ($reportsInfo as $reportInfo)
+                                                        <li class="dropdown-item-text">
+                                                            <small class="text-muted">Case
+                                                                #{{ $reportInfo['case_number'] }}</small>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('pnp.incident_reports.view', $reportInfo['id']) }}"
+                                                                target="_blank">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('pnp.incident_reports.download', $reportInfo['id']) }}">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a>
+                                                        </li>
+                                                        @if (!$loop->last)
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                        @endif
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </span>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 @endsection
@@ -270,7 +372,7 @@
                 },
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -336,7 +438,7 @@
                 confirmButtonText: "Yes, mark as completed!",
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }

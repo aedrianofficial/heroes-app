@@ -1,3 +1,4 @@
+<!--message-->
 @extends('layouts.lgu')
 
 @section('content')
@@ -83,6 +84,7 @@
                                                                 @else
                                                                     <em>No date available</em>
                                                                 @endif
+                                                            </p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
@@ -181,13 +183,13 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="{{ route('bfp.emergencymessage.index') }}" class="btn btn-outline-secondary">
+                        <a href="{{ route('lgu.emergencymessage.index') }}" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-{{ $message->id }}"
-                                action="{{ route('lgu.emergencymessage.responded', $message->id) }}"
-                                method="POST" class="d-inline">
+                                action="{{ route('lgu.emergencymessage.responded', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <input type="hidden" name="message_id" value="{{ $message->id }}">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -202,8 +204,8 @@
                             </form>
 
                             <form id="completeForm-{{ $message->id }}"
-                                action="{{ route('lgu.emergencymessage.complete', $message->id) }}"
-                                method="POST" class="d-inline">
+                                action="{{ route('lgu.emergencymessage.complete', $message->id) }}" method="POST"
+                                class="d-inline">
                                 @csrf
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
                                     title="{{ $message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : ''))) }}">
@@ -215,6 +217,100 @@
                                     </button>
                                 </span>
                             </form>
+                            @if ($message->status_id == 3)
+                                @php
+                                    $allCasesHaveReports = true;
+                                    $caseIds = [];
+                                    $reportsInfo = [];
+
+                                    // Collect all incident case IDs for this message
+                                    foreach ($message->requests as $request) {
+                                        if ($request->incidentCase) {
+                                            $caseIds[] = $request->incidentCase->id;
+
+                                            // Check if this case has a report and store report info
+                                            $report = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $request->incidentCase->id,
+                                            )->first();
+                                            if ($report) {
+                                                $reportsInfo[] = [
+                                                    'id' => $report->id,
+                                                    'case_number' => $request->incidentCase->case_number,
+                                                ];
+                                            }
+                                        }
+                                    }
+
+                                    // Check if each case already has a report
+                                    if (!empty($caseIds)) {
+                                        foreach ($caseIds as $caseId) {
+                                            $reportExists = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $caseId,
+                                            )->exists();
+                                            if (!$reportExists) {
+                                                $allCasesHaveReports = false;
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // No cases, so can't generate report
+                                        $allCasesHaveReports = true;
+                                    }
+                                @endphp
+
+                                <span class="d-inline-block">
+                                    @if (!$allCasesHaveReports)
+                                        <button type="button" class="btn btn-sm btn-primary action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                                            Generate Report
+                                        </button>
+                                    @else
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                                title="Reports already generated for all cases">
+                                                Reports Generated
+                                            </button>
+
+                                            @if (!empty($reportsInfo))
+                                                <button type="button"
+                                                    class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    @foreach ($reportsInfo as $reportInfo)
+                                                        <li class="dropdown-item-text">
+                                                            <small class="text-muted">Case
+                                                                #{{ $reportInfo['case_number'] }}</small>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('lgu.incident_reports.view', $reportInfo['id']) }}"
+                                                                target="_blank">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="{{ route('lgu.incident_reports.download', $reportInfo['id']) }}">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a>
+                                                        </li>
+                                                        @if (!$loop->last)
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                        @endif
+                                                    @endforeach
+                                                </ul>
+                                            @endif
+                                        </div>
+                                    @endif
+                                </span>
+                            @endif
+
                         </div>
                     </div>
                 </div>
@@ -226,13 +322,13 @@
     <!--Initialize tooltips-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            var tooltipTriggerList = [].slice.message(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl);
             });
         });
     </script>
-    <!--sweet alert-->
+
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -304,23 +400,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "{{ session('success') }}";
-            let errorMessage = "{{ session('error') }}";
+            let successCall = "{{ session('success') }}";
+            let errorCall = "{{ session('error') }}";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false

@@ -1,3 +1,6 @@
+<!--message-->
+
+
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid my-2">
         <div class="row justify-content-center">
@@ -86,6 +89,7 @@
                                                                 <?php else: ?>
                                                                     <em>No date available</em>
                                                                 <?php endif; ?>
+                                                            </p>
                                                         </div>
                                                         <div class="col-6">
                                                             <h6 class="text-muted">Assigned Agencies</h6>
@@ -132,19 +136,19 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'bfp-logo.png';
+                                                                            $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         case 5:
-                                                                            $agencyLogoPath = 'mho-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         case 6:
                                                                             $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 7:
-                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            $agencyLogoPath = 'pnp-logo.jpg';
                                                                             break;
                                                                         default:
                                                                             $agencyLogoPath = '';
@@ -187,13 +191,13 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="<?php echo e(route('bfp.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('pnp.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('pnp.emergencymessage.responded', $message->id)); ?>"
-                                method="POST" class="d-inline">
+                                action="<?php echo e(route('pnp.emergencymessage.responded', $message->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -208,8 +212,8 @@
                             </form>
 
                             <form id="completeForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('pnp.emergencymessage.complete', $message->id)); ?>"
-                                method="POST" class="d-inline">
+                                action="<?php echo e(route('pnp.emergencymessage.complete', $message->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
                                     title="<?php echo e($message->status_id == 3 ? 'This case is already completed' : ($message->requests->isEmpty() ? 'No requests to complete' : ($message->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($message->missing_agencies) ? ' (' . implode(', ', $message->missing_agencies) . ')' : '')))); ?>">
@@ -221,6 +225,100 @@
                                     </button>
                                 </span>
                             </form>
+                            <?php if($message->status_id == 3): ?>
+                                <?php
+                                    $allCasesHaveReports = true;
+                                    $caseIds = [];
+                                    $reportsInfo = [];
+
+                                    // Collect all incident case IDs for this message
+                                    foreach ($message->requests as $request) {
+                                        if ($request->incidentCase) {
+                                            $caseIds[] = $request->incidentCase->id;
+
+                                            // Check if this case has a report and store report info
+                                            $report = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $request->incidentCase->id,
+                                            )->first();
+                                            if ($report) {
+                                                $reportsInfo[] = [
+                                                    'id' => $report->id,
+                                                    'case_number' => $request->incidentCase->case_number,
+                                                ];
+                                            }
+                                        }
+                                    }
+
+                                    // Check if each case already has a report
+                                    if (!empty($caseIds)) {
+                                        foreach ($caseIds as $caseId) {
+                                            $reportExists = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $caseId,
+                                            )->exists();
+                                            if (!$reportExists) {
+                                                $allCasesHaveReports = false;
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // No cases, so can't generate report
+                                        $allCasesHaveReports = true;
+                                    }
+                                ?>
+
+                                <span class="d-inline-block">
+                                    <?php if(!$allCasesHaveReports): ?>
+                                        <button type="button" class="btn btn-sm btn-primary action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                                            Generate Report
+                                        </button>
+                                    <?php else: ?>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                                title="Reports already generated for all cases">
+                                                Reports Generated
+                                            </button>
+
+                                            <?php if(!empty($reportsInfo)): ?>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <?php $__currentLoopData = $reportsInfo; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reportInfo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <li class="dropdown-item-text">
+                                                            <small class="text-muted">Case
+                                                                #<?php echo e($reportInfo['case_number']); ?></small>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="<?php echo e(route('pnp.incident_reports.view', $reportInfo['id'])); ?>"
+                                                                target="_blank">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="<?php echo e(route('pnp.incident_reports.download', $reportInfo['id'])); ?>">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a>
+                                                        </li>
+                                                        <?php if(!$loop->last): ?>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </span>
+                            <?php endif; ?>
+
                         </div>
                     </div>
                 </div>
@@ -238,7 +336,7 @@
             });
         });
     </script>
-    <!--sweet alert-->
+
     <!--Mark as Responded-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
@@ -310,23 +408,23 @@
     <!--Mark as Completed-->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let successMessage = "<?php echo e(session('success')); ?>";
-            let errorMessage = "<?php echo e(session('error')); ?>";
+            let successCall = "<?php echo e(session('success')); ?>";
+            let errorCall = "<?php echo e(session('error')); ?>";
 
-            if (successMessage) {
+            if (successCall) {
                 Swal.fire({
                     title: "Success!",
-                    text: successMessage,
+                    text: successCall,
                     icon: "success",
                     timer: 2000,
                     showConfirmButton: false
                 });
             }
 
-            if (errorMessage) {
+            if (errorCall) {
                 Swal.fire({
                     title: "Error!",
-                    text: errorMessage,
+                    text: errorCall,
                     icon: "error",
                     timer: 2000,
                     showConfirmButton: false

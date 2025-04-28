@@ -17,9 +17,14 @@ use App\Models\MessageView;
 use App\Models\RequestMessageView;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Bfp\IncidentReportController as BfpIncidentReportController;
+use App\Http\Controllers\Pnp\IncidentReportController as PnpIncidentReportController;
 use App\Http\Controllers\CallController;
+use App\Http\Controllers\Coastguard\IncidentReportController as CoastguardIncidentReportController;
 use App\Http\Controllers\IncidentReportController;
+use App\Http\Controllers\Lgu\IncidentReportController as LguIncidentReportController;
 use App\Http\Controllers\Mdrrmo\IncidentReportController as MdrrmoIncidentReportController;
+use App\Http\Controllers\Mho\IncidentReportController as MhoIncidentReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleRequestController;
@@ -384,6 +389,18 @@ Route::middleware(['auth'])->group(function () {
          //cases
          Route::get('pnp/all-call-cases', [PnpController::class, 'callCaseLists'])->name('pnp.call_cases.index');
          Route::get('pnp/all-message-cases', [PnpController::class, 'messageCaseLists'])->name('pnp.message_cases.index');
+
+          //incidentReport
+          Route::get('pnp/incident_reports/generate/{id}', [PnpIncidentReportController::class, 'generateReport'])->name('pnp.incident_reports.generate');
+          Route::get('pnp/incident_reports/view/{reportId}', [PnpIncidentReportController::class, 'viewReport'])->name('pnp.incident_reports.view');
+          Route::get('pnp/incident_reports/download/{reportId}', [PnpIncidentReportController::class, 'downloadReport'])->name('pnp.incident_reports.download');
+          Route::get('pnp/incident_reports/', [PnpIncidentReportController::class, 'list'])->name('pnp.incident_reports.index');
+      
+        // Additional route for specifying source type (call or message)
+         Route::get('pnp/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+         $request->merge(['source_type' => $source_type]);
+         return app(PnpIncidentReportController::class)->generateReport($request, $id);
+         })->name('pnp.incident_reports.generate.with_source');
     });
 
     // Bureau of Fire Protection (BFP)
@@ -424,6 +441,18 @@ Route::middleware(['auth'])->group(function () {
         //cases
         Route::get('bfp/all-call-cases', [BfpController::class, 'callCaseLists'])->name('bfp.call_cases.index');
         Route::get('bfp/all-message-cases', [BfpController::class, 'messageCaseLists'])->name('bfp.message_cases.index');
+
+         //incidentReport
+         Route::get('bfp/incident_reports/generate/{id}', [BfpIncidentReportController::class, 'generateReport'])->name('bfp.incident_reports.generate');
+         Route::get('bfp/incident_reports/view/{reportId}', [BfpIncidentReportController::class, 'viewReport'])->name('bfp.incident_reports.view');
+         Route::get('bfp/incident_reports/download/{reportId}', [BfpIncidentReportController::class, 'downloadReport'])->name('bfp.incident_reports.download');
+         Route::get('bfp/incident_reports/', [BfpIncidentReportController::class, 'list'])->name('bfp.incident_reports.index');
+     
+       // Additional route for specifying source type (call or message)
+        Route::get('bfp/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+        $request->merge(['source_type' => $source_type]);
+        return app(BfpIncidentReportController::class)->generateReport($request, $id);
+        })->name('bfp.incident_reports.generate.with_source');
     });
     
     //Municipal Disaster Risk Reduction and Management Office (MDRRMO)
@@ -509,6 +538,18 @@ Route::middleware(['auth'])->group(function () {
         //cases
         Route::get('mho/all-call-cases', [MhoController::class, 'callCaseLists'])->name('mho.call_cases.index');
         Route::get('mho/all-message-cases', [MhoController::class, 'messageCaseLists'])->name('mho.message_cases.index');
+
+         //incidentReport
+         Route::get('mho/incident_reports/generate/{id}', [MhoIncidentReportController::class, 'generateReport'])->name('mho.incident_reports.generate');
+         Route::get('mho/incident_reports/view/{reportId}', [MhoIncidentReportController::class, 'viewReport'])->name('mho.incident_reports.view');
+         Route::get('mho/incident_reports/download/{reportId}', [MhoIncidentReportController::class, 'downloadReport'])->name('mho.incident_reports.download');
+         Route::get('mho/incident_reports/', [MhoIncidentReportController::class, 'list'])->name('mho.incident_reports.index');
+     
+       // Additional route for specifying source type (call or message)
+        Route::get('mho/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+        $request->merge(['source_type' => $source_type]);
+        return app(MhoIncidentReportController::class)->generateReport($request, $id);
+        })->name('mho.incident_reports.generate.with_source');
     });
 
     // Coast Guard
@@ -543,6 +584,18 @@ Route::middleware(['auth'])->group(function () {
           //cases
           Route::get('coastguard/all-call-cases', [CoastGuardController::class, 'callCaseLists'])->name('coastguard.call_cases.index');
           Route::get('coastguard/all-message-cases', [CoastGuardController::class, 'messageCaseLists'])->name('coastguard.message_cases.index');
+
+           //incidentReport
+         Route::get('coastguard/incident_reports/generate/{id}', [CoastguardIncidentReportController::class, 'generateReport'])->name('coastguard.incident_reports.generate');
+         Route::get('coastguard/incident_reports/view/{reportId}', [CoastguardIncidentReportController::class, 'viewReport'])->name('coastguard.incident_reports.view');
+         Route::get('coastguard/incident_reports/download/{reportId}', [CoastguardIncidentReportController::class, 'downloadReport'])->name('coastguard.incident_reports.download');
+         Route::get('coastguard/incident_reports/', [CoastguardIncidentReportController::class, 'list'])->name('coastguard.incident_reports.index');
+     
+        // Additional route for specifying source type (call or message)
+        Route::get('coastguard/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+        $request->merge(['source_type' => $source_type]);
+        return app(CoastguardIncidentReportController::class)->generateReport($request, $id);
+        })->name('coastguard.incident_reports.generate.with_source');
     });
     
     //Local Government Unit (LGU)
@@ -578,6 +631,18 @@ Route::middleware(['auth'])->group(function () {
          //cases
          Route::get('lgu/all-call-cases', [LguController::class, 'callCaseLists'])->name('lgu.call_cases.index');
          Route::get('lgu/all-message-cases', [LguController::class, 'messageCaseLists'])->name('lgu.message_cases.index');
+
+            //incidentReport
+            Route::get('lgu/incident_reports/generate/{id}', [LguIncidentReportController::class, 'generateReport'])->name('lgu.incident_reports.generate');
+            Route::get('lgu/incident_reports/view/{reportId}', [LguIncidentReportController::class, 'viewReport'])->name('lgu.incident_reports.view');
+            Route::get('lgu/incident_reports/download/{reportId}', [LguIncidentReportController::class, 'downloadReport'])->name('lgu.incident_reports.download');
+            Route::get('lgu/incident_reports/', [LguIncidentReportController::class, 'list'])->name('lgu.incident_reports.index');
+        
+          // Additional route for specifying source type (call or message)
+           Route::get('lgu/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+           $request->merge(['source_type' => $source_type]);
+           return app(LguIncidentReportController::class)->generateReport($request, $id);
+           })->name('lgu.incident_reports.generate.with_source');
     });
 
     Route::middleware(['role:super admin,DEFAULT'])->group(function () {

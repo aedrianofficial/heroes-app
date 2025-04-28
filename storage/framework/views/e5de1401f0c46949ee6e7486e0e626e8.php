@@ -136,10 +136,10 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'lgu-logo.png';
+                                                                            $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            $agencyLogoPath = 'coastguard-logo.jpg';
                                                                             break;
                                                                         case 5:
                                                                             $agencyLogoPath = 'mho-logo.jpg';
@@ -191,12 +191,12 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="<?php echo e(route('lgu.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('coastguard.emergencymessage.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('lgu.emergencymessage.responded', $message->id)); ?>" method="POST"
+                                action="<?php echo e(route('coastguard.emergencymessage.responded', $message->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="message_id" value="<?php echo e($message->id); ?>">
@@ -212,7 +212,7 @@
                             </form>
 
                             <form id="completeForm-<?php echo e($message->id); ?>"
-                                action="<?php echo e(route('lgu.emergencymessage.complete', $message->id)); ?>" method="POST"
+                                action="<?php echo e(route('coastguard.emergencymessage.complete', $message->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -276,7 +276,7 @@
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
                                                 <form
-                                                    action="<?php echo e(route('lgu.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message'])); ?>"
+                                                    action="<?php echo e(route('coastguard.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message'])); ?>"
                                                     method="GET">
                                                     <div class="modal-header">
                                                         <h5 class="modal-title" id="generateReportModalLabel">Generate
@@ -509,4 +509,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.lgu', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/lgu/emergency-messages/view.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.coastguard', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/coastguard/emergency-messages/view.blade.php ENDPATH**/ ?>

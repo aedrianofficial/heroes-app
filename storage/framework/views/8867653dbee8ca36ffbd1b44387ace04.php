@@ -136,7 +136,7 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'bfp-logo.png';
+                                                                            $agencyLogoPath = 'mdrrmo-logo.png';
                                                                             break;
                                                                         case 4:
                                                                             $agencyLogoPath = 'mdrrmo-logo.jpg';
@@ -148,7 +148,7 @@
                                                                             $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 7:
-                                                                            $agencyLogoPath = 'lgu-logo.jpg';
+                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
                                                                             break;
                                                                         default:
                                                                             $agencyLogoPath = '';

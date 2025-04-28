@@ -1,3 +1,5 @@
+<!--call-->
+
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid my-2">
         <div class="row justify-content-center">
@@ -29,6 +31,13 @@
 
                                         </span>
                                     </div>
+
+                                    <?php if($call->caller_description): ?>
+                                        <div class="mb-3">
+                                            <h5 class="text-muted">Caller Description</h5>
+                                            <p class="text-dark"><?php echo e($call->caller_description); ?></p>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <hr>
 
@@ -122,7 +131,7 @@
                                                                             $agencyLogoPath = 'bfp-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            $agencyLogoPath = 'bfp-logo.jpg';
                                                                             break;
                                                                         case 5:
                                                                             $agencyLogoPath = 'mho-logo.jpg';
@@ -179,8 +188,8 @@
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('bfp.emergencycall.responded', $call->id)); ?>"
-                                method="POST" class="d-inline">
+                                action="<?php echo e(route('bfp.emergencycall.responded', $call->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -195,8 +204,8 @@
                             </form>
 
                             <form id="completeForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('bfp.emergencycall.complete', $call->id)); ?>"
-                                method="POST" class="d-inline">
+                                action="<?php echo e(route('bfp.emergencycall.complete', $call->id)); ?>" method="POST"
+                                class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
                                     title="<?php echo e($call->status_id == 3 ? 'This case is already completed' : ($call->requests->isEmpty() ? 'No requests to complete' : ($call->can_complete ? 'Mark as Complete' : 'Required agencies must respond first' . (!empty($call->missing_agencies) ? ' (' . implode(', ', $call->missing_agencies) . ')' : '')))); ?>">
@@ -208,10 +217,137 @@
                                     </button>
                                 </span>
                             </form>
+                            <?php if($call->status_id == 3): ?>
+                                <?php
+                                    $allCasesHaveReports = true;
+                                    $caseIds = [];
+
+                                    // Collect all incident case IDs for this call
+                                    foreach ($call->requests as $request) {
+                                        if ($request->incidentCase) {
+                                            $caseIds[] = $request->incidentCase->id;
+                                        }
+                                    }
+
+                                    // Check if each case already has a report
+                                    if (!empty($caseIds)) {
+                                        foreach ($caseIds as $caseId) {
+                                            $reportExists = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $caseId,
+                                            )->exists();
+                                            if (!$reportExists) {
+                                                $allCasesHaveReports = false;
+                                                break;
+                                            }
+                                        }
+                                    } else {
+                                        // No cases, so can't generate report
+                                        $allCasesHaveReports = true;
+                                    }
+                                ?>
+
+                                <span class="d-inline-block">
+                                    <?php if(!$allCasesHaveReports): ?>
+                                        <button type="button" class="btn btn-sm btn-primary action-btn"
+                                            data-bs-toggle="modal" data-bs-target="#generateReportModal">
+                                            Generate Report
+                                        </button>
+                                    <?php else: ?>
+                                        <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                            title="Reports already generated for all cases">
+                                            Reports Generated
+                                        </button>
+                                    <?php endif; ?>
+                                </span>
+
+                                <!-- Generate Report Modal -->
+                                <?php if(!$allCasesHaveReports): ?>
+                                    <div class="modal fade" id="generateReportModal" tabindex="-1"
+                                        aria-labelledby="generateReportModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-lg">
+                                            <div class="modal-content">
+                                                <form
+                                                    action="<?php echo e(route('bfp.incident_reports.generate.with_source', ['id' => $call->id, 'source_type' => 'call'])); ?>"
+                                                    method="GET">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="generateReportModalLabel">Generate
+                                                            Incident Report</h5>
+                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                            aria-label="Close"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-4">
+                                                            <h6 class="text-muted mb-3">Call Information</h6>
+                                                            <div class="row">
+                                                                <div class="col-md-6">
+                                                                    <p><strong>Caller Contact:</strong>
+                                                                        <?php echo e($call->caller_contact); ?></p>
+                                                                    <p><strong>Date Received:</strong>
+                                                                        <?php echo e($call->created_at->format('F j, Y g:i A')); ?></p>
+                                                                </div>
+                                                                <div class="col-md-6">
+                                                                    <p><strong>Case Number(s):</strong>
+                                                                        <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                                            <?php if($request->incidentCase): ?>
+                                                                                <?php
+                                                                                    $hasReport = \App\Models\IncidentReport::where(
+                                                                                        'incident_case_id',
+                                                                                        $request->incidentCase->id,
+                                                                                    )->exists();
+                                                                                ?>
+                                                                                <span
+                                                                                    class="badge <?php echo e($hasReport ? 'bg-success' : 'bg-info'); ?>">
+                                                                                    <?php echo e($request->incidentCase->case_number); ?>
+
+                                                                                    <?php echo e($hasReport ? '✓' : ''); ?>
+
+                                                                                </span>
+                                                                            <?php endif; ?>
+                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                                    </p>
+                                                                </div>
+                                                            </div>
+                                                            <?php if(count($caseIds) > 0): ?>
+                                                                <div class="alert alert-info mt-2">
+                                                                    <small>
+                                                                        <i class="fas fa-info-circle"></i>
+                                                                        Reports will only be generated for cases that don't
+                                                                        already have one.
+                                                                        Cases with existing reports are marked with ✓.
+                                                                    </small>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="resolution_details" class="form-label">Resolution
+                                                                Details <span class="text-danger">*</span></label>
+                                                            <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required
+                                                                placeholder="Provide detailed information about how this incident was resolved..."></textarea>
+                                                            <small class="form-text text-muted">
+                                                                Include actions taken, resources deployed, outcomes, and any
+                                                                follow-up requirements.
+                                                            </small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary">Generate
+                                                            Report</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 <?php $__env->stopSection(); ?>
@@ -276,7 +412,7 @@
                 },
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }
@@ -342,7 +478,7 @@
                 confirmButtonText: "Yes, mark as completed!",
                 preConfirm: (logDetails) => {
                     if (!logDetails) {
-                        Swal.showValidationCall("Log details are required!");
+                        Swal.showValidationMessage("Log details are required!");
                     }
                     return logDetails;
                 }
