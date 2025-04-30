@@ -143,7 +143,7 @@
                                                                             $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 7:
-                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
+                                                                            $agencyLogoPath = 'lgu-logo.jpg';
                                                                             break;
                                                                         default:
                                                                             $agencyLogoPath = '';
@@ -266,49 +266,114 @@
                                             data-bs-toggle="modal" data-bs-target="#generateReportModal">
                                             Generate Report
                                         </button>
-                                    @else
-                                        <div class="btn-group">
-                                            <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
-                                                title="Reports already generated for all cases">
-                                                Reports Generated
-                                            </button>
 
-                                            @if (!empty($reportsInfo))
-                                                <button type="button"
-                                                    class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <span class="visually-hidden">Toggle Dropdown</span>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    @foreach ($reportsInfo as $reportInfo)
-                                                        <li class="dropdown-item-text">
-                                                            <small class="text-muted">Case
-                                                                #{{ $reportInfo['case_number'] }}</small>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('mdrrmo.incident_reports.view', $reportInfo['id']) }}"
-                                                                target="_blank">
-                                                                <i class="fas fa-eye me-1"></i> View
-                                                            </a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="dropdown-item"
-                                                                href="{{ route('mdrrmo.incident_reports.download', $reportInfo['id']) }}">
-                                                                <i class="fas fa-download me-1"></i> Download
-                                                            </a>
-                                                        </li>
-                                                        @if (!$loop->last)
-                                                            <li>
-                                                                <hr class="dropdown-divider">
-                                                            </li>
-                                                        @endif
-                                                    @endforeach
-                                                </ul>
-                                            @endif
+                                        <!-- Generate Report Modal -->
+                                        <div class="modal fade" id="generateReportModal" tabindex="-1"
+                                            aria-labelledby="generateReportModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog modal-lg">
+                                                <div class="modal-content">
+                                                    <form
+                                                        action="{{ route('mdrrmo.incident_reports.generate.with_source', ['id' => $message->id, 'source_type' => 'message']) }}"
+                                                        method="GET">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="generateReportModalLabel">Generate
+                                                                Incident Report</h5>
+                                                            <button type="button" class="btn-close"
+                                                                data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="mb-4">
+                                                                <h6 class="text-muted mb-3">Message Information</h6>
+                                                                <div class="row">
+                                                                    <div class="col-md-6">
+                                                                        <p><strong>Sender Contact:</strong>
+                                                                            {{ $message->sender_contact }}</p>
+                                                                        <p><strong>Date Received:</strong>
+                                                                            {{ $message->created_at->format('F j, Y g:i A') }}
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="col-md-6">
+                                                                        <p><strong>Message Type:</strong>
+                                                                            {{ $message->sender_type }}</p>
+                                                                        <p><strong>Case Number(s):</strong>
+                                                                            @foreach ($message->requests as $request)
+                                                                                @if ($request->incidentCase)
+                                                                                    <span
+                                                                                        class="badge bg-info">{{ $request->incidentCase->case_number }}</span>
+                                                                                @endif
+                                                                            @endforeach
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="mb-3">
+                                                                <label for="resolution_details"
+                                                                    class="form-label">Resolution
+                                                                    Details <span class="text-danger">*</span></label>
+                                                                <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required
+                                                                    placeholder="Provide detailed information about how this incident was resolved..."></textarea>
+                                                                <small class="form-text text-muted">
+                                                                    Include actions taken, resources deployed, outcomes, and
+                                                                    any
+                                                                    follow-up requirements.
+                                                                </small>
+                                                            </div>
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button type="button" class="btn btn-secondary"
+                                                                data-bs-dismiss="modal">Cancel</button>
+                                                            <button type="submit" class="btn btn-primary">Generate
+                                                                Report</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endif
-                                </span>
+                                @else
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                            title="Reports already generated for all cases">
+                                            Reports Generated
+                                        </button>
+
+                                        @if (!empty($reportsInfo))
+                                            <button type="button"
+                                                class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
+                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="visually-hidden">Toggle Dropdown</span>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                @foreach ($reportsInfo as $reportInfo)
+                                                    <li class="dropdown-item-text">
+                                                        <small class="text-muted">Case
+                                                            #{{ $reportInfo['case_number'] }}</small>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('mdrrmo.incident_reports.view', $reportInfo['id']) }}"
+                                                            target="_blank">
+                                                            <i class="fas fa-eye me-1"></i> View
+                                                        </a>
+                                                    </li>
+                                                    <li>
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('mdrrmo.incident_reports.download', $reportInfo['id']) }}">
+                                                            <i class="fas fa-download me-1"></i> Download
+                                                        </a>
+                                                    </li>
+                                                    @if (!$loop->last)
+                                                        <li>
+                                                            <hr class="dropdown-divider">
+                                                        </li>
+                                                    @endif
+                                                @endforeach
+                                            </ul>
+                                        @endif
+                                    </div>
+                            @endif
+                            </span>
                             @endif
 
                         </div>
@@ -317,6 +382,7 @@
             </div>
         </div>
     </div>
+
 @endsection
 @section('scripts')
     <!--Initialize tooltips-->

@@ -183,12 +183,12 @@
                     </div>
 
                     <div class="card-footer bg-light d-flex justify-content-between">
-                        <a href="<?php echo e(route('mdrrmo.emergencycall.index')); ?>" class="btn btn-outline-secondary">
+                        <a href="<?php echo e(route('superadmin.emergencycall.index')); ?>" class="btn btn-outline-secondary">
                             <i class="fas fa-arrow-left"></i> Back
                         </a>
                         <div class="d-flex gap-2">
                             <form id="respondedForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('mdrrmo.emergencycall.responded', $call->id)); ?>" method="POST"
+                                action="<?php echo e(route('superadmin.emergencycall.responded', $call->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <input type="hidden" name="call_id" value="<?php echo e($call->id); ?>">
@@ -204,7 +204,7 @@
                             </form>
 
                             <form id="completeForm-<?php echo e($call->id); ?>"
-                                action="<?php echo e(route('mdrrmo.emergencycall.complete', $call->id)); ?>" method="POST"
+                                action="<?php echo e(route('superadmin.emergencycall.complete', $call->id)); ?>" method="POST"
                                 class="d-inline">
                                 <?php echo csrf_field(); ?>
                                 <span class="d-inline-block" tabindex="0" data-bs-toggle="tooltip"
@@ -266,70 +266,6 @@
                                             data-bs-toggle="modal" data-bs-target="#generateReportModal">
                                             Generate Report
                                         </button>
-
-                                        <!-- Generate Report Modal -->
-                                        <div class="modal fade" id="generateReportModal" tabindex="-1"
-                                            aria-labelledby="generateReportModalLabel" aria-hidden="true">
-                                            <div class="modal-dialog modal-lg">
-                                                <div class="modal-content">
-                                                    <form
-                                                        action="<?php echo e(route('mdrrmo.incident_reports.generate.with_source', ['id' => $call->id, 'source_type' => 'call'])); ?>"
-                                                        method="GET">
-                                                        <div class="modal-header">
-                                                            <h5 class="modal-title" id="generateReportModalLabel">Generate
-                                                                Incident Report</h5>
-                                                            <button type="button" class="btn-close"
-                                                                data-bs-dismiss="modal" aria-label="Close"></button>
-                                                        </div>
-                                                        <div class="modal-body">
-                                                            <div class="mb-4">
-                                                                <h6 class="text-muted mb-3">Call Information</h6>
-                                                                <div class="row">
-                                                                    <div class="col-md-6">
-                                                                        <p><strong>Caller Contact:</strong>
-                                                                            <?php echo e($call->caller_contact); ?></p>
-                                                                        <p><strong>Date Received:</strong>
-                                                                            <?php echo e($call->created_at->format('F j, Y g:i A')); ?>
-
-                                                                        </p>
-                                                                    </div>
-                                                                    <div class="col-md-6">
-
-                                                                        <p><strong>Case Number(s):</strong>
-                                                                            <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                                <?php if($request->incidentCase): ?>
-                                                                                    <span
-                                                                                        class="badge bg-info"><?php echo e($request->incidentCase->case_number); ?></span>
-                                                                                <?php endif; ?>
-                                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="mb-3">
-                                                                <label for="resolution_details"
-                                                                    class="form-label">Resolution
-                                                                    Details <span class="text-danger">*</span></label>
-                                                                <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required
-                                                                    placeholder="Provide detailed information about how this incident was resolved..."></textarea>
-                                                                <small class="form-text text-muted">
-                                                                    Include actions taken, resources deployed, outcomes, and
-                                                                    any
-                                                                    follow-up requirements.
-                                                                </small>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary"
-                                                                data-bs-dismiss="modal">Cancel</button>
-                                                            <button type="submit" class="btn btn-primary">Generate
-                                                                Report</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div>
                                     <?php else: ?>
                                         <div class="btn-group">
                                             <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
@@ -351,14 +287,14 @@
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item"
-                                                                href="<?php echo e(route('mdrrmo.incident_reports.view', $reportInfo['id'])); ?>"
+                                                                href="<?php echo e(route('superadmin.incident_reports.view', $reportInfo['id'])); ?>"
                                                                 target="_blank">
                                                                 <i class="fas fa-eye me-1"></i> View
                                                             </a>
                                                         </li>
                                                         <li>
                                                             <a class="dropdown-item"
-                                                                href="<?php echo e(route('mdrrmo.incident_reports.download', $reportInfo['id'])); ?>">
+                                                                href="<?php echo e(route('superadmin.incident_reports.download', $reportInfo['id'])); ?>">
                                                                 <i class="fas fa-download me-1"></i> Download
                                                             </a>
                                                         </li>
@@ -529,4 +465,4 @@
     </script>
 <?php $__env->stopSection(); ?>
 
-<?php echo $__env->make('layouts.mdrrmo', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/admin/mdrrmo/emergency-calls/view.blade.php ENDPATH**/ ?>
+<?php echo $__env->make('layouts.superadmin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\xampp\htdocs\heroes-app\resources\views/super-admin/emergency-calls/view.blade.php ENDPATH**/ ?>

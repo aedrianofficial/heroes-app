@@ -128,19 +128,19 @@
                                                                             $agencyLogoPath = 'pnp-logo.png';
                                                                             break;
                                                                         case 3:
-                                                                            $agencyLogoPath = 'pnp-logo.png';
+                                                                            $agencyLogoPath = 'bfp-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'pnp-logo.jpg';
+                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
                                                                             break;
                                                                         case 5:
-                                                                            $agencyLogoPath = 'pnp-logo.jpg';
+                                                                            $agencyLogoPath = 'mho-logo.jpg';
                                                                             break;
                                                                         case 6:
                                                                             $agencyLogoPath = 'coastguard-logo.png';
                                                                             break;
                                                                         case 7:
-                                                                            $agencyLogoPath = 'pnp-logo.jpg';
+                                                                            $agencyLogoPath = 'lgu-logo.jpg';
                                                                             break;
                                                                         default:
                                                                             $agencyLogoPath = '';

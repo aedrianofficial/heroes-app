@@ -77,9 +77,56 @@
                 </div>
 
                 <!-- Pagination -->
-                <div class="d-flex justify-content-center mt-4">
-                    <?php echo e($vehicleRequests->links()); ?>
+                <div class="d-flex justify-content-center align-items-center mt-3">
+                    <div>
+                        Showing <?php echo e($vehicleRequests->firstItem()); ?> to <?php echo e($vehicleRequests->lastItem()); ?> of
+                        <?php echo e($vehicleRequests->total()); ?> results
+                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination mb-0">
+                            
+                            <?php if($vehicleRequests->onFirstPage()): ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </span>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo e($vehicleRequests->previousPageUrl()); ?>"
+                                        aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                            <?php endif; ?>
 
+                            
+                            <?php $__currentLoopData = $vehicleRequests->getUrlRange(1, $vehicleRequests->lastPage()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $page => $url): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                <li class="page-item <?php echo e($page == $vehicleRequests->currentPage() ? 'active' : ''); ?>">
+                                    <a class="page-link" href="<?php echo e($url); ?>"><?php echo e($page); ?></a>
+                                </li>
+                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+
+                            
+                            <?php if($vehicleRequests->hasMorePages()): ?>
+                                <li class="page-item">
+                                    <a class="page-link" href="<?php echo e($vehicleRequests->nextPageUrl()); ?>" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            <?php else: ?>
+                                <li class="page-item disabled">
+                                    <span class="page-link" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </span>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                    </nav>
+                </div>
+                <div class="d-flex justify-content-center align-items-center">
+                   <p> Showing <?php echo e($vehicleRequests->firstItem()); ?> to <?php echo e($vehicleRequests->lastItem()); ?> of
+                    <?php echo e($vehicleRequests->total()); ?> results</p>
                 </div>
             </div>
         </div>

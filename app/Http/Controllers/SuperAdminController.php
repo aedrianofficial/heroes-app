@@ -14,6 +14,7 @@ use App\Models\StatusLogMessage;
 use App\Models\User;
 use App\Models\UserContact;
 use App\Models\UserProfile;
+use App\Models\VehicleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -48,8 +49,25 @@ class SuperAdminController extends Controller
     }
     public function superAdminDashboard()
     { 
+       // Fetch reports assigned to PNP (agency_id = 2)
+       $reports = Report::whereHas('user', function ($query) {
+        $query->where('agency_id', 4); 
+        })->with(['incidentType', 'agencies', 'status', 'location', 'reportAttachments'])
+        ->latest()
+        ->get();
+        
+        // Fetch all vehicle requests
+        $vehicleRequests = VehicleRequest::with('requester')
+        ->orderBy('created_at', 'desc')
+        ->paginate(5);
+
+        // Count reports by status
+        $totalReports = $reports->count();
+        $pendingReports = $reports->where('status_id', 1)->count();
+        $respondedReports = $reports->where('status_id', 2)->count();
+        $completedReports = $reports->where('status_id', 3)->count();
         $agencies = Agency::all();
-        return view('super-admin.dashboard',compact('agencies'));
+        return view('super-admin.dashboard',compact('totalReports', 'pendingReports', 'completedReports','respondedReports', 'reports','agencies','vehicleRequests'));
     }
     public function usersList()
     {

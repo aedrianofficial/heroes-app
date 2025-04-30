@@ -24,6 +24,7 @@ use App\Http\Controllers\Coastguard\IncidentReportController as CoastguardIncide
 use App\Http\Controllers\IncidentReportController;
 use App\Http\Controllers\Lgu\IncidentReportController as LguIncidentReportController;
 use App\Http\Controllers\Mdrrmo\IncidentReportController as MdrrmoIncidentReportController;
+use App\Http\Controllers\SuperAdmin\IncidentReportController as SuperAdminIncidentReportController;
 use App\Http\Controllers\Mho\IncidentReportController as MhoIncidentReportController;
 use App\Http\Controllers\SuperAdminController;
 use App\Http\Controllers\UserController;
@@ -690,5 +691,21 @@ Route::middleware(['auth'])->group(function () {
         ->name('superadmin.contact-messages.index');
          Route::delete('/contact-messages/{id}', [App\Http\Controllers\SuperAdmin\ContactMessageController::class, 'destroy'])
         ->name('superadmin.contact-messages.delete');
+
+          //vehicle request
+          Route::post('superadmin/vehicle-requests', [VehicleRequestController::class, 'store'])->name('superadmin.request_vehicle.store');
+          Route::patch('superadmin/vehicle-requests/{id}/status', [VehicleRequestController::class, 'updateStatus'])->name('superadmin.request_vehicle.status');
+ 
+          //incidentReport
+         Route::get('superadmin/incident_reports/generate/{id}', [SuperAdminIncidentReportController::class, 'generateReport'])->name('superadmin.incident_reports.generate');
+         Route::get('superadmin/incident_reports/view/{reportId}', [SuperAdminIncidentReportController::class, 'viewReport'])->name('superadmin.incident_reports.view');
+         Route::get('superadmin/incident_reports/download/{reportId}', [SuperAdminIncidentReportController::class, 'downloadReport'])->name('superadmin.incident_reports.download');
+         Route::get('superadmin/incident_reports/', [SuperAdminIncidentReportController::class, 'list'])->name('superadmin.incident_reports.index');
+     
+           // Additional route for specifying source type (call or message)
+         Route::get('superadmin/incident_reports/generate/{id}/{source_type}', function($id, $source_type, Request $request) {
+         $request->merge(['source_type' => $source_type]);
+         return app(SuperAdminIncidentReportController::class)->generateReport($request, $id);
+         })->name('superadmin.incident_reports.generate.with_source');
     });
 });

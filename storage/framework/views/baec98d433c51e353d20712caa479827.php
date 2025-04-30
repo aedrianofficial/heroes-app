@@ -131,7 +131,7 @@
                                                                             $agencyLogoPath = 'bfp-logo.png';
                                                                             break;
                                                                         case 4:
-                                                                            $agencyLogoPath = 'bfp-logo.jpg';
+                                                                            $agencyLogoPath = 'mdrrmo-logo.jpg';
                                                                             break;
                                                                         case 5:
                                                                             $agencyLogoPath = 'mho-logo.jpg';
@@ -221,11 +221,24 @@
                                 <?php
                                     $allCasesHaveReports = true;
                                     $caseIds = [];
+                                    $reportsInfo = [];
 
                                     // Collect all incident case IDs for this call
                                     foreach ($call->requests as $request) {
                                         if ($request->incidentCase) {
                                             $caseIds[] = $request->incidentCase->id;
+
+                                            // Check if this case has a report and store report info
+                                            $report = \App\Models\IncidentReport::where(
+                                                'incident_case_id',
+                                                $request->incidentCase->id,
+                                            )->first();
+                                            if ($report) {
+                                                $reportsInfo[] = [
+                                                    'id' => $report->id,
+                                                    'case_number' => $request->incidentCase->case_number,
+                                                ];
+                                            }
                                         }
                                     }
 
@@ -254,94 +267,48 @@
                                             Generate Report
                                         </button>
                                     <?php else: ?>
-                                        <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
-                                            title="Reports already generated for all cases">
-                                            Reports Generated
-                                        </button>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn btn-sm btn-secondary action-btn" disabled
+                                                title="Reports already generated for all cases">
+                                                Reports Generated
+                                            </button>
+
+                                            <?php if(!empty($reportsInfo)): ?>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-info dropdown-toggle dropdown-toggle-split"
+                                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <span class="visually-hidden">Toggle Dropdown</span>
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end">
+                                                    <?php $__currentLoopData = $reportsInfo; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $reportInfo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                        <li class="dropdown-item-text">
+                                                            <small class="text-muted">Case
+                                                                #<?php echo e($reportInfo['case_number']); ?></small>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="<?php echo e(route('bfp.incident_reports.view', $reportInfo['id'])); ?>"
+                                                                target="_blank">
+                                                                <i class="fas fa-eye me-1"></i> View
+                                                            </a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="dropdown-item"
+                                                                href="<?php echo e(route('bfp.incident_reports.download', $reportInfo['id'])); ?>">
+                                                                <i class="fas fa-download me-1"></i> Download
+                                                            </a>
+                                                        </li>
+                                                        <?php if(!$loop->last): ?>
+                                                            <li>
+                                                                <hr class="dropdown-divider">
+                                                            </li>
+                                                        <?php endif; ?>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                </ul>
+                                            <?php endif; ?>
+                                        </div>
                                     <?php endif; ?>
                                 </span>
-
-                                <!-- Generate Report Modal -->
-                                <?php if(!$allCasesHaveReports): ?>
-                                    <div class="modal fade" id="generateReportModal" tabindex="-1"
-                                        aria-labelledby="generateReportModalLabel" aria-hidden="true">
-                                        <div class="modal-dialog modal-lg">
-                                            <div class="modal-content">
-                                                <form
-                                                    action="<?php echo e(route('bfp.incident_reports.generate.with_source', ['id' => $call->id, 'source_type' => 'call'])); ?>"
-                                                    method="GET">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="generateReportModalLabel">Generate
-                                                            Incident Report</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        <div class="mb-4">
-                                                            <h6 class="text-muted mb-3">Call Information</h6>
-                                                            <div class="row">
-                                                                <div class="col-md-6">
-                                                                    <p><strong>Caller Contact:</strong>
-                                                                        <?php echo e($call->caller_contact); ?></p>
-                                                                    <p><strong>Date Received:</strong>
-                                                                        <?php echo e($call->created_at->format('F j, Y g:i A')); ?></p>
-                                                                </div>
-                                                                <div class="col-md-6">
-                                                                    <p><strong>Case Number(s):</strong>
-                                                                        <?php $__currentLoopData = $call->requests; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $request): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                                            <?php if($request->incidentCase): ?>
-                                                                                <?php
-                                                                                    $hasReport = \App\Models\IncidentReport::where(
-                                                                                        'incident_case_id',
-                                                                                        $request->incidentCase->id,
-                                                                                    )->exists();
-                                                                                ?>
-                                                                                <span
-                                                                                    class="badge <?php echo e($hasReport ? 'bg-success' : 'bg-info'); ?>">
-                                                                                    <?php echo e($request->incidentCase->case_number); ?>
-
-                                                                                    <?php echo e($hasReport ? '✓' : ''); ?>
-
-                                                                                </span>
-                                                                            <?php endif; ?>
-                                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                                    </p>
-                                                                </div>
-                                                            </div>
-                                                            <?php if(count($caseIds) > 0): ?>
-                                                                <div class="alert alert-info mt-2">
-                                                                    <small>
-                                                                        <i class="fas fa-info-circle"></i>
-                                                                        Reports will only be generated for cases that don't
-                                                                        already have one.
-                                                                        Cases with existing reports are marked with ✓.
-                                                                    </small>
-                                                                </div>
-                                                            <?php endif; ?>
-                                                        </div>
-
-                                                        <div class="mb-3">
-                                                            <label for="resolution_details" class="form-label">Resolution
-                                                                Details <span class="text-danger">*</span></label>
-                                                            <textarea class="form-control" id="resolution_details" name="resolution_details" rows="5" required
-                                                                placeholder="Provide detailed information about how this incident was resolved..."></textarea>
-                                                            <small class="form-text text-muted">
-                                                                Include actions taken, resources deployed, outcomes, and any
-                                                                follow-up requirements.
-                                                            </small>
-                                                        </div>
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary"
-                                                            data-bs-dismiss="modal">Cancel</button>
-                                                        <button type="submit" class="btn btn-primary">Generate
-                                                            Report</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
                             <?php endif; ?>
                         </div>
                     </div>

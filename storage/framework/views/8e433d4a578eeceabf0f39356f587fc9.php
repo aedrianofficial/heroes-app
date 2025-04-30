@@ -39,20 +39,10 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="<?php echo e(route('admin.bfp')); ?>">Dashboard</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle active" href="#" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Reports
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="<?php echo e(route('bfp.reports.create')); ?>">Create a Report</a>
-                            </li>
-                            <li>
-                                <hr class="dropdown-divider">
-                            </li>
-                            <li><a class="dropdown-item" href="<?php echo e(route('bfp.reports.index')); ?>">All Reports</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="<?php echo e(route('bfp.incident_reports.index')); ?>">Reports</a>
                     </li>
+                    
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle active" href="#" role="button"
                             data-bs-toggle="dropdown" aria-expanded="false">
